@@ -1,0 +1,153 @@
+### * cl_membership
+
+## Get the class membership matrix from a partition.
+
+## <TODO>
+## We should really use sparse matrices for the memberships of hard
+## partitions.
+## </TODO>
+
+## <NOTE>
+## Currently, the number of classes to be used for the memberships must
+## not be less than the number of classes in the partition.  We might
+## eventually change this so that "optimal" collapsing of classes is
+## performed (but note that optimality needs to be relative to some
+## dissimilarity measure) ...
+## However, from the discussion of the second method in Gordon and Vichi
+## (2001) we note that whereas optimal assignment is "simple", optimal
+## collapsing (equivalent to partitioning into an arbitrary number of
+## partitions) is of course very hard.
+## </NOTE>
+
+cl_membership <-
+function(x, k = n_of_classes(x))
+{
+    if(k < n_of_classes(x))
+        stop("k cannot be less than the number of classes in x.")
+    UseMethod("cl_membership")
+}
+
+## Default method.
+cl_membership.default <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_class_ids(cl_class_ids(x), k)
+
+## Package stats: kmeans() (R 2.1.0 or better).
+cl_membership.kmeans <- cl_membership.default
+## Package cclust: cclust().
+cl_membership.cclust <- cl_membership.default
+## Package e1071: cmeans(), cshell(), and ufcl() give objects of class
+## "fclust".
+cl_membership.fclust <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_memberships(x$membership, k)
+## Package cluster: clara(), fanny(), and pam() give objects of the
+## respective class inheriting from class "partition".
+cl_membership.fanny <- cl_membership.fclust
+cl_membership.partition <- cl_membership.default
+## Package mclust: Mclust().
+cl_membership.Mclust <- cl_membership.default
+
+## Memberships.
+cl_membership.cl_membership <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_memberships(x, k)
+## (Note: we cannot simply return x in case k equals n_of_classes(x),
+## because ncol(x) might be different.)
+
+## cl_pclust.
+cl_membership.cl_pclust <- cl_membership.fclust
+
+
+print.cl_membership <-
+function(x, ...)
+{
+    print.default(unclass(x), ...)
+    invisible(x)
+}
+
+### * .cl_membership_from_class_ids
+
+.cl_membership_from_class_ids <-
+function(x, k = NULL)
+{
+    x <- factor(x)
+    n_of_objects <- length(x)
+    n_of_classes <- nlevels(x)
+    if(is.null(k))
+        k <- n_of_classes
+    else if(k < n_of_classes)
+        stop("k cannot be less than the number of classes in x.")
+    ## <TODO>
+    ## Should really use a sparse encoding of this ...
+    M <- matrix(0, n_of_objects, k)
+    ## (Could also use .one_entry_per_column(M, as.numeric(x)) <- 1 for
+    ## the time being.)
+    M[cbind(seq(length = n_of_objects), as.numeric(x))] <- 1
+    ## </TODO>
+    if(nlevels(x) == k)
+        colnames(M) <- levels(x)
+    if(!is.null(nm <- names(x)))
+        rownames(M) <- nm
+    attr(M, "n_of_classes") <- n_of_classes
+    attr(M, "is_cl_hard_partition") <- TRUE
+    class(M) <- "cl_membership"
+    M
+}
+
+### * .cl_membership_from_memberships
+
+.cl_membership_from_memberships <-
+function(x, k = NULL)
+{
+    n_of_objects <- nrow(x)
+    x <- x[ , colSums(x) > 0]
+    n_of_classes <- ncol(x)
+    if(!is.null(k)) {
+        if(k < n_of_classes)
+            stop("k cannot be less than the number of classes in x.")
+        if(k > n_of_classes) {
+            ## Fill up with zero columns.
+            x <- cbind(x, matrix(0, nrow(x), k - n_of_classes))
+        }
+    }
+    attr(x, "n_of_classes") <- n_of_classes
+    attr(x, "is_cl_hard_partition") <- all(rowSums(x == 1))
+    class(x) <- "cl_membership"
+    x
+}
+
+### * as.cl_membership
+
+as.cl_membership <-
+function(x)
+    UseMethod("as.cl_membership")
+as.cl_membership.default <-
+function(x)
+{
+    if(inherits(x, "cl_membership"))
+        x
+    else if(is.atomic(x))
+        .cl_membership_from_class_ids(x)
+    else
+        cl_membership(x)
+}
+as.cl_membership.matrix <-
+function(x)
+    .cl_membership_from_memberships(x)
+
+### * print.cl_membership
+
+print.cl_membership <-
+function(x, ...)
+{
+    cat("Memberships:\n")
+    print(matrix(as.vector(x), nr = nrow(x), dimnames = dimnames(x)),
+          ...)
+    invisible(x)
+}
+
+### Local variables: ***
+### mode: outline-minor ***
+### outline-regexp: "### [*]+" ***
+### End: ***

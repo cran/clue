@@ -1,0 +1,155 @@
+\name{agreement}
+\alias{cl_agreement}
+\title{Agreement Between Partitions or Hierarchies}
+\description{Compute the agreement between (ensembles) of partitions or
+  hierarchies.
+}
+\usage{
+cl_agreement(x, y = NULL, method = "euclidean")
+}
+\arguments{
+  \item{x}{an ensemble of partitions or hierarchies, or something
+    coercible to that (see \code{\link{cl_ensemble}}).}
+  \item{y}{\code{NULL} (default), or as for \code{x}.}
+  \item{method}{a character string specifying one of the built-in
+    methods for computing agreement, or a function to be taken as
+    a user-defined method.  If a character string, its lower-cased
+    version is matched against the lower-cased names of the available
+    built-in methods using \code{\link{pmatch}}.  See \bold{Details} for
+    available built-in methods.}
+}
+\value{
+  If \code{y} is \code{NULL}, an object of class \code{"cl_agreement"}
+  containing the agreements between the all pairs of components of
+  \code{x}.  Otherwise, an object of class \code{"cl_cross_agreement"}
+  with the agreements between the components of \code{x} and the
+  components of \code{y}.
+}
+\details{
+  If \code{y} is given, its components must be of the same kind as those
+  of \code{x} (i.e., components must either all be partitions, or all be
+  hierarchies).
+
+  If all components are partitions, the following built-in methods for
+  measuring agreement between two partitions with respective membership
+  matrices \eqn{u} and \eqn{v} (brought to a common number of columns)
+  are available:
+  
+  \describe{
+    \item{\code{"euclidean"}}{\eqn{1 - d}, where \eqn{d} is the
+      euclidean dissimilarity of the memberships, i.e., the minimal
+      sum of the squared differences of \eqn{u} and all column
+      permutations of \eqn{v}.  See Dimitriadou, Weingessel and Hornik
+      (2002).}
+    \item{\code{"Rand"}}{The Rand index (the rate of distinct pairs of
+      objects both in the same class or both in different classes in
+      both partitions), see Rand (1971) or Gordon (1999), page 198.
+      For soft partitions, (currently) the Rand index of the
+      corresponding \dQuote{nerest} hard partitions is used.}
+    \item{\code{"cRand"}}{The Rand index corrected for agreement by
+      chance, see Hubert and Arabie (1985) or Gordon (1999), page 198.
+      Can only be used for hard partitions.}
+    \item{\code{"NMI"}}{Normalized Mutual Information, see Strehl and
+      Ghosh (2002).  For soft partitions, (currently) the NMI of the
+      corresponding \dQuote{nerest} hard partitions is used.} 
+    \item{\code{"KP"}}{The Katz-Powell index, i.e., the product-moment
+      correlation coefficient between the elements of the co-membership
+      matrices \eqn{C(u) = u u'} and \eqn{C(v)}, respectively, see Katz
+      and Powell (1953).  For soft partitions, (currently) the
+      Katz-Powell index of the corresponding \dQuote{nerest} hard
+      partitions is used.  (Note that for hard partitions, the
+      \eqn{(i,j)} entry of \eqn{C(u)} is one iff objects \eqn{i} and
+      \eqn{j} are in the same class.)}
+    \item{\code{"angle"}}{The maximal cosine of the angle between the
+      elements of \eqn{u} and all column permutations of \eqn{v}.}
+    \item{\code{"diag"}}{The maximal co-classification rate, i.e., the
+      maximal rate of objects with the same class ids in both
+      partitions after arbitrarily permuting the ids.}
+  }
+
+  If all components are hierarchies, available built-in methods for
+  measuring agreement between two hierarchies with respective
+  ultrametrics \eqn{u} and \eqn{v} are as follows.
+
+  \describe{
+    \item{\code{"euclidean"}}{\eqn{1 / (1 + d)}, where \eqn{d} is the
+      euclidean dissimilarity of the ultrametrics (i.e., the sum of the
+      squared differences of \eqn{u} and \eqn{v}).}
+    \item{\code{"cophenetic"}}{The cophenetic correlation coefficient.
+      (I.e., the product-moment correlation of the ultrametrics.}
+    \item{\code{"angle"}}{The cosine of the angle between the
+      ultrametrics.}
+    \item{\code{"gamma"}}{\eqn{1 - d}, where \eqn{d} is the rate of
+      inversions between the associated ultrametrics (i.e., the rate of
+      pairs \eqn{(i,j)} and \eqn{(k,l)} for which \eqn{u_{ij} < u_{kl}}
+      and \eqn{v_{ij} > v_{kl}}).  (This agreement measure is a linear
+      transformation of Kruskal's \eqn{\gamma}{gamma}.)}
+  }
+
+  If a user-defined agreement method is to be employed, it must be a
+  function taking two clusterings as its arguments.
+
+  Symmetric agreement objects of class \code{"cl_agreement"} are
+  implemented as symmetric proximity objects with self-proximities
+  identical to one, and inherit from class \code{"cl_proximity"}.  They
+  can be coerced to dense square matrices using \code{as.matrix}.  It is
+  possible to use 2-index matrix-style subscripting for such objects;
+  unless this uses identical row and column indices, this results in a
+  (non-symmetric agreement) object of class \code{"cl_cross_agreement"}.
+}
+\references{
+  E. Dimitriadou and A. Weingessel and K. Hornik (2002).
+  A combination scheme for fuzzy clustering.
+  \emph{International Journal of Pattern Recognition and Artificial
+    Intelligence}, \bold{16}, 901--912.
+  
+  A. D. Gordon (1999).
+  \emph{Classification} (2nd edition).
+  Boca Raton, FL: Chapman \& Hall/CRC.
+  
+  L. Hubert and P. Arabie (1985).
+  Comparing partitions.
+  \emph{Journal of Classification}, \bold{2}, 193--218.
+
+  W. M. Rand (1971).
+  Objective criteria for the evaluation of clustering methods.
+  \emph{Journal of the American Statistical Association}, \bold{66},
+  846--850.
+
+  L. Katz and J. H. Powell (1953).
+  A proposed index of the conformity of one sociometric measurement to
+  another.
+  \emph{Psychometrika}, \bold{18}, 249--256.
+
+  A. Strehl and J. Ghosh (2002).
+  Cluster ensembles --- A knowledge reuse framework for combining
+  multiple partitions.
+  \emph{Journal on Machine Learning Research}, \bold{3}, 583--617.
+}
+\seealso{
+  \code{\link{cl_dissimilarity}};
+  \code{\link[e1071]{classAgreement}} in package \pkg{e1071}.
+}
+\examples{
+## An ensemble of partitions.
+data("CKME")
+pens <- CKME[1 : 20]		# for saving precious time ...
+summary(c(cl_agreement(pens)))
+summary(c(cl_agreement(pens, method = "Rand")))
+summary(c(cl_agreement(pens, method = "diag")))
+cl_agreement(pens[1:5], pens[6:7], method = "NMI")
+## Equivalently, using subscripting.
+cl_agreement(pens, method = "NMI")[1:5, 6:7]
+
+## An ensemble of hierarchies.
+d <- dist(USArrests)
+hclust_methods <- c("ward", "single", "complete", "average",
+                    "mcquitty", "median", "centroid")
+hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
+hens <- cl_ensemble(list = hclust_results)
+names(hens) <- hclust_methods 
+summary(c(cl_agreement(hens)))
+summary(c(cl_agreement(hens, method = "cophenetic")))
+cl_agreement(hens[1:3], hens[4:5], method = "gamma")
+}
+\keyword{cluster}
