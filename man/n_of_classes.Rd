@@ -1,4 +1,4 @@
-\name{n-of-classes}
+\name{n_of_classes}
 \alias{n_of_classes}
 \alias{cl_class_ids}
 \title{Classes in a Partition}

@@ -2,8 +2,8 @@
 \alias{Macro}
 \title{Gordon-Vichi Macroeconomic Partition Data}
 \description{
-  Soft partitions of 21 countries according based on macroeconomic data
-  for the years 1975, 1980, 1985, 1990, and 1995.
+  Soft partitions of 21 countries based on macroeconomic data for the
+  years 1975, 1980, 1985, 1990, and 1995.
 }
 \usage{data("Macro")}
 \format{

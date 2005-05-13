@@ -1,4 +1,5 @@
-\name{solve-LSAP}
+\name{solve_LSAP}
+\encoding{UTF-8}
 \alias{solve_LSAP}
 \title{Solve Linear Sum Assignment Problem}
 \description{
@@ -34,7 +35,7 @@ solve_LSAP(x, maximum = FALSE)
   Englewood Cliffs: Prentice Hall.
 }
 \author{
-  Walter Boehm \email{Walter.Boehm@wu-wien.ac.at} kindly provided C code
+  Walter Böhm \email{Walter.Boehm@wu-wien.ac.at} kindly provided C code
   implementing the Hungarian method.
 }
 \examples{

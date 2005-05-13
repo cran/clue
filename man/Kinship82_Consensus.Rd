@@ -1,4 +1,4 @@
-\name{Kinship82-Consensus}
+\name{Kinship82_Consensus}
 \alias{Kinship82_Consensus}
 \title{Gordon-Vichi Kinship82 Consensus Partition Data}
 \description{

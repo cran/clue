@@ -43,7 +43,7 @@ cl_median(x, method = NULL, weights = 1, control = list())
   \describe{
     \item{\code{"DWH"}}{an extension of the greedy algorithm in
       Dimitriadou, Weingessel and Hornik (2002) for approximately
-      minimizing \eqn{L} with \eqn{d} being euclidean dissimilarity.
+      minimizing \eqn{L} with \eqn{d} being Euclidean dissimilarity.
       The reference provides some structure theory relating finding
       the median to an instance of the multiple assignment problem,
       which is known to be NP-hard, and suggests a simple heuristic
@@ -68,7 +68,7 @@ cl_median(x, method = NULL, weights = 1, control = list())
 
     \item{\code{"GV1"}}{the fixed-point algorithm for the \dQuote{first
 	model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
-      \eqn{d} again being euclidean dissimilarity.  This iterates
+      \eqn{d} again being Euclidean dissimilarity.  This iterates
       between individually matching all partitions to the current
       approximation to the median, and computing the next approximation
       as a weighted average of the memberships of all partitions after
@@ -126,7 +126,7 @@ cl_median(x, method = NULL, weights = 1, control = list())
   If all elements of the ensemble are hierarchies, the built-in method
   (named \code{"cophenetic"}) for computing medians is based on
   minimizing \eqn{L(u) = \sum w_b d(x_b, u)} over all ultrametrics,
-  where \eqn{d} is euclidean dissimilarity.  This is equivalent to
+  where \eqn{d} is Euclidean dissimilarity.  This is equivalent to
   finding the best least squares ultrametric approximation of the
   weighted average \eqn{d = \sum w_b u_b} of the ultrametrics \eqn{u_b}
   of the hierarchies \eqn{x_b}, which is attempted by calling
@@ -183,13 +183,13 @@ cl_dissimilarity(as.cl_hard_partition(m1),
 ## Hmm ...
 
 ## Median partition for the Gordon and Vichi (2001) macroeconomic
-## partition data based on euclidean dissimilarities.
+## partition data based on Euclidean dissimilarities.
 data("Macro")
 set.seed(1)
 m1 <- cl_median(Macro, method = "GV1",
                 control = list(k = 2, verbose = TRUE))
 ## (Note that one should really use several replicates of this.)
-## Total euclidean dissimilarity:
+## Total Euclidean dissimilarity:
 sum(cl_dissimilarity(Macro, m1))
 ## Compare to the consensus solution given in Gordon & Vichi (2001).
 data("Macro_Consensus")
