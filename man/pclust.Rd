@@ -4,7 +4,7 @@
 \description{
   Compute prototype-based partitions of a cluster ensemble by minimizing
   \eqn{\sum u_{bj}^m d(x_b, p_j)}, the sum of the membership-weighted
-  euclidean dissimilarities between the elements \eqn{x_b} of the
+  Euclidean dissimilarities between the elements \eqn{x_b} of the
   ensemble and the prototypes \eqn{p_j}.
 }
 \usage{

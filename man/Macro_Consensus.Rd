@@ -1,4 +1,4 @@
-\name{Macro-Consensus}
+\name{Macro_Consensus}
 \alias{Macro_Consensus}
 \title{Gordon-Vichi Macroeconomic Consensus Partition Data}
 \description{

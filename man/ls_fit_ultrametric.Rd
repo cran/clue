@@ -1,15 +1,16 @@
-\name{ls-fit-ultrametric}
+\name{ls_fit_ultrametric}
 \alias{ls_fit_ultrametric}
 \title{Least Squares Fit of Ultrametrics to Dissimilarities}
 \description{
-  Find the ultrametric minimizing least squares distance (euclidean
+  Find the ultrametric minimizing least squares distance (Euclidean
   dissimilarity) to a given dissimilarity object.
 }
 \usage{
 ls_fit_ultrametric(x, control = list())
 }
 \arguments{
-  \item{x}{a dissimilarity object inheriting from class \code{"dist"}.}
+  \item{x}{a dissimilarity object inheriting from class
+    \code{"\link{dist}"}.}
   \item{control}{a list of control parameters.  See \bold{Details}.}
 }
 \value{
@@ -31,7 +32,7 @@ ls_fit_ultrametric(x, control = list())
   constraints such that \eqn{P(u)} is zero iff \eqn{u} is an
   ultrametric.  The \eqn{\rho} values are increased according to the
   rule \eqn{\rho_{k+1} = q \rho_k} for some constant \eqn{q > 1}, until
-  convergence is obtained in the sense that the euclidean distance
+  convergence is obtained in the sense that the Euclidean distance
   between successive solutions \eqn{u_k} and \eqn{u_{k+1}} is small
   enough.  We then use a final rounding step to ensure that the returned
   object exactly satisfies the ultrametric constraints.  The starting

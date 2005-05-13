@@ -71,7 +71,7 @@ function(x, k, m = 1, control = list())
         ## Need an auxiliary function which takes [d_{bj}] and returns
         ## [u_{bj}] such that \sum_{b,j} u_{bj}^m d_{bj} => min! under
         ## the constraint that u is a membership matrix.
-        exponent <- 2 / (m - 1)
+        exponent <- 1 / (m - 1)
         u_from_d <- function(d) {
             u <- matrix(0, nrow(d), ncol(d))
             FUN <- function(s, t) (s / t) ^ exponent
@@ -95,7 +95,7 @@ function(x, k, m = 1, control = list())
             ## This amounts to solving, for each j:
             ##   \sum_b u_{bj}^m d(x_b, p_j) => \min_p
             ## I.e., p_j is the *weighted* median of the x_b with
-            ## corresponding weights u_{bj}.
+            ## corresponding weights u_{bj}^m.
             for(j in 1 : k)
                 prototypes[[j]] <-
                     cl_median(memberships, weights = u[, j] ^ m,

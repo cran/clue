@@ -37,7 +37,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
   
   \describe{
     \item{\code{"euclidean"}}{\eqn{1 - d}, where \eqn{d} is the
-      euclidean dissimilarity of the memberships, i.e., the minimal
+      Euclidean dissimilarity of the memberships, i.e., the minimal
       sum of the squared differences of \eqn{u} and all column
       permutations of \eqn{v}.  See Dimitriadou, Weingessel and Hornik
       (2002).}
@@ -45,18 +45,18 @@ cl_agreement(x, y = NULL, method = "euclidean")
       objects both in the same class or both in different classes in
       both partitions), see Rand (1971) or Gordon (1999), page 198.
       For soft partitions, (currently) the Rand index of the
-      corresponding \dQuote{nerest} hard partitions is used.}
+      corresponding \dQuote{nearest} hard partitions is used.}
     \item{\code{"cRand"}}{The Rand index corrected for agreement by
       chance, see Hubert and Arabie (1985) or Gordon (1999), page 198.
       Can only be used for hard partitions.}
     \item{\code{"NMI"}}{Normalized Mutual Information, see Strehl and
       Ghosh (2002).  For soft partitions, (currently) the NMI of the
-      corresponding \dQuote{nerest} hard partitions is used.} 
+      corresponding \dQuote{nearest} hard partitions is used.} 
     \item{\code{"KP"}}{The Katz-Powell index, i.e., the product-moment
       correlation coefficient between the elements of the co-membership
       matrices \eqn{C(u) = u u'} and \eqn{C(v)}, respectively, see Katz
       and Powell (1953).  For soft partitions, (currently) the
-      Katz-Powell index of the corresponding \dQuote{nerest} hard
+      Katz-Powell index of the corresponding \dQuote{nearest} hard
       partitions is used.  (Note that for hard partitions, the
       \eqn{(i,j)} entry of \eqn{C(u)} is one iff objects \eqn{i} and
       \eqn{j} are in the same class.)}
@@ -73,10 +73,10 @@ cl_agreement(x, y = NULL, method = "euclidean")
 
   \describe{
     \item{\code{"euclidean"}}{\eqn{1 / (1 + d)}, where \eqn{d} is the
-      euclidean dissimilarity of the ultrametrics (i.e., the sum of the
+      Euclidean dissimilarity of the ultrametrics (i.e., the sum of the
       squared differences of \eqn{u} and \eqn{v}).}
     \item{\code{"cophenetic"}}{The cophenetic correlation coefficient.
-      (I.e., the product-moment correlation of the ultrametrics.}
+      (I.e., the product-moment correlation of the ultrametrics.)}
     \item{\code{"angle"}}{The cosine of the angle between the
       ultrametrics.}
     \item{\code{"gamma"}}{\eqn{1 - d}, where \eqn{d} is the rate of

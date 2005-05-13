@@ -35,12 +35,12 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   columns) are available:
 
   \describe{
-    \item{\code{"euclidean"}}{the euclidean dissimilarity of the
+    \item{\code{"euclidean"}}{the Euclidean dissimilarity of the
       memberships, i.e., the minimal sum of the squared differences of
       \eqn{u} and all column permutations of \eqn{v}, divided by twice
       the number of objects in the partitions.  See Dimitriadou,
       Weingessel and Hornik (2002).}
-    \item{\code{"comemberships"}}{the euclidean dissimilarity of the
+    \item{\code{"comemberships"}}{the Euclidean dissimilarity of the
       elements of the co-membership matrices \eqn{C(u) = u u'} and
       \eqn{C(v)}, i.e., the sum of the squared differences of \eqn{C(u)}
       and \eqn{C(v)}, divided by the squared number of objects in the
@@ -52,15 +52,15 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   ultrametrics \eqn{u} and \eqn{v} are as follows.
 
   \describe{
-    \item{\code{"euclidean"}}{the euclidean dissimilarity of the
+    \item{\code{"euclidean"}}{the Euclidean dissimilarity of the
       ultrametrics (i.e., the sum of the squared differences of \eqn{u}
       and \eqn{v}).}
     \item{\code{"cophenetic"}}{\eqn{1 - c^2}, where \eqn{c} is the
       cophenetic correlation coefficient (i.e., the product-moment
-      correlation of the ultrametrics.}
+      correlation of the ultrametrics).}
     \item{\code{"gamma"}}{the rate of inversions between the
       ultrametrics (i.e., the rate of pairs \eqn{(i,j)} and \eqn{(k,l)}
-      for which \eqn{u_{ij} < u_{kl}} and \eqn{v_{ij} > v_{kl}})}
+      for which \eqn{u_{ij} < u_{kl}} and \eqn{v_{ij} > v_{kl}}).}
   }
 
 

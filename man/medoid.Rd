@@ -3,7 +3,7 @@
 \title{Medoid Partitions and Hierarchies}
 \description{
   Compute the medoid of an ensemble of partitions or hierarchies, i.e.,
-  the element of the ensemble mimimizing the sum of dissimilarities to
+  the element of the ensemble minimizing the sum of dissimilarities to
   all other elements.
 }
 \usage{
@@ -26,7 +26,7 @@ cl_medoid(x, method = "euclidean")
   The dissimilarities \code{d} for determining the medoid are obtained
   by calling \code{cl_dissimilarity} with arguments \code{x} and
   \code{method}.  The medoid can then be found as the (first) row index
-  for which the row sum of \code{as.matrix(d)} is mimimal.  Modulo
+  for which the row sum of \code{as.matrix(d)} is minimal.  Modulo
   possible differences in the case of ties, this gives the same results
   as (the medoid obtained by) \code{\link[cluster]{pam}} in package
   \pkg{cluster}.

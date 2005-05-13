@@ -1,4 +1,4 @@
-\name{n-of-objects}
+\name{n_of_objects}
 \alias{n_of_objects}
 \title{Number of Objects in a Partition or Hierarchy}
 \description{Determine the number of objects from which a partition or
