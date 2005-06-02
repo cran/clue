@@ -11,6 +11,12 @@ function(x, y = NULL, method = "euclidean")
     x <- as.cl_ensemble(x)
     is_partition_ensemble <- inherits(x, "cl_partition_ensemble")
 
+    ## Be nice.
+    if(is.character(y) || is.function(y)) {
+        method <- y
+        y <- NULL
+    }
+
     if(!is.function(method)) {
         builtin_methods <- if(is_partition_ensemble)
             c("euclidean", "Rand", "cRand", "NMI", "KP", "angle", "diag")
@@ -31,9 +37,9 @@ function(x, y = NULL, method = "euclidean")
               "rate of inversions")
         if(is.na(ind <- pmatch(tolower(method),
                                tolower(builtin_methods))))
-            stop(paste("Value", sQuote(method),
-                       "is not a valid abbreviation",
-                       "for an agreement method."))
+            stop(gettextf("Value '%s' is not a valid abbreviation for an agreement method.",
+                          method),
+                 domain = NA)
         method <- paste(".cl_agreement",
                         if(is_partition_ensemble)
                         "partition"                        

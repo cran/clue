@@ -1,360 +1,304 @@
 #include "assignment.h"
 
-void ap_print_solution(AP *p)
-{
-    int i;
-  
-    printf("%d itertations, %d secs.\n", p->runs, (int)p->rtime);
-    printf("Min Cost: %10.4f\n", p->c);
-  
-    for(i = 0; i < p->n; i++)
-	printf("%4d" ,p->s[i]);
-    printf("\n");
-}
-
-void ap_reduce_cuts(AP *p)
-{
-    int i,j;
-    double min;
-
-    min = DBL_MAX;
-
-    for(i = 0; i < p->n; i++)
-	for(j = 0; j < p->n; j++)
-	    if(p->ic[j] == 0 && p->ir[i] == 0 && p->t[i][j] < min)
-		min = p->t[i][j];
-
-    for(i = 0; i < p->n; i++)
-	for(j = 0; j < p->n; j++){
-	    if(p->ic[j] == 0 && p->ir[i] == 0)
-		p->t[i][j]-= min;
-	    if(p->ic[j] == 1 && p->ir[i] == 1)
-		p->t[i][j]+= min;
-	}
-}
-
-int ap_make_cuts(AP *p)
-{
-    int i, j;
-    int ncut = 0;
-    int **zeroes;
-    int min;
-
-    /* reset row and column indicators */
-    for(i = 0; i < p->n; i++){
-	p->ic[i] = 0;
-	p->ir[i] = 0;
-    }
-
-    /* count zeroes */
-    zeroes = (int **) malloc(p->n * sizeof(int *));
-    for(i = 0; i < p->n; i++)
-	zeroes[i] = (int *) calloc(2, sizeof(int));
-    
-    for(i = 0; i < p->n; i++)
-	for(j = 0; j < p->n; j++)
-	    if(p->ir[i] == 0 && p->ic[j] == 0 && p->t[i][j] == 0) {
-		++zeroes[i][0];
-		++zeroes[j][1];
-	    }
-
-    while(1){
-	min = INT_MAX;
-	p->zr = -1;
-	p->zc = -1;
-	p->ztype = NOTYPE;
-
-	for(i = 0; i < p->n; i++) {
-	    if(zeroes[i][0] > 0 && zeroes[i][0] < min && p->ir[i] == 0) {
-		min = zeroes[i][0];
-		p->zr = i;
-		p->ztype = ROW;
-	    }
-	    if(zeroes[i][1] > 0 && zeroes[i][1] < min && p->ic[i] == 0) {
-		min = zeroes[i][1];
-		p->zc = i;
-		p->ztype = COLUMN;
-	    }
-	}
-    
-	if(p->ztype == NOTYPE)
-	    break;
-
-	if(p->ztype == ROW) {
-	    /* zeroes[p->zr][0] -= 1; */
-	    for(i = 0; i < p->n; i++)
-		if(p->t[p->zr][i] == 0 && p->ic[i] == 0) {
-		    p->zc = i;
-		    break;
-		}
-	} else {
-	    /* zeroes[p->zc][1] -= 1; */
-	    for(i = 0; i < p->n; i++)
-		if(p->t[i][p->zc] == 0 && p->ir[i] == 0) {
-		    p->zr = i;
-		    break;
-		}
-	}
-
-	/* apply cut */
-	++ncut;
-	if(p->ztype == ROW) {
-	    /* printf("cut column %d\n",p->zc); */
-	    p->ic[p->zc] = 1;
-	    for(i = 0; i < p->n; i++)
-		if(p->t[i][p->zc] == 0)
-		    --zeroes[i][0];
-	} else {
-	    /* printf("cut row %d\n",p->zr); */
-	    p->ir[p->zr] = 1;
-	    for(i = 0; i < p->n; i++)
-		if(p->t[p->zr][i] == 0)
-		    --zeroes[i][1];
-	}
-    }
-
-    /* free zeroes */
-    for(i = 0; i < p->n; i++)
-	free(zeroes[i]);
-    free(zeroes);
-    return ncut;
-}
-
-void ap_show_data(AP *p)
-{
-    int i,j;
-    
-    printf("      ");
-    for(i = 0; i < p->n; i++)
-	printf("%5d", p->ic[i]);
-    printf("\n");
-    for(i = 0; i < p->n; i++) {
-	printf("%5d:", p->ir[i]);
-	for(j = 0; j < p->n; j++)
-	    printf("%5.2f", p->t[i][j]);
-	printf("\n");
-    }
-}
+/* main routine */
 
 void ap_hungarian(AP *p)
 {
-    int c;
-    time_t start, end;
+  int      n;            /* size of problem */
+  int    *ri;            /* covered rows    */
+  int    *ci;            /* covered columns */
+  time_t start, end;     /* timer           */ 
+  int i, j, ok;
 
-    start = time(0);
-    ap_preproc(p);
+  start = time(0);
 
-    while((c = ap_make_cuts(p)) < p->n) {
-	++p->runs;
-	ap_reduce_cuts(p);
-    }
+  n = p->n;
+  p->runs = 0;
 
-    /* construct solution */
-    ap_generate_solution(p);
-    end = time(0);
-    p->rtime = end - start;
-    return;
+  /* allocate memory */
+  p->s = calloc(1 + n, sizeof(int));
+  p->f = calloc(1 + n, sizeof(int));
+
+  ri = calloc(1 + n, sizeof(int));
+  ci = calloc(1 + n, sizeof(int));
+
+  if(ri == NULL || ci == NULL || p->s == NULL || p->f == NULL)
+    ap_error("ap_hungarian: could not allocate memory!");
+
+  preprocess(p);
+  preassign(p);
+
+  while(p->na < n){
+    if(REDUCE == cover(p, ri, ci))
+      reduce(p, ri, ci);
+    ++p->runs;
+  }
+
+  end = time(0);  
+  
+  p->rtime = end - start;
+  
+  /* check if assignment is a permutation of (1..n) */
+  for(i = 1; i <= n; i++){
+      ok = 0;
+      for(j = 1; j <= n; j++)
+	if(p->s[j] == i)
+	  ++ok;
+      if(ok != 1)
+	ap_error("ap_hungarian: error in assigment, is not a permutation!");
+  }
+
+  /* calculate cost of assignment */
+  p->cost = 0;
+  for(i = 1; i <= n; i++)
+    p->cost+= p->C[i][p->s[i]];
+
+  /* reset result back to base-0 indexing */
+  for(i = 1; i <= n; i++)
+    p->s[i - 1] = p->s[i] - 1;
+
+  /* free memory */
+
+  free(ri);
+  free(ci);
 }
 
-void ap_preproc(AP *p)
+/* abbreviated interface */
+int ap_assignment(AP *p, int *res)
 {
-    int i,j;
-    double min;
-    
-    /* first reduce row minima */
-    for(i = 0; i < p->n; i++){
-	min = p->t[i][0];
-	for(j = 1; j < p->n; j++)
-	    min = (p->t[i][j] < min) ? p->t[i][j] : min;
-	if(min > 0)
-	    for(j = 0; j < p->n; j++)
-		p->t[i][j]-= min;
-    }
-    
-    /* do same with columns */
-    for(i = 0; i < p->n; i++){
-	min = p->t[0][i];
-	for(j = 1; j < p->n; j++)
-	    min = (p->t[j][i] < min) ? p->t[j][i] : min;
-	if(min > 0)
-	    for(j = 0; j < p->n; j++)
-		p->t[j][i]-= min;
-    }
+  int i;
+
+  if(p->s == NULL)
+    ap_hungarian(p);
+
+  for(i = 0; i < p->n; i++)
+    res[i] = p->s[i];
+  
+  return p->n;
 }
+
+
+/*******************************************************************/
+/* constructors                                                    */
+/* read data from file                                             */
+/*******************************************************************/
 
 AP *ap_read_problem(char *file)
 {
-    FILE *f;
-    int i,j,c;
-    int m,n;
-    double x;
-    double **t;
-    int nrow,ncol;
-    AP *p;
+  FILE *f;
+  int i,j,c;
+  int m,n;
+  double x;
+  double **t;
+  int nrow,ncol;
+  AP *p;
 
-    f = fopen(file,"r");
-    if(f == NULL)
-	return NULL;
+  f = fopen(file,"r");
+  if(f==NULL)
+    return NULL;
 
-    t = (double **)malloc(sizeof(double*));
+  t = (double **)malloc(sizeof(double*));
 
-    m = 0; 
-    n = 0;  
+  m = 0; 
+  n = 0;  
 
-    nrow = 0;
-    ncol = 0;
-    
-    while(EOF != (i = fscanf(f, "%lf", &x))) {
-	if(i == 1){
-	    if(n == 0){
-		t = (double **) realloc(t,(m + 1) * sizeof(double *));
-		t[m] = (double *) malloc(sizeof(double));
-	    } else
-		t[m] = (double *) realloc(t[m], (n + 1) * sizeof(double));
+  nrow = 0;
+  ncol = 0;
 
-	    t[m][n++] = x;
+  while(EOF != (i = fscanf(f, "%lf", &x))){
+    if(i == 1){
+      if(n == 0){
+	t = (double **) realloc(t,(m + 1) * sizeof(double *));
+	t[m] = (double *) malloc(sizeof(double));
+      }else
+	t[m] = (double *) realloc(t[m], (n + 1) * sizeof(double));
 
-	    ncol = (ncol < n) ? n : ncol;
-	    c = fgetc(f);
-	    if(c == '\n'){
-		n = 0;
-		++m;
-		nrow = (nrow < m) ? m : nrow;
-	    }
-	}
+      t[m][n++] = x;
+
+      ncol = (ncol < n) ? n : ncol;
+      c=fgetc(f);
+      if(c == '\n'){
+	n = 0;
+	++m;
+	nrow = (nrow < m) ? m : nrow;
+      }
     }
-    fclose(f);
+  }
+  fclose(f);
 
-    /* prepare data */
+  /* prepare data */
 
-    if(nrow != ncol) {
-	printf("error: problem not quadratic\nrows = %d, cols = %d\n",
-	       nrow, ncol);
-	exit(1);
+  if(nrow != ncol){
+    fprintf(stderr,"ap_read_problem: problem not quadratic\nrows = %d, cols = %d\n",nrow,ncol);
+    return NULL;
+  }
+
+  p = (AP*) malloc(sizeof(AP)); 
+  p->n = ncol;
+
+  p->C  = (double **) malloc((1 + nrow)*sizeof(double *));
+  p->c  = (double **) malloc((1 + nrow)*sizeof(double *));
+  if(p->C == NULL || p->c == NULL)
+    return NULL;
+
+  for(i = 1; i <= nrow; i++){
+    p->C[i] = (double *) calloc(ncol + 1, sizeof(double));
+    p->c[i] = (double *) calloc(ncol + 1, sizeof(double));
+    if(p->C[i] == NULL || p->c[i] == NULL)
+      return NULL;
+  }
+
+  for(i = 1; i <= nrow; i++)
+    for( j = 1; j <= ncol; j++){
+      p->C[i][j] = t[i-1][j-1];
+      p->c[i][j] = t[i-1][j-1];
     }
 
-    p = (AP*) malloc(sizeof(AP)); 
-    p->n = ncol;
-    p->runs = 0;
-    
-    p->t  = (double **) malloc((nrow)*sizeof(double *));
-    p->tc = (double **) malloc((nrow)*sizeof(double *));
-    if(p->t == NULL || p->tc == NULL)
-	return NULL;
+  for(i = 0; i < nrow; i++)
+    free(t[i]);
+  free(t);
 
-    for(i = 0; i < nrow; i++){
-	p->t[i] = (double *) calloc(ncol, sizeof(double));
-	p->tc[i] = (double *) calloc(ncol, sizeof(double));
-	if(p->t[i] == NULL || p->tc[i] == NULL)
-	    return NULL;
-    }
-
-    for(i = 0; i < nrow; i++)
-	for( j = 0; j < ncol; j++){
-	    p->t[i][j] = t[i][j];
-	    p->tc[i][j] = t[i][j];
-	}
-    for(i = 0; i < nrow; i++)
-	free(t[i]);
-    free(t);
-    
-    /* prepare ir,ic: */
-    p->ic = (int *) calloc(nrow,sizeof(int));
-    p->ir = (int *) calloc(nrow,sizeof(int));
-    if(p->ic == NULL || p->ir == NULL)
-	return NULL;
-    
-    /* set cost to maximum to indicate that the problem has not been
-       solved */
-    p->c = DBL_MAX;
-    p->s = NULL;
-    
-    p->rtime = 0;
-    return p;
+  p->cost = 0;
+  p->s = NULL;
+  p->f = NULL;
+  return p;
 }
 
-AP *ap_create_problem(double **t, int n)
+AP     *ap_create_problem_from_matrix(double **t, int n)
 {
-    int i,j;
-    AP *p;
+ int i,j;
+  AP *p;
 
-    p = (AP*) malloc(sizeof(AP)); 
-    if(p == NULL)
-	return NULL;
-    
-    p->n = n;
-    p->runs = 0;
-    
-    p->t  = (double **) malloc(n * sizeof(double *));
-    p->tc = (double **) malloc(n * sizeof(double *));
-    if(p->t == NULL || p->tc == NULL)
-	return NULL;
-    
-    for(i = 0; i < n; i++){
-	p->t[i] = (double *) calloc(n, sizeof(double));
-	p->tc[i] = (double *) calloc(n, sizeof(double));
-	if(p->t[i] == NULL || p->tc[i] == NULL)
-	    return NULL;
+  p = (AP*) malloc(sizeof(AP)); 
+  if(p == NULL)
+    return NULL;
+
+  p->n = n;
+
+  p->C  = (double **) malloc((n + 1) * sizeof(double *));
+  p->c  = (double **) malloc((n + 1) * sizeof(double *));
+  if(p->C == NULL || p->c == NULL)
+    return NULL;
+
+  for(i = 1; i <= n; i++){
+    p->C[i] = (double *) calloc(n + 1, sizeof(double));
+    p->c[i] = (double *) calloc(n + 1, sizeof(double));
+    if(p->C[i] == NULL || p->c[i] == NULL)
+      return NULL;
+  }
+
+
+  for(i = 1; i <= n; i++)
+    for( j = 1; j <= n; j++){
+      p->C[i][j] = t[i-1][j-1];
+      p->c[i][j] = t[i-1][j-1];
     }
+  p->cost = 0;
+  p->s = NULL;
+  p->f = NULL;
+  return p;
+}
 
-    for(i = 0; i < n; i++)
-	for( j = 0; j < n; j++){
-	    p->t[i][j] = t[i][j];
-	    p->tc[i][j] = t[i][j];
-	}  if(t == NULL)
-	    return NULL;
+/* read data from vector */
+AP *ap_create_problem(double *t, int n)
+{
+  int i,j;
+  AP *p;
 
+  p = (AP*) malloc(sizeof(AP)); 
+  if(p == NULL)
+    return NULL;
+
+  p->n = n;
+
+  p->C  = (double **) malloc((n + 1) * sizeof(double *));
+  p->c  = (double **) malloc((n + 1) * sizeof(double *));
+  if(p->C == NULL || p->c == NULL)
+    return NULL;
+
+  for(i = 1; i <= n; i++){
+    p->C[i] = (double *) calloc(n + 1, sizeof(double));
+    p->c[i] = (double *) calloc(n + 1, sizeof(double));
+    if(p->C[i] == NULL || p->c[i] == NULL)
+      return NULL;
+  }
+
+
+  for(i = 1; i <= n; i++)
+    for( j = 1; j <= n; j++){
+      p->C[i][j] = t[n*(j - 1) + i - 1];
+      p->c[i][j] = t[n*(j - 1) + i - 1];
+    }
+  p->cost = 0;
+  p->s = NULL;
+  p->f = NULL;
+  return p;
+}
+
+/* destructor */
+void ap_free(AP *p)
+{
+  int i;
+
+  free(p->s);
+  free(p->f);
+
+
+  for(i = 1; i <= p->n; i++){
+    free(p->C[i]);
+    free(p->c[i]);
+  }
+
+  free(p->C);
+  free(p->c);
+  free(p);
+}
+
+/* set + get functions */
+void ap_show_data(AP *p)
+{
+  int i, j;
   
-    /* prepare ir,ic: */
-    p->ic = (int *) calloc(n, sizeof(int));
-    p->ir = (int *) calloc(n, sizeof(int));
-    
-    if(p->ic == NULL || p->ir == NULL)
-	return NULL;
-    
-    /* set cost to maximum to indicate that the problem has not been
-       solved */
-    p->c = DBL_MAX;
-    p->s = NULL;
-    
-    p->rtime = 0;
-    return p;
-}
-
-int ap_assignment(AP *p, int *res)
-{
-    int i;
-    
-    if(p->s == NULL)
-	ap_hungarian(p);
-    
-    for(i = 0; i < p->n; i++)
-	res[i] = p->s[i];
-    
-    return p->n;
+  for(i = 1; i <= p->n; i++){
+    for(j = 1; j <= p->n; j++)
+      printf("%6.2f ", p->c[i][j]);
+    printf("\n");
+  }
 }
 
 double ap_mincost(AP *p)
 {
-    if(p->s == NULL)
-	ap_hungarian(p);
-    
-    return p->c;
+  if(p->s == NULL)
+    ap_hungarian(p);
+ 
+  return p->cost;
 }
 
 int ap_size(AP *p)
 {
-    return p->n;
+  return p->n;
 }
 
 int ap_time(AP *p)
 {
-    return (int) p->rtime; 
+  return (int) p->rtime; 
 }
 
 int ap_iterations(AP *p)
 {
-    return p->runs; 
+  return p->runs; 
+}
+
+void ap_print_solution(AP *p)
+{
+  int i;
+  
+  printf("%d itertations, %d secs.\n",p->runs, (int)p->rtime);
+  printf("Min Cost: %10.4f\n",p->cost);
+  
+  for(i = 0; i < p->n; i++)
+    printf("%4d",p->s[i]);
+  printf("\n");
 }
 
 int ap_costmatrix(AP *p, double **m)
@@ -363,121 +307,216 @@ int ap_costmatrix(AP *p, double **m)
   
   for(i = 0; i < p->n; i++)
     for(j = 0; j < p->n; j++)
-      m[i][j] = p->tc[i][j];
+      m[i][j] = p->C[i + 1][j + 1];
 
   return p->n;
 }
 
 int ap_datamatrix(AP *p, double **m)
 {
-    int i,j;
+  int i,j;
   
-    for(i = 0; i < p->n; i++)
-	for(j = 0; j < p->n; j++)
-	    m[i][j] = p->t[i][j];
-    
-    return p->n;
+  for(i = 0; i < p->n; i++)
+    for(j = 0; j < p->n; j++)
+      m[i][j] = p->c[i + 1][j + 1];
+
+  return p->n;
 }
 
-int ap_generate_solution(AP *p)
+/* error reporting */
+void ap_error(char *message)
 {
-    int i, j;
-    int ncut = 0;
-    int **zeroes;
-    int min;
-    
-    p->s = (int *) calloc(p->n, sizeof(int));
-    
-    /* reset row and column indicators */
-    for(i = 0; i < p->n; i++) {
-	p->ic[i] = 0;
-	p->ir[i] = 0;
-    }
-
-    /* count zeroes */
-    zeroes = (int **) malloc(p->n * sizeof(int *));
-    for(i = 0; i < p->n; i++)
-	zeroes[i] = (int *) calloc(2,sizeof(int));
-
-    for(i = 0; i < p->n; i++)
-	for(j = 0; j < p->n; j++)
-	    if(p->ir[i] == 0 && p->ic[j] == 0 && p->t[i][j] == 0) {
-		++zeroes[i][0];
-		++zeroes[j][1];
-	    }
-
-    p->c = 0;
-    while(1) {
-	min = INT_MAX;
-	p->zr = -1;
-	p->zc = -1;
-	p->ztype = NOTYPE;
-
-	for(i = 0; i < p->n; i++){
-	    if(zeroes[i][0] > 0 && zeroes[i][0] < min && p->ir[i] == 0) {
-		min = zeroes[i][0];
-		p->zr = i;
-		p->ztype = ROW;
-	    }
-	    if(zeroes[i][1] > 0 && zeroes[i][1] < min && p->ic[i] == 0) {
-		min = zeroes[i][1];
-		p->zc = i;
-		p->ztype = COLUMN;
-	    }
-	}
-	
-	if(p->ztype == NOTYPE)
-	    break;
-
-	if(p->ztype == ROW){
-	    for(i = 0; i < p->n; i++)
-		if(p->t[p->zr][i] == 0 && p->ic[i] == 0){
-		    p->zc = i;
-		    break;
-		}
-	} else {
-	    for(i = 0; i < p->n; i++)
-		if(p->t[i][p->zc] == 0 && p->ir[i] == 0){
-		    p->zr = i;
-		    break;
-		}
-	}
-	
-	/*apply cut */
-	++ncut;
-	p->ic[p->zc] = 1;
-	p->ir[p->zr] = 1;
-	for(i = 0; i < p->n; i++)
-	    if(p->t[i][p->zc] == 0)
-		--zeroes[i][0];
-	for(i = 0; i < p->n; i++)
-	    if(p->t[p->zr][i] == 0)
-		--zeroes[i][1];
-	p->s[p->zr] = p->zc;
-	p->c+= p->tc[p->zr][p->zc];
-    }
-
-    /* free zeroes */
-    for(i = 0; i < p->n; i++)
-	free(zeroes[i]);
-    free(zeroes);
-    return ncut;
+  fprintf(stderr,"%s\n",message);
+  exit(1);
 }
 
-int ap_free(AP *p)
+/*************************************************************/
+/* these functions are used internally                       */
+/* by ap_hungarian                                           */
+/*************************************************************/
+
+int cover(AP *p, int *ri, int *ci)
 {
-    int i;
-    
-    for(i = 0; i < p->n; i++){
-	free(p->t[i]);
-	free(p->tc[i]);
+  int *mr, i, r;
+  int n;
+
+  n = p->n;
+  mr = calloc(1 + p->n, sizeof(int));
+  
+  /* reset cover indices */
+  for(i = 1; i <= n; i++){
+    if(p->s[i] == UNASSIGNED){
+      ri[i] = UNCOVERED;
+      mr[i] = MARKED;
     }
-    free(p->t);
-    free(p->tc);
+    else
+      ri[i] = COVERED;
+    ci[i] = UNCOVERED;
+  }
+
+  while(TRUE){
+    /* find marked row */
+    r = 0;
+    for(i = 1; i <= n; i++)
+      if(mr[i] == MARKED){
+	r = i;
+	break;
+      }
+
+    if(r == 0)
+      break;
+    for(i = 1; i <= n; i++)
+      if(p->c[r][i] == 0 && ci[i] == UNCOVERED){
+	if(p->f[i]){
+	  ri[p->f[i]] = UNCOVERED;
+	  mr[p->f[i]] = MARKED;
+	  ci[i] = COVERED;
+	}else{
+	  if(p->s[r] == UNASSIGNED)
+	    ++p->na;
+
+	  p->f[p->s[r]] = 0;
+	  p->f[i] = r;
+	  p->s[r] = i;
+
+	  free(mr);
+	  return NOREDUCE;
+	}
+      }
+    mr[r] = UNMARKED;
+  }
+  free(mr);
+  return REDUCE;
+}
+
+void reduce(AP *p, int *ri, int *ci)
+{
+  int i, j, n;
+  double min;
+
+  n = p->n;
+
+  /* find minimum in uncovered c-matrix */
+  min = MAXDOUBLE;
+  for(i = 1; i <= n; i++)
+    for(j = 1; j <= n; j++)
+      if(ri[i] == UNCOVERED && ci[j] == UNCOVERED){
+	if(p->c[i][j] < min)
+	  min = p->c[i][j];
+      }
+  
+  /* subtract min from each uncovered element and add it to each element */
+  /* which is covered twice                                              */
+  for(i = 1; i <= n; i++)
+    for(j = 1; j <= n; j++){
+      if(ri[i] == UNCOVERED && ci[j] == UNCOVERED)
+	p->c[i][j]-= min;
+      if(ri[i] == COVERED && ci[j] == COVERED)
+	p->c[i][j]+= min;
+    }
+}
+
+void preassign(AP *p)
+{
+  int i, j, min, r, c, n, count;
+  int *ri, *ci, *rz, *cz;
+
+  n = p->n;
+  p->na = 0;
+
+  /* row and column markers */
+  ri = calloc(1 + n, sizeof(int));
+  ci = calloc(1 + n, sizeof(int));
+
+  /* row and column counts of zeroes */
+  rz = calloc(1 + n, sizeof(int));
+  cz = calloc(1 + n, sizeof(int));
+
+  for(i = 1; i <= n; i++){
+    count = 0;
+    for(j = 1; j <= n; j++)
+      if(p->c[i][j] == 0)
+	++count;
+    rz[i] = count;
+  }
+  
+  for(i = 1; i <= n; i++){
+    count = 0;
+    for(j = 1; j <= n; j++)
+      if(p->c[j][i] == 0)
+	++count;
+    cz[i] = count;
+  }
+
+  while(TRUE){
+    /* find unassigned row with least number of zeroes > 0 */
+    min = MAXINT;
+    r = 0;
+    for(i = 1; i <= n; i++)
+      if(rz[i] > 0 && rz[i] < min && ri[i] == UNASSIGNED){
+	min = rz[i];
+	r = i;
+      }
+    /* check if we are done */
+    if(r == 0)
+      break;
     
-    free(p->ir);
-    free(p->ic);
-    free(p->s);
-    free(p);
-    return 0;
+    /* find unassigned column in row r with least number of zeroes */
+    c = 0;
+    min = MAXINT;
+    for(i = 1; i <= n; i++)
+      if(p->c[r][i] == 0 && cz[i] < min && ci[i] == UNASSIGNED){
+	min = cz[i];
+	c = i;
+      }
+
+    if(c){
+      ++p->na;
+      p->s[r] = c;
+      p->f[c] = r;
+
+      ri[r] = ASSIGNED;
+      ci[c] = ASSIGNED;
+
+      /* adjust zero counts */
+      cz[c] = 0;
+      for(i = 1; i <= n; i++)
+	if(p->c[i][c] == 0)
+	  --rz[i];
+    }
+  }
+
+  /* free memory */
+  free(ri);
+  free(ci);
+  free(rz);
+  free(cz);
+}
+  
+void preprocess(AP *p)
+{
+  int i, j, n;
+  double min;
+
+  n = p->n;
+
+  /* subtract column minima in each row */
+  for(i = 1; i <= n; i++){
+    min = p->c[i][1];
+    for(j = 2; j <= n; j++)
+      if(p->c[i][j] < min)
+	min = p->c[i][j];
+    for(j = 1; j <= n; j++)
+      p->c[i][j]-= min;
+  }
+
+  /* subtract row minima in each column */
+  for(i = 1; i <= n; i++){
+      min = p->c[1][i];
+      for(j = 2; j <= n; j++)
+	if(p->c[j][i] < min)
+	  min = p->c[j][i];
+      for(j = 1; j <= n; j++)
+	p->c[j][i]-= min;
+    }
 }

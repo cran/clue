@@ -1,43 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>		/* INT_MAX */
-#include <float.h>		/* DBL_MAX */
-#include <time.h>		/* time_t */
+#include <math.h>
+#include <values.h>
+#include <assert.h>
+#include <time.h>
 
-#define ROW             0
-#define COLUMN          1
-#define NOTYPE         -1
+/* constants used for improving readability of code */
 
-typedef struct {
-    int n;		/* order of problem */
-    double **t;		/* cost matrix */
-    double **tc;	/* copy of cost matrix */
-    int ztype;		/* ROW | COLUMN with minimum number of zeroes */
-    int zr;		/* row index */
-    int zc;		/* column index */
-    int *ir, *ic;	/* cut row and column indicator */
-    int *s;		/* solution */
-    int runs;		/* number of iterations */
-    double c;		/* minimum cost */
-    time_t rtime;	/* time needed to solve */
+#define COVERED       1
+#define UNCOVERED     0
+#define ASSIGNED      1
+#define UNASSIGNED    0
+#define TRUE          1
+#define FALSE         0
+
+#define MARKED        1
+#define UNMARKED      0
+
+#define REDUCE        1
+#define NOREDUCE      0
+
+typedef struct{
+  int        n;            /* order of problem             */
+  double   **C;            /* cost matrix		   */
+  double   **c;            /* reduced cost matrix	   */
+  int       *s;            /* assignment                   */
+  int       *f;            /* column i is assigned to f[i] */
+  int       na;            /* number of assigned items;	   */
+  int     runs;            /* number of iterations	   */
+  double  cost;            /* minimum cost		   */
+  time_t rtime;            /* time                         */
 } AP;
 
-AP    *ap_create_problem(double **t, int n);
-int    ap_assignment(AP *p, int *res);
-double ap_mincost(AP *p);
-void   ap_hungarian(AP *p);
-int    ap_make_cuts(AP *p);
-void   ap_preproc(AP *p);
-void   ap_print_solution(AP *p);
-AP    *ap_read_problem(char *file);
-void   ap_reduce_cuts(AP *p);
-void   ap_show_data(AP *p);
+/* public interface */
 
-int    ap_iterations(AP *p);
-int    ap_size(AP *p);
-int    ap_time(AP *p);
-int    ap_costmatrix(AP *p, double **m);
-int    ap_datamatrix(AP *p, double **m);
-int    ap_generate_solution(AP *p);
+/* constructors and destructor */
+AP     *ap_create_problem(double *t, int n);
+AP     *ap_create_problem_from_matrix(double **t, int n);
+AP     *ap_read_problem(char *file);
+void    ap_free(AP *p);
 
-int    ap_free(AP *p);
+int     ap_assignment(AP *p, int *res);
+int     ap_costmatrix(AP *p, double **m);
+int     ap_datamatrix(AP *p, double **m);
+int     ap_iterations(AP *p);
+void    ap_hungarian(AP *p);
+double  ap_mincost(AP *p);
+void    ap_print_solution(AP *p);
+void    ap_show_data(AP *p);
+int     ap_size(AP *p);
+int     ap_time(AP *p);
+
+/* error reporting */
+void ap_error(char *message);
+
+/* private functions */
+void    preprocess(AP *p);
+void    preassign(AP *p);
+int     cover(AP *p, int *ri, int *ci);
+void    reduce(AP *p, int *ri, int *ci);
+
+
+
+
+
+
