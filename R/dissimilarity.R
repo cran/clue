@@ -5,6 +5,12 @@ function(x, y = NULL, method = "euclidean")
 {
     x <- as.cl_ensemble(x)
     is_partition_ensemble <- inherits(x, "cl_partition_ensemble")
+
+    ## Be nice.
+    if(is.character(y) || is.function(y)) {
+        method <- y
+        y <- NULL
+    }
     
     if(!is.function(method)) {
         builtin_methods <- if(is_partition_ensemble)
@@ -20,9 +26,10 @@ function(x, y = NULL, method = "euclidean")
               "rate of inversions")
         if(is.na(ind <- pmatch(tolower(method),
                                tolower(builtin_methods))))
-            stop(paste("Value", sQuote(method),
-                       "is not a valid abbreviation",
-                       "for a dissimilarity method."))
+
+            stop(gettextf("Value '%s' is not a valid abbreviation for a dissimilarity method.",
+                          method),
+                 domain = NA)
         method <- paste(".cl_dissimilarity",
                         if(is_partition_ensemble)
                         "partition"                        
@@ -94,9 +101,23 @@ function(x, y)
 .cl_dissimilarity_partition_comemberships <-
 function(x, y)
 {
-    C_x <- crossprod(t(cl_membership(x))) # M_x M_x'
-    C_y <- crossprod(t(cl_membership(y))) # M_y M_y'
-    sum((C_x - C_y) ^ 2) / n_of_objects(x) ^ 2
+    ## We used to have the straightforward
+    ##   C_x <- crossprod(t(cl_membership(x))) # M_x M_x'
+    ##   C_y <- crossprod(t(cl_membership(y))) # M_y M_y'
+    ##   sum((C_x - C_y) ^ 2) / n_of_objects(x) ^ 2
+    ## But note that
+    ##   \| AA' - BB' \|^2
+    ##      = tr((AA' - BB')'(AA' - BB')
+    ##      = tr(A'A A'A) - 2 tr(A'B B'A) + tr(B'B B'B)
+    ##      = \| A'A \|^2 - 2 \| A'B \|^2 + \| B'B \|^2
+    ## which can be computed much more efficiently as all involved cross
+    ## product matrices are "small" ...
+    k <- max(n_of_classes(x), n_of_classes(y))
+    M_x <- cl_membership(x, k)
+    M_y <- cl_membership(y, k)
+    (sum(crossprod(M_x) ^ 2)
+     - 2 * sum(crossprod(M_x, M_y) ^ 2)
+     + sum(crossprod(M_y) ^ 2)) / (n_of_objects(x) ^ 2)
 }
 
 ### ** .cl_dissimilarity_hierarchy_euclidean
@@ -104,8 +125,7 @@ function(x, y)
 .cl_dissimilarity_hierarchy_euclidean <-
 function(x, y)
 {
-    u <- cl_ultrametric(x)
-    sum((u - cl_ultrametric(y)) ^ 2) / length(u)
+    mean((cl_ultrametric(x) - cl_ultrametric(y)) ^ 2)
 }
 
 ### ** .cl_dissimilarity_hierarchy_cophenetic

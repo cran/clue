@@ -11,14 +11,13 @@
 \newcommand{\dQuote}[1]{``{#1}''}
 \let\code=\texttt
 \newcommand{\file}[1]{\sQuote{\textsf{#1}}}
-
 \newcommand{\class}[1]{\code{"#1"}}
 
-\sloppy{}
+\SweaveOpts{strip.white=TRUE}
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2005-05-13}
+\date{2005-06-01}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -76,20 +75,23 @@ providing a computational environment for creating and analyzing cluster
 ensembles.  In Section~2, we describe the underlying data structures,
 and the functionality for measuring proximity, obtaining consensus
 clusterings, and ``secondary'' clusterings.  Four examples are discussed
-in Section~3.  Section~4 concludes.
+in Section~3.  Section~4 concludes the paper.
 
 
 \section{Data structures and algorithms}
 \label{sec:structures+algorithms}
 
-\subsection{Partitions and Hierarchies}
+\subsection{Partitions and hierarchies}
 
 Representations of clusterings of objects greatly vary across the
 multitude of methods available in R packages.  For example, the class
 ids (``cluster labels'') for the results of \code{kmeans()} in base
-package~\pkg{stats}, \code{pam()} in recommended package~\pkg{cluster},
-and \code{Mclust()} in package~\pkg{mclust}, are available as components
-named \code{cluster}, \code{clustering}, and \code{classification},
+package~\pkg{stats}, \code{pam()} in recommended
+package~\pkg{cluster}~\citep{cluster:Rousseeuw+Struyf+Hubert:2005,
+  cluster:Struyf+Hubert+Rousseeuw:1996}, and \code{Mclust()} in
+package~\pkg{mclust}~\citep{cluster:Fraley+Raftery+Wehrens:2005,
+  cluster:Fraley+Raftery:2003}, are available as components named
+\code{cluster}, \code{clustering}, and \code{classification},
 respectively, of the R objects returned by these functions.  In many
 cases, the representations inherit from suitable classes.  (We note that
 for versions of R prior to 2.1.0, \code{kmeans()} only returned a
@@ -271,10 +273,10 @@ replications of the base algorithm.
 
 The methods provided in package~\pkg{clue} handle the partitions and
 hierarchies obtained from clustering functions in the base R
-distribution, as well as packages \pkg{cclust}
-\citep{cluster:Dimitriadou:2005}, \pkg{cluster}, \pkg{e1071}
-\citep{cluster:Dimitriadou+Hornik+Leisch:2005}, and \pkg{mclust} (and of
-course, \pkg{clue} itself).
+distribution, as well as packages
+\pkg{cclust}~\citep{cluster:Dimitriadou:2005}, \pkg{cluster},
+\pkg{e1071}~\citep{cluster:Dimitriadou+Hornik+Leisch:2005}, and
+\pkg{mclust} (and of course, \pkg{clue} itself).
 
 Extending support to other packages is straightforward, provided that
 clusterings are instances of classes.  Suppose e.g.\ that a package has
@@ -296,7 +298,7 @@ function(x)
     TRUE
 @ 
 
-\subsection{Cluster Ensembles}
+\subsection{Cluster ensembles}
 
 Cluster ensembles are realized as lists of clusterings with additional
 class information.  All clusterings in an ensemble must be of the same
@@ -352,26 +354,27 @@ closest prototype).  In fact, we believe that for unsupervised learning
 methods such as clustering, \emph{reweighting} is conceptually superior
 to resampling, and have therefore recently enhanced package~\pkg{e1071}
 to provide an implementation of weighted fuzzy $c$-means, and
-package~\pkg{flexclust} (not yet released) contains an implementation of
-weighted $k$-means by F.~Leisch.  We are currently experimenting with
-interfaces for providing ``direct'' support for reweighting via
-\code{cl\_boot()}.
+package~\pkg{flexclust}~\citep[not yet released]{cluster:Leisch:2005}
+contains an implementation of weighted $k$-means.  We are currently
+experimenting with interfaces for providing ``direct'' support for
+reweighting via \code{cl\_boot()}.
 
-\subsection{Cluster Proximities}
+\subsection{Cluster proximities}
 
 \subsubsection{Principles}
 
 Computing dissimilarities and similarities (``agreements'') between
 clusterings of the same objects is a key ingredient in the analysis of
 cluster ensembles.  The ``standard'' data structures available for such
-proximity data are classes~\class{dist} and \class{dissimilarity} in
-package~\pkg{cluster} (which basically, but not strictly, extends
-\class{dist}), and are both not entirely suited to our needs.  First,
-they are confined to \emph{symmetric} dissimilarity data.  Second, they
-do not provide enough reflectance.  We also note that the Bioconductor
-package~\pkg{graph} contains an efficient subscript method for objects
-of class~\class{dist}, but returns a ``raw'' matrix for row/column
-subscripting.
+proximity data (measures of similarity or dissimilarity) are
+classes~\class{dist} and \class{dissimilarity} in package~\pkg{cluster}
+(which basically, but not strictly, extends \class{dist}), and are both
+not entirely suited to our needs.  First, they are confined to
+\emph{symmetric} dissimilarity data.  Second, they do not provide enough
+reflectance.  We also note that the Bioconductor
+package~\pkg{graph}~\citep{cluster:Gentleman+Whalen:2005} contains an
+efficient subscript method for objects of class~\class{dist}, but
+returns a ``raw'' matrix for row/column subscripting.
 
 For package~\pkg{clue}, we use the following approach.  There are
 classes for symmetric and (possibly) non-symmetric proximity data
@@ -427,9 +430,9 @@ coincide (in which case they are transforms of each other), but do not
 necessarily do so, as there typically are no canonical transformations.
 E.g., according to needs and scientific community, agreements might be
 transformed to dissimilarities via $d = - \log(s)$ or the square root
-thereof \citep[e.g.,]{cluster:Strehl+Ghosh:2003b}, or via $d = 1 - s$.
+thereof \citep[e.g.,][]{cluster:Strehl+Ghosh:2003b}, or via $d = 1 - s$.
 
-\subsubsection{Partition Proximities}
+\subsubsection{Partition proximities}
 
 When assessing agreement or dissimilarity of partitions, one needs to
 consider that the class ids may be permuted arbitrarily without changing
@@ -441,8 +444,9 @@ on co-occurences, such as the Katz-Powell
 \citep{cluster:Katz+Powell:1953} or Rand \citep{cluster:Rand:1971}
 indices, do not explicitly need to adjust for possible re-labeling.  The
 same is true for measures based on the ``confusion matrix'' $M'
-\tilde{M}$ which are invariant under permuations of rows and columns,
-such as the Normalized Mutual Information (NMI) measure introduced in
+\tilde{M}$ of two membership matrices $M$ and $\tilde{M}$ which are
+invariant under permuations of rows and columns, such as the Normalized
+Mutual Information (NMI) measure introduced in
 \cite{cluster:Strehl+Ghosh:2003a}.  Other proximity measures need to
 find permutations so that the classes are optimally matched, which of
 course in general requires exhaustive search through all $k!$ possible
@@ -473,7 +477,8 @@ $\Pi$ is thus recognized as an instance of the \emph{linear sum
   assignment problem} (LSAP, also known as the weighted bipartite graph
 matching problem).  The LSAP can be solved by linear programming, e.g.\
 using Simplex-style primal algorithms as done by
-function~\code{lp.assign()} in package~\pkg{lpSolve}), but primal-dual
+function~\code{lp.assign()} in
+package~\pkg{lpSolve}~\citep{cluster:Buttrey:2005}, but primal-dual
 algorithms such as the so-called Hungarian method can be shown to find
 the optimum in time $O(k^3)$
 \citep[e.g.,][]{cluster:Papadimitriou+Steiglitz:1982}.  Available
@@ -482,16 +487,15 @@ published implementations include TOMS 548
 integer weights and $k < 131$.  One can also transform the LSAP into a
 network flow problem, and use e.g. RELAX-IV
 \citep{cluster:Bertsekas+Tseng:1994} for solving this, as is done in
-package~\pkg{optmatch}, available from
-\url{http://www.stat.lsa.umich.edu/~bbh/optmatch.html}.  In
+package~\pkg{optmatch}~\citep{cluster:Hansen:2005}.  In
 package~\pkg{clue}, we use an efficient C implementation of the
 Hungarian algorithm kindly provided to us by Walter B\"ohm, which has
 been found to perform very well across a wide range of problem sizes.
 
-The partition agreement measures `angle' and `diag' (maximal cosine of
-angle between the memberships, and maximal co-classification rate, where
-both maxima are taken over all column permutations of the membership
-matrices) are based on solving the same LSAP as for Euclidean
+The partition agreement measures ``angle'' and ``diag'' (maximal cosine
+of angle between the memberships, and maximal co-classification rate,
+where both maxima are taken over all column permutations of the
+membership matrices) are based on solving the same LSAP as for Euclidean
 dissimilarity.
 
 Note when assessing proximity that agreements for soft partitions are
@@ -519,7 +523,7 @@ the ``usual'' choice.  A similar point can be made for co-occurrences of
 soft memberships.  We are not aware of systematic investigations of
 these extension issues.
 
-\subsubsection{Hierachy Proximities}
+\subsubsection{Hierachy proximities}
 
 Available built-in dissimilarity measures for hierarchies include
 \emph{Euclidean} dissimilarity (again, the default measure used by
@@ -542,7 +546,7 @@ only the relative ``structure'' of the dendrograms is of interest,
 Euclidean dissimilarities should only be used after transforming the
 ultrametrics to a common range of values (e.g., to $[0,1]$).
 
-\subsection{Consensus Clusterings}
+\subsection{Consensus clusterings}
 
 There are three main approaches to obtaining consensus clusterings
 \citep{cluster:Hornik:2005,cluster:Gordon+Vichi:2001}: in the
@@ -567,6 +571,20 @@ clusterings maximizing weighted average similarity.  Following
 (weighted) \emph{median} or \emph{medoid} clustering if the optimum is
 sought over the set of all possible base clusterings, or the set $\{
 C_1, \ldots, C_B \}$ of the base clusterings, respectively.
+
+For computing median clusterings, package~\pkg{clue} provides function
+\code{cl\_median()} which has synopsis \code{cl\_median(x, method =
+  NULL, weights = 1, control = list())}.  This allows (similar to the
+functions for computing cluster proximities, see Section~\ref{synopsis}
+on Page~\pageref{synopsis}) argument \code{method} to be a character
+string specifying one of the built-in methods discussed below, or a
+function to be taken as a user-defined method (taking an ensemble, the
+case weights, and a list of control parameters as its arguments), again
+making it reasonably straightforward to add methods.
+Function~\code{cl\_medoid()} can be used for obtaining medoid partitions
+(using, in principle, arbitrary dissimilarities).  Modulo possible
+differences in the case of ties, this gives the same results as (the
+medoid obtained by) \code{pam()} in package~\pkg{cluster}.
 
 If all elements of the ensemble are partitions, package~\pkg{clue}
 provides algorithms for computing soft median partitions for weighted
@@ -703,20 +721,6 @@ optimization problems, and cannot be guaranteed to find a global
 optimum.  Standard practice would recommend to use the best solution
 found in ``sufficiently many'' replications of the methods.
 
-Function \code{cl\_median()} has synopsis \code{cl\_median(x, method =
-  NULL, weights = 1, control = list())}, which allows (similar to the
-functions for computing cluster proximities, see Section~\ref{synopsis}
-on Page~\pageref{synopsis}) argument \code{method} to be a character
-string specifying one of the built-in methods as discussed above, or a
-function to be taken as a user-defined method (taking an ensemble, the
-case weights, and a list of control parameters as its arguments), again
-making it reasonably straightforward to add methods.
-
-Finally, function \code{cl\_medoid()} can be used for obtaining medoid
-partitions (using, in principle, arbitrary dissimilarities).  Mudulo
-possible differences in the case of ties, this gives the same results as
-(the medoid obtained by) \code{pam()} in package~\pkg{cluster}.
-
 Alternative recent approaches to obtaining consensus partitions include
 ``Bagged Clustering'' \citep[implemented in
 package~\pkg{e1071}]{cluster:Leisch:1999}, the ``evidence accumulation''
@@ -737,7 +741,7 @@ data set and bootstrap samples from it, respectively.)  Finally, the
 approach of \cite{cluster:Fern+Brodley:2004} solves an LSAP for an
 asymmetric cost matrix based on object-by-all-classes incidences.
 
-\subsection{Cluster Partitions}
+\subsection{Cluster partitions}
 
 To investigate the ``structure'' in a cluster ensemble, an obvious idea
 is to start clustering the clusterings in the ensemble, resulting in
@@ -772,7 +776,7 @@ prototypes, and computing new prototypes as the class medians.  This may
 result in degenerate solutions, and will be replaced by a Hartigan-Wong
 \citep{cluster:Hartigan+Wong:1979} style algorithm eventually.  For $m >
 1$, a generalization of the fuzzy $c$-means recipe
-\citep[e.g.,]{cluster:Bezdek:1981} is used, which alternates between
+\citep[e.g.,][]{cluster:Bezdek:1981} is used, which alternates between
 computing optimal memberships for fixed prototypes, and computing new
 prototypes as the class medians.
 
@@ -792,30 +796,37 @@ non-convex structure which cannot be found by the base algorithm.  Such
 data sets contain points in 2-dimensional space drawn from the uniform
 distribution on 3 structures, with the two ``outer'' ones banana-shaped
 and the ``middle'' one a circle, and can be obtained by
-function~\code{mlbench.cassini()} in package~\pkg{mlbench}
-\citep{cluster:Leisch+Dimitriadou:2005}.  Package~\pkg{clue} contains
-the data sets \code{Cassini} and \code{CKME}, which are an instance of a
-1000-point Cassini data set, and a cluster ensemble of 50 $k$-means
-partitions of the data set into three classes, respectively.
+function~\code{mlbench.cassini()} in
+package~\pkg{mlbench}~\citep{cluster:Leisch+Dimitriadou:2005}.
+Package~\pkg{clue} contains the data sets \code{Cassini} and
+\code{CKME}, which are an instance of a 1000-point Cassini data set, and
+a cluster ensemble of 50 $k$-means partitions of the data set into three
+classes, respectively.
 
 The data set is shown in Figure~\ref{fig:Cassini}.
-\begin{figure}
-  \centering
-<<fig=TRUE,echo=FALSE>>=
+<<Cassini-data,eval=FALSE>>=
 data("Cassini")
 plot(Cassini$x, col = as.integer(Cassini$classes),
      xlab = "", ylab = "")
+@ 
+\begin{figure}
+  \centering
+<<fig=TRUE,echo=FALSE>>=
+<<Cassini-data>>
 @ 
   \caption{The Cassini data set.}
   \label{fig:Cassini}
 \end{figure}
 Figure~\ref{fig:CKME} gives a dendrogram of the Euclidean
 dissimilarities of the elements of the $k$-means ensemble.
+<<CKME,eval=FALSE>>=
+data("CKME")
+plot(hclust(cl_dissimilarity(CKME)), labels = FALSE)
+@ 
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
-data("CKME")
-plot(hclust(cl_dissimilarity(CKME)), labels = FALSE)
+<<CKME>>
 @ 
   \caption{A dendrogram of the Euclidean dissimilarities of 50 $k$-means
     partitions of the Cassini data into 3 classes.}
@@ -830,10 +841,13 @@ m1 <- cl_medoid(CKME)
 table(Medoid = cl_class_ids(m1), "True Classes" = Cassini$classes)
 @ 
 and inspecting it (Figure~\ref{fig:Cassini-medoid}):
+<<Cassini-medoid,eval=FALSE>>=
+plot(Cassini$x, col = cl_class_ids(m1), xlab = "", ylab = "")
+@ 
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
-plot(Cassini$x, col = cl_class_ids(m1), xlab = "", ylab = "")
+<<Cassini-medoid>>
 @ 
   \caption{Medoid of the Cassini $k$-means ensemble.}
   \label{fig:Cassini-medoid}
@@ -849,23 +863,26 @@ with confusion matrix
 <<>>=
 table(Median = cl_class_ids(m2), "True Classes" = Cassini$classes)
 @ 
-(see Figure~\ref{fig:Cassini-median}),
+and details as displayed in Figure~\ref{fig:Cassini-median}:
+<<Cassini-median,eval=FALSE>>=
+plot(Cassini$x, col = cl_class_ids(m2), xlab = "", ylab = "")
+@ 
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
-plot(Cassini$x, col = cl_class_ids(m2), xlab = "", ylab = "")
+<<Cassini-median>>
 @ 
   \caption{Median of the Cassini $k$-means ensemble.}
   \label{fig:Cassini-median}
 \end{figure}
-which has drastically improved performance, and perfect recovery of the
+This has drastically improved performance, and perfect recovery of the
 two outer shapes.  In fact,
 \cite{cluster:Dimitriadou+Weingessel+Hornik:2002} show that almost
 perfect classification can be obtained by suitable combinations of
 different base clusterers ($k$-means, fuzzy $c$-means, and unsupervised
 fuzzy competitive learning).
 
-\subsection{Vichi-Gordon macroeconomic data}
+\subsection{Gordon-Vichi macroeconomic data}
 
 \citet[Table 1]{cluster:Gordon+Vichi:2001} provide soft partitions of 21
 countries based on macroeconomic data for the years 1975, 1980, 1985,
@@ -1081,9 +1098,14 @@ detail in the course of this paper).
 We are hoping to be able to provide many of these extensions in the near
 future.
 
+\subsubsection*{Acknowledgments}
+
+We are grateful to Walter B\"ohm for providing efficient C code for
+solving assignment problems.
+
 
 {\small
-  \bibliographystyle{plainnat}
+  \bibliographystyle{abbrvnat}
   \bibliography{cluster}
 }
 
