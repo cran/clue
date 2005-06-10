@@ -3,9 +3,9 @@
 \title{Prototype-Based Partitions of Clusterings}
 \description{
   Compute prototype-based partitions of a cluster ensemble by minimizing
-  \eqn{\sum u_{bj}^m d(x_b, p_j)}, the sum of the membership-weighted
-  Euclidean dissimilarities between the elements \eqn{x_b} of the
-  ensemble and the prototypes \eqn{p_j}.
+  \eqn{\sum u_{bj}^m d(x_b, p_j)^2}, the sum of the membership-weighted
+  squared Euclidean dissimilarities between the elements \eqn{x_b} of
+  the ensemble and the prototypes \eqn{p_j}.
 }
 \usage{
 cl_pclust(x, k, m = 1, control = list())
@@ -40,18 +40,19 @@ cl_pclust(x, k, m = 1, control = list())
   For \eqn{m = 1}, a generalization of the Lloyd-Forgy variant of the
   \eqn{k}-means algorithm is used, which iterates between reclassifying
   objects to their closest prototypes, and computing new prototypes as
-  the class medians.  This may result in degenerate solutions, and will
-  be replaced by a Hartigan-Wong style algorithm eventually.
+  the least squares consensus clusterings for the classes.  This may
+  result in degenerate solutions, and will be replaced by a
+  Hartigan-Wong style algorithm eventually.
 
   For \eqn{m > 1}, a generalization of the fuzzy \eqn{c}-means recipe
   (e.g., Bezdek (1981)) is used, which alternates between computing
   optimal memberships for fixed prototypes, and computing new prototypes
-  as the class medians.
+  as the least squares consensus clusterings for the classes.
 
   This procedure is repeated until convergence occurs, or the maximal
   number of iterations is reached.
 
-  Class medians are computed using \code{\link{cl_median}}.
+  Consensus clusterings are computed using \code{\link{cl_consensus}}.
 
   Available control parameters are as follows.
   \describe{
@@ -60,16 +61,16 @@ cl_pclust(x, k, m = 1, control = list())
     \item{\code{reltol}}{the relative convergence tolerance.  Defaults
       to \code{sqrt(.Machine$double.eps)}.}
     \item{\code{method}}{the method to be used in
-      \code{\link{cl_median}}.}
+      \code{\link{cl_consensus}}.}
     \item{\code{control}}{control parameters to be used in
-      \code{\link{cl_median}}.}
+      \code{\link{cl_consensus}}.}
   }
 
   The fixed point approach employed is a heuristic which cannot be
   guaranteed to find the global minimum (as this is already true for the
-  computation of cluster medians).  Standard practice would recommend to
-  use the best solution found in \dQuote{sufficiently many} replications
-  of the base algorithm.
+  computation of consensus clusterings).  Standard practice would
+  recommend to use the best solution found in \dQuote{sufficiently many}
+  replications of the base algorithm.
 }
 \references{
   J. C. Bezdek (1981).
@@ -90,8 +91,9 @@ diss <- cl_dissimilarity(CKME)
 hc <- hclust(diss)
 plot(hc)
 ## This suggests using a partition with three classes, which can be
-## obtained using cutree(hc, 3).  Could use cl_median() to compute
-## prototypes as the medians of the classes, or alternatively:
+## obtained using cutree(hc, 3).  Could use cl_consensus() to compute
+## prototypes as the least squares consensus clusterings of the classes,
+## or alternatively: 
 x1 <- cl_pclust(CKME, 3, m = 1)
 x2 <- cl_pclust(CKME, 3, m = 2)
 ## Agreement of solutions.

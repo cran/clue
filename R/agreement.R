@@ -19,11 +19,13 @@ function(x, y = NULL, method = "euclidean")
 
     if(!is.function(method)) {
         builtin_methods <- if(is_partition_ensemble)
-            c("euclidean", "Rand", "cRand", "NMI", "KP", "angle", "diag")
+            c("euclidean", "manhattan", "Rand", "cRand", "NMI", "KP",
+              "angle", "diag")
         else
-            c("euclidean", "cophenetic", "angle", "gamma")
+            c("euclidean", "manhattan", "cophenetic", "angle", "gamma")
         builtin_method_names <- if(is_partition_ensemble)
             c("minimal euclidean membership distances",
+              "minimal manhattan membership distances",
               "Rand index",
               "corrected Rand index",
               "normalized mutual information",
@@ -32,6 +34,7 @@ function(x, y = NULL, method = "euclidean")
               "maximal co-classification rate")
         else
             c("euclidean ultrametric distances",
+              "manhattan ultrametric distances",              
               "cophenetic correlations",
               "angle between ultrametrics",
               "rate of inversions")
@@ -100,7 +103,25 @@ function(x, y = NULL, method = "euclidean")
 
 .cl_agreement_partition_euclidean <-
 function(x, y)
-    1 - .cl_dissimilarity_partition_euclidean(x, y)
+{
+    ## <NOTE>
+    ## Upper bound for maximal dissimilarity, maybe improve eventually.
+    d_max <- sqrt(2 * n_of_objects(x))
+    ## </NOTE>
+    1 - .cl_dissimilarity_partition_euclidean(x, y) / d_max
+}
+
+### ** .cl_agreement_partition_manhattan
+
+.cl_agreement_partition_manhattan <-
+function(x, y)
+{
+    ## <NOTE>
+    ## Upper bound for maximal dissimilarity, maybe improve eventually.
+    d_max <- 2 * n_of_objects(x)
+    ## </NOTE>
+    1 - .cl_dissimilarity_partition_manhattan(x, y) / d_max
+}
     
 ### ** .cl_agreement_partition_Rand
 
@@ -241,6 +262,12 @@ function(x, y)
 .cl_agreement_hierarchy_euclidean <-
 function(x, y)
     1 / (1 + .cl_dissimilarity_hierarchy_euclidean(x, y))
+
+### ** .cl_agreement_hierarchy_manhattan
+
+.cl_agreement_hierarchy_manhattan <-
+function(x, y)
+    1 / (1 + .cl_dissimilarity_hierarchy_manhattan(x, y))
 
 ### ** .cl_agreement_hierarchy_cophenetic
 

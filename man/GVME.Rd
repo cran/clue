@@ -1,11 +1,11 @@
-\name{Macro}
-\alias{Macro}
-\title{Gordon-Vichi Macroeconomic Partition Data}
+\name{GVME}
+\alias{GVME}
+\title{Gordon-Vichi Macroeconomic Partition Ensemble Data}
 \description{
   Soft partitions of 21 countries based on macroeconomic data for the
   years 1975, 1980, 1985, 1990, and 1995.
 }
-\usage{data("Macro")}
+\usage{data("GVME")}
 \format{
   A named cluster ensemble of 5 soft partitions of 21 countries into 2
   or 3 classes.  The names are the years to which the partitions

@@ -90,8 +90,9 @@ ls_fit_ultrametric(x, control = list())
   \emph{Pattern Recognition Letters}, \bold{2}, 133--137.
 }
 \seealso{
-  \code{\link{cl_median}} for computing median hierarchies by least
-  squares fitting average ultrametric distances.
+  \code{\link{cl_consensus}} for computing least squares consensus
+  hierarchies by least squares fitting of average ultrametric
+  distances.
 }
 \examples{
 ## Least squares fit of an ultrametric to the Miller-Nicely consonant

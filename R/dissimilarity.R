@@ -14,14 +14,16 @@ function(x, y = NULL, method = "euclidean")
     
     if(!is.function(method)) {
         builtin_methods <- if(is_partition_ensemble)
-            c("euclidean", "comemberships")
+            c("euclidean", "manhattan", "comemberships")
         else
-            c("euclidean", "cophenetic", "gamma")
+            c("euclidean", "manhattan", "cophenetic", "gamma")
         builtin_method_names <- if(is_partition_ensemble)
             c("minimal euclidean membership distances",
+              "minimal manhattan membership distances",
               "euclidean comembership distances")
         else
             c("euclidean ultrametric distances",
+              "manhattan ultrametric distances",
               "cophenetic correlations",
               "rate of inversions")
         if(is.na(ind <- pmatch(tolower(method),
@@ -93,8 +95,21 @@ function(x, y)
     M_y <- cl_membership(y, k)
     ## Match classes from conforming memberships.
     ind <- solve_LSAP(crossprod(M_x, M_y), max = TRUE)
-    sum((M_x - M_y[, ind]) ^ 2) / (2 * n_of_objects(x))
+    sqrt(sum((M_x - M_y[, ind]) ^ 2))
 }
+
+### ### ** .cl_dissimilarity_partition_manhattan
+
+.cl_dissimilarity_partition_manhattan <-
+function(x, y)
+{
+    k <- max(n_of_classes(x), n_of_classes(y))
+    M_x <- cl_membership(x, k)
+    M_y <- cl_membership(y, k)
+    C <- .cxdist(M_x, M_y, "manhattan")
+    ind <- solve_LSAP(C)
+    sum(C[seq(along = ind), ind])
+}    
 
 ### ** .cl_dissimilarity_partition_comemberships
 
@@ -115,9 +130,9 @@ function(x, y)
     k <- max(n_of_classes(x), n_of_classes(y))
     M_x <- cl_membership(x, k)
     M_y <- cl_membership(y, k)
-    (sum(crossprod(M_x) ^ 2)
-     - 2 * sum(crossprod(M_x, M_y) ^ 2)
-     + sum(crossprod(M_y) ^ 2)) / (n_of_objects(x) ^ 2)
+    sqrt(sum(crossprod(M_x) ^ 2)
+         - 2 * sum(crossprod(M_x, M_y) ^ 2)
+         + sum(crossprod(M_y) ^ 2))
 }
 
 ### ** .cl_dissimilarity_hierarchy_euclidean
@@ -125,7 +140,15 @@ function(x, y)
 .cl_dissimilarity_hierarchy_euclidean <-
 function(x, y)
 {
-    mean((cl_ultrametric(x) - cl_ultrametric(y)) ^ 2)
+    sqrt(sum((cl_ultrametric(x) - cl_ultrametric(y)) ^ 2))
+}
+
+### ** .cl_dissimilarity_hierarchy_manhattan
+
+.cl_dissimilarity_hierarchy_manhattan <-
+function(x, y)
+{
+    sum(abs(cl_ultrametric(x) - cl_ultrametric(y)))
 }
 
 ### ** .cl_dissimilarity_hierarchy_cophenetic
@@ -178,6 +201,49 @@ function(x, i, j)
     }
     y
 }
+
+### .cxdist
+
+.cxdist <-
+function(A, B, method = "manhattan")
+{
+    ## Return the column cross distance matrix of A and B.
+    ## I.e., the matrix C = [c_{j,k}] with
+    ##   c_{j,k} = distance(A[, j], B[, k])
+    ## Currently, only Manhattan (L1) distances are provided.
+    ## Extensions to Minkowski or even more distances (a la dist())
+    ## could be added eventually.
+
+    ## <NOTE>
+    ## Possible implementations include
+    ##
+    ## foo_a <- function(A, B)
+    ##   apply(B, 2, function(u) colSums(abs(A - u)))
+    ## foo_d <- function(A, B) {
+    ##   out <- as.matrix(dist(rbind(t(A), t(B)), "manhattan"))
+    ##   dimnames(out) <- NULL
+    ##   nc_B <- NCOL(B)
+    ##   out[seq(from = NCOL(A) + 1, length = nc_B), seq(length = nc_B)]
+    ## }
+    ## foo_f <- function(A, B) {
+    ##   out <- matrix(0, NCOL(A), NCOL(B))
+    ##   for(j in seq(length = NCOL(A)))
+    ##     for(k in seq(length = NCOL(B)))
+    ##       out[j, k] = sum(abs(A[, j] - B[, k]))
+    ##   out
+    ## }
+    ##
+    ## The one actually used seems to be the best performer, with the
+    ## "for" version a close second (note that "typically", A and B have
+    ## much fewer columns than rows).
+    ## only few columns 
+    
+    out <- matrix(0, NCOL(A), NCOL(B))
+    for(k in seq(length = NCOL(B)))
+        out[, k] <- colSums(abs(A - B[, k]))
+    out
+}
+
 
 ### Local variables: ***
 ### mode: outline-minor ***

@@ -12,7 +12,7 @@
 }
 \details{
   The elements of the ensemble are named \code{"MF1"}, \code{"MF2"}, and
-  \code{"JMF"}, and correspond to the median partitions obtained by
+  \code{"JMF"}, and correspond to the consensus partitions obtained by
   applying models 1, 2, and 3 in Gordon and Vichi (2001) to the kinship
   terms partition data in Rosenberg (1982), which are available as data
   set \code{\link{Kinship82}}.
@@ -33,7 +33,7 @@
   Hillsdale, NJ: Erlbaum.
 }
 \examples{
-## Load the median consensus partitions.
+## Load the consensus partitions.
 data("Kinship82_Consensus")
 ## Fuzziness using the Partition Coefficient.
 cl_fuzziness(Kinship82_Consensus)

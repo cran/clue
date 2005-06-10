@@ -17,7 +17,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2005-06-01}
+\date{2005-06-10}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -548,7 +548,9 @@ ultrametrics to a common range of values (e.g., to $[0,1]$).
 
 \subsection{Consensus clusterings}
 
-There are three main approaches to obtaining consensus clusterings
+Consensus clusterings ``synthesize'' the information in the elements of
+a cluster ensemble into a single clustering.  There are three main
+approaches to obtaining consensus clusterings
 \citep{cluster:Hornik:2005,cluster:Gordon+Vichi:2001}: in the
 \emph{constructive} approach, one specifies a way to construct a
 consensus clustering.  In the \emph{axiomatic} approach, emphasis is on
@@ -561,37 +563,41 @@ clusterings.  If $d$ is a dissimilarity measure and $C_1, \ldots, C_B$
 are the elements of the ensemble, one can e.g.\ look for solutions of
 the problem
 \begin{displaymath}
-  \sum\nolimits_{b=1}^B w_b d(C, C_b)
+  \sum\nolimits_{b=1}^B w_b d(C, C_b) ^ p
   \Rightarrow \min\nolimits_{C \in \mathcal{C}},
 \end{displaymath}
-i.e., as clusterings~$C^*$ minimizing weighted average dissimilarity.
-Analogously, if a similarity measure is given, one can look for
-clusterings maximizing weighted average similarity.  Following
-\cite{cluster:Gordon+Vichi:1998}, an above $C^*$ is referred to as
-(weighted) \emph{median} or \emph{medoid} clustering if the optimum is
-sought over the set of all possible base clusterings, or the set $\{
-C_1, \ldots, C_B \}$ of the base clusterings, respectively.
+for some $p \ge 0$, i.e., as clusterings~$C^*$ minimizing weighted
+average dissimilarity powers of order~$p$.  Analogously, if a similarity
+measure is given, one can look for clusterings maximizing weighted
+average similarity powers.  Following \cite{cluster:Gordon+Vichi:1998},
+an above $C^*$ is referred to as (weighted) \emph{median} or
+\emph{medoid} clustering if $p = 1$ and the optimum is sought over the
+set of all possible base clusterings, or the set $\{ C_1, \ldots, C_B
+\}$ of the base clusterings, respectively.  For $p = 2$, we have
+\emph{least squares} consensus clusterings (generalized means).
 
-For computing median clusterings, package~\pkg{clue} provides function
-\code{cl\_median()} which has synopsis \code{cl\_median(x, method =
-  NULL, weights = 1, control = list())}.  This allows (similar to the
-functions for computing cluster proximities, see Section~\ref{synopsis}
-on Page~\pageref{synopsis}) argument \code{method} to be a character
-string specifying one of the built-in methods discussed below, or a
-function to be taken as a user-defined method (taking an ensemble, the
-case weights, and a list of control parameters as its arguments), again
-making it reasonably straightforward to add methods.
-Function~\code{cl\_medoid()} can be used for obtaining medoid partitions
-(using, in principle, arbitrary dissimilarities).  Modulo possible
-differences in the case of ties, this gives the same results as (the
-medoid obtained by) \code{pam()} in package~\pkg{cluster}.
+For computing consensus clusterings, package~\pkg{clue} provides
+function \code{cl\_consensus()} which has synopsis
+\code{cl\_consensus(x, method = NULL, weights = 1, control = list())}.
+This allows (similar to the functions for computing cluster proximities,
+see Section~\ref{synopsis} on Page~\pageref{synopsis}) argument
+\code{method} to be a character string specifying one of the built-in
+methods discussed below, or a function to be taken as a user-defined
+method (taking an ensemble, the case weights, and a list of control
+parameters as its arguments), again making it reasonably straightforward
+to add methods.  In addition, function~\code{cl\_medoid()} can be used
+for obtaining medoid partitions (using, in principle, arbitrary
+dissimilarities).  Modulo possible differences in the case of ties, this
+gives the same results as (the medoid obtained by) \code{pam()} in
+package~\pkg{cluster}.
 
 If all elements of the ensemble are partitions, package~\pkg{clue}
-provides algorithms for computing soft median partitions for weighted
-Euclidean and co-membership dissimilarities, respectively.  Let $M_1,
-\ldots, M_B$ and $M$ denote the membership matrices of the elements of
-the ensemble and their sought median, respectively.  For Euclidean
-dissimilarity (ignoring normalization constants), we need to find
+provides algorithms for computing soft least squares consensus
+partitions for weighted Euclidean and co-membership dissimilarities,
+respectively.  Let $M_1, \ldots, M_B$ and $M$ denote the membership
+matrices of the elements of the ensemble and their sought least squares
+consensus partition, respectively.  For Euclidean dissimilarity, we need
+to find
 \begin{displaymath}
   \sum_b w_b \min\nolimits_{\Pi_b} \| M - M_b \Pi_b \|^2
   \Rightarrow \min\nolimits_M
@@ -638,8 +644,9 @@ for ``typical'' sizes of cluster ensembles ($B \ge 20$, maybe even in
 the hundreds).
 
 Package~\pkg{clue} provides two heuristics for (approximately) finding
-the soft median for Euclidean dissimilarity.  Method \code{"DWH"} of
-function \code{cl\_median()} is an extension of the greedy algorithm in
+the soft least squares consensus partition for Euclidean dissimilarity.
+Method \code{"DWH"} of function \code{cl\_consensus()} is an extension
+of the greedy algorithm in
 \cite{cluster:Dimitriadou+Weingessel+Hornik:2002} which is based on a
 single forward pass through the ensemble which in each step chooses the
 ``locally'' optimal $\Pi$.  Starting with $\tilde{M}_1 = M_1$,
@@ -655,11 +662,12 @@ the weighted average of the current $M_b \Pi_b$, and determining the
 $\Pi_b$ by optimally matching the current $M$ to the individual $M_b$.
 
 In the above, we implicitly assumed that all partitions in the ensemble
-as well as the sought median have the same number of classes.  The more
-general case can be dealt with through suitable projection devices.
+as well as the sought consensus partition have the same number of
+classes.  The more general case can be dealt with through suitable
+projection devices.
 
-When using co-membership dissimilarity, the median is determined by
-minimizing
+When using co-membership dissimilarity, the least squares consensus
+partition is determined by minimizing
 \begin{eqnarray*}
   \lefteqn{\sum_b w_b \|MM' - M_bM_b'\|^2} \\
   &=& s \|MM' - \bar{C}\|^2 + \sum_b w_b \|M_bM_b'\|^2 - s \|\bar{C}\|^2
@@ -668,8 +676,8 @@ over all membership matrices~$M$, where now $\bar{C} = s^{-1} \sum_b
 C(M_b) = s^{-1} \sum_b M_bM_b'$ is the weighted average co-membership
 matrix of the ensemble.  This corresponds to the ``third model'' in
 \cite{cluster:Gordon+Vichi:2001}.  Method \code{"GV3"} of function
-\code{cl\_median()} provides a SUMT approach (see Section~\ref{SUMT} on
-Page~\pageref{SUMT}) for finding the minimum.  We note that this
+\code{cl\_consensus()} provides a SUMT approach (see Section~\ref{SUMT}
+on Page~\pageref{SUMT}) for finding the minimum.  We note that this
 strategy could more generally be applied to consensus problems of the
 form
 \begin{displaymath}
@@ -682,7 +690,7 @@ the ``standard'' fuzzy intersection of co-incidences, as discussed in
 Section~\ref{fuzzy} on Page~\pageref{fuzzy}.
 
 Package~\pkg{clue} currently does not provide algorithms for obtaining
-median \emph{hard} partitions, as e.g.\ done in
+\emph{hard} consensus partitions, as e.g.\ done in
 \cite{cluster:Krieger+Green:1999} using Rand proximity.  It seems
 ``natural'' to extend the methods discussed above to include a
 constraint on softness, e.g., on the partition coefficient PC (see
@@ -702,8 +710,8 @@ restrictions on the admissible $\Pi_b$ in the underlying MAP.  Thus,
 such a simple relaxation approach to obtaining optimal hard partitions
 is not feasible.
 
-For ensembles of hierarchies, \code{cl\_median()} provides a built-in
-method for approximately minimizing average weighted Euclidean
+For ensembles of hierarchies, \code{cl\_consensus()} provides a built-in
+method for approximately minimizing average weighted squared Euclidean
 dissimilarity
 \begin{displaymath}
   \sum_b w_b \| U - U_b \|^2 \Rightarrow \min\nolimits_U
@@ -714,7 +722,7 @@ equivalent to minimizing $\| U - \bar{U} \|^2$, where $\bar{U} = s^{-1}
 \sum_b w_b U_b$ is the weighted average of the $U_b$.  The SUMT approach
 provided by function \code{ls\_fit\_ultrametric()} (see
 Section~\ref{SUMT} on Page~\pageref{SUMT}) is employed for finding the
-sought weighted Euclidean median hierarchy.
+sought weighted least squares consensus hierarchy.
 
 Clearly, the available methods use heuristics for solving hard
 optimization problems, and cannot be guaranteed to find a global
@@ -755,13 +763,13 @@ can even use \code{cutree()} to obtain hard partitions from hierarchies
 thus obtained.)  If prototypes (``typical clusterings'') are desired for
 partitions of clusterings, they can be determined post-hoc by finding
 suitable consensus clusterings in the classes of the partition, e.g.,
-using \code{cl\_median()} or \code{cl\_medoid()}.
+using \code{cl\_consensus()} or \code{cl\_medoid()}.
 
-For the case of Euclidean dissimilarities~$d$ between clusterings,
+For at least Euclidean dissimilarities~$d$ between clusterings,
 package~\pkg{clue} additionally provides \code{cl\_pclust()} for direct
 prototype-based partitioning based on minimizing the criterion function
-$\sum u_{bj}^m d(x_b, p_j)$, the sum of the membership-weighted
-Euclidean dissimilarities between the elements~$x_b$ of the ensemble and
+$\sum u_{bj}^m d(x_b, p_j)^2$, the sum of the membership-weighted
+squared dissimilarities between the elements~$x_b$ of the ensemble and
 the prototypes~$p_j$.  (The underlying feature spaces are that of
 membership matrices and ultrametrics, respectively, for partitions and
 hierarchies.)
@@ -772,17 +780,19 @@ obtained partitions, corresponding to the \dQuote{fuzzification
 generalization of the Lloyd-Forgy variant \citep{cluster:Lloyd:1957,
   cluster:Forgy:1965, cluster:Lloyd:1982} of the $k$-means algorithm is
 used, which iterates between reclassifying objects to their closest
-prototypes, and computing new prototypes as the class medians.  This may
-result in degenerate solutions, and will be replaced by a Hartigan-Wong
+prototypes, and computing new prototypes as the least squares consensus
+clusterings of the classes.  This may result in degenerate solutions,
+and will be replaced by a Hartigan-Wong
 \citep{cluster:Hartigan+Wong:1979} style algorithm eventually.  For $m >
 1$, a generalization of the fuzzy $c$-means recipe
 \citep[e.g.,][]{cluster:Bezdek:1981} is used, which alternates between
 computing optimal memberships for fixed prototypes, and computing new
-prototypes as the class medians.
+prototypes as the least squares consensus clusterings of the classes.
 
 This procedure is repeated until convergence occurs, or the maximal
-number of iterations is reached.  Class medians are computed using (one
-of the methods provided by) \code{cl\_median()}. 
+number of iterations is reached.  Least squares consensus clusterings
+are computed using (one of the methods provided by)
+\code{cl\_consensus()}.
 
 \section{Examples}
 \label{sec:examples}
@@ -854,26 +864,27 @@ plot(Cassini$x, col = cl_class_ids(m1), xlab = "", ylab = "")
 \end{figure}
 Flipping this solution top-down gives a second ``typical'' partition.
 We see that the $k$-means base clusterers cannot resolve the underlying
-non-convex structure.  For the median of the ensemble, we obtain
+non-convex structure.  For the least squares consensus of the ensemble,
+we obtain
 <<>>=
 set.seed(1)
-m2 <- cl_median(CKME)
+m2 <- cl_consensus(CKME)
 @ 
 with confusion matrix
 <<>>=
-table(Median = cl_class_ids(m2), "True Classes" = Cassini$classes)
+table(Consensus = cl_class_ids(m2), "True Classes" = Cassini$classes)
 @ 
-and details as displayed in Figure~\ref{fig:Cassini-median}:
-<<Cassini-median,eval=FALSE>>=
+and details as displayed in Figure~\ref{fig:Cassini-mean}:
+<<Cassini-mean,eval=FALSE>>=
 plot(Cassini$x, col = cl_class_ids(m2), xlab = "", ylab = "")
 @ 
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
-<<Cassini-median>>
+<<Cassini-mean>>
 @ 
-  \caption{Median of the Cassini $k$-means ensemble.}
-  \label{fig:Cassini-median}
+  \caption{Least Squares Consensus of the Cassini $k$-means ensemble.}
+  \label{fig:Cassini-mean}
 \end{figure}
 This has drastically improved performance, and perfect recovery of the
 two outer shapes.  In fact,
@@ -898,32 +909,32 @@ partitions obtained by applying their models 1, 2, and 3 and the
 approach in \cite{cluster:Sato+Sato:1994}.
 
 The partitions and consensus partitions are available in data sets
-\code{Macro} and \code{Macro\_Consensus}, respectively.  We compare the
+\code{GVME} and \code{GVME\_Consensus}, respectively.  We compare the
 results of \cite{cluster:Gordon+Vichi:2001} using Euclidean
-dissimilarities (model 1) to ours as obtained by \code{cl\_median()} with
-method \code{"GV1"}.
+dissimilarities (model 1) to ours as obtained by \code{cl\_consensus()}
+with method \code{"GV1"}.
 
 <<>>=
-data("Macro")
-Macro
+data("GVME")
+GVME
 set.seed(1)
-m1 <- cl_median(Macro, method = "GV1",
-                control = list(k = 2, verbose = TRUE))
+m1 <- cl_consensus(GVME, method = "GV1",
+                   control = list(k = 2, verbose = TRUE))
 @ 
 (Here, we set the random seed for reproducibility.  Of course, one
-should really use several replicates of the median heuristic.)
+should really use several replicates of the consensus heuristic.)
 
 This results in a soft partition with average Euclidean dissimilarity
-(the criterion function to be optimized by the median) of
+(the criterion function to be optimized by the consensus partition) of
 <<>>=
-mean(cl_dissimilarity(Macro, m1))
+mean(cl_dissimilarity(GVME, m1))
 @ 
 We compare this to the consensus solution given in
 \cite{cluster:Gordon+Vichi:2001}:
 <<>>=
-data("Macro_Consensus")
-m2 <- Macro_Consensus[["MF1"]]
-mean(cl_dissimilarity(Macro, m2))
+data("GVME_Consensus")
+m2 <- GVME_Consensus[["MF1"]]
+mean(cl_dissimilarity(GVME, m2))
 table(CLUE = cl_class_ids(m1), GV2001 = cl_class_ids(m2))
 @ 
 Interestingly, we are able to obtain a better solution, which is
@@ -948,19 +959,20 @@ columns interchanged, which is corrected in data set \code{Kinship82}.
 for these data based on their models 1--3 (available in data set
 \code{Kinship82\_Consensus}).  We compare their results using
 co-membership dissimilarities (model 3) to ours as obtained by
-\code{cl\_median()} with method \code{"GV3"}.
+\code{cl\_consensus()} with method \code{"GV3"}.
 
 <<>>=
 data("Kinship82")
 Kinship82
 set.seed(1)
-m1 <- cl_median(Kinship82, method = "GV3",
-                control = list(k = 3, verbose = TRUE))
+m1 <- cl_consensus(Kinship82, method = "GV3",
+                   control = list(k = 3, verbose = TRUE))
 @ 
 (See above for setting the random seed.)
 
 This results in a soft partition with average co-membership
-dissimilarity (the criterion function to be optimized by the median) of
+dissimilarity (the criterion function to be optimized by the consensus
+partition) of
 <<>>=
 mean(cl_dissimilarity(Kinship82, m1, "comem"))
 @ 
@@ -1088,7 +1100,8 @@ detail in the course of this paper).
   approximation problems for the weighted medians of the co-memberships
   and ultrametrics, respectively, and could be approached by employing
   SUMTs analogous to the ones used for the $L_2$ approximations.
- \item Provide heuristics for obtaining \emph{hard} median partitions.
+ \item Provide heuristics for obtaining \emph{hard} consensus
+  partitions.
  \item Add facilities for tuning hyper-parameters (most prominently, the
   number of classes employed) and ``cluster validation'' of partitioning
   algorithms, as recently proposed by

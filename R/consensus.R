@@ -1,15 +1,15 @@
-### * cl_median
+### * cl_consensus
 
-cl_median <-
+cl_consensus <-
 function(x, method = NULL, weights = 1, control = list())
 {
     ## <NOTE>
     ## Interfaces are a matter of taste.
     ## E.g., one might want to have a 'type' argument indication whether
     ## hard or soft partitions are sought.  One could then do
-    ##   cl_median(x, method = "euclidean", type = "hard")
-    ## to look for an optimal median hard partition (for euclidean
-    ## dissimilarity).
+    ##   cl_consensus(x, method = "euclidean", type = "hard")
+    ## to look for an optimal median (or least squares) hard partition
+    ## (for euclidean dissimilarity).
     ## For us, "method" really indicates a certain algorithm, with its
     ## bells and whistles accessed via the 'control' argument.
     ## </NOTE>
@@ -17,7 +17,7 @@ function(x, method = NULL, weights = 1, control = list())
     clusterings <- as.cl_ensemble(x)
 
     if(!length(clusterings))
-        stop("Cannot compute median of empty ensemble.")
+        stop("Cannot compute consensus of empty ensemble.")
 
     weights <- rep(weights, length = length(clusterings))
     if(any(weights < 0))
@@ -40,8 +40,8 @@ function(x, method = NULL, weights = 1, control = list())
                                     tolower(builtin_methods))))
             stop(paste("Value", sQuote(method),
                        "is not a valid abbreviation",
-                       "for a median method."))
-        method <- get(paste(".cl_median",
+                       "for a consensus method."))
+        method <- get(paste(".cl_consensus",
                             if(is_partition_ensemble)
                             "partition"                        
                             else
@@ -53,9 +53,9 @@ function(x, method = NULL, weights = 1, control = list())
     method(clusterings, weights, control)
 }
 
-### ** .cl_median_partition_DWH
+### ** .cl_consensus_partition_DWH
 
-.cl_median_partition_DWH <-
+.cl_consensus_partition_DWH <-
 function(clusterings, weights, control)
 {
     ## <TODO>
@@ -94,9 +94,9 @@ function(clusterings, weights, control)
     cl_membership(as.cl_membership(M[, 1 : k]), k)    
 }
 
-### ** .cl_median_partition_GV1
+### ** .cl_consensus_partition_GV1
 
-.cl_median_partition_GV1 <-
+.cl_consensus_partition_GV1 <-
 function(clusterings, weights, control)
 {
     ## <TODO>
@@ -187,9 +187,9 @@ function(clusterings, weights, control)
     cl_membership(as.cl_membership(M[, 1 : k]), k)
 }
 
-### ** .cl_median_partition_GV3
+### ** .cl_consensus_partition_GV3
 
-.cl_median_partition_GV3 <-
+.cl_consensus_partition_GV3 <-
 function(clusterings, weights, control)
 {
     ## Use a SUMT similar to the one in ls_fit_ultrametric() to solve
@@ -303,9 +303,9 @@ function(clusterings, weights, control)
     cl_membership(as.cl_membership(M), k)
 }
 
-### ** .cl_median_hierarchy_cophenetic
+### ** .cl_consensus_hierarchy_cophenetic
 
-.cl_median_hierarchy_cophenetic <-
+.cl_consensus_hierarchy_cophenetic <-
 function(clusterings, weights, control)
 {
     w <- weights / sum(weights)
