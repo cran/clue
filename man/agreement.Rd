@@ -36,11 +36,17 @@ cl_agreement(x, y = NULL, method = "euclidean")
   are available:
   
   \describe{
-    \item{\code{"euclidean"}}{\eqn{1 - d}, where \eqn{d} is the
-      Euclidean dissimilarity of the memberships, i.e., the minimal
-      sum of the squared differences of \eqn{u} and all column
-      permutations of \eqn{v}.  See Dimitriadou, Weingessel and Hornik
-      (2002).}
+    \item{\code{"euclidean"}}{\eqn{1 - d / m}, where \eqn{d} is the
+      Euclidean dissimilarity of the memberships, i.e., the square root
+      of the minimal sum of the squared differences of \eqn{u} and all
+      column permutations of \eqn{v}, and \eqn{m} is an upper bound for
+      the maximal Euclidean dissimilarity.  See Dimitriadou, Weingessel
+      and Hornik (2002).}
+    \item{\code{"manhattan"}}{\eqn{1 - d / m}, where \eqn{d} is the
+      Manhattan dissimilarity of the memberships, i.e., the minimal
+      sum of the absolute differences of \eqn{u} and all column
+      permutations of \eqn{v}, and \eqn{m} is an upper bound for the
+      maximal Manhattan dissimilarity.}
     \item{\code{"Rand"}}{The Rand index (the rate of distinct pairs of
       objects both in the same class or both in different classes in
       both partitions), see Rand (1971) or Gordon (1999), page 198.
@@ -73,8 +79,11 @@ cl_agreement(x, y = NULL, method = "euclidean")
 
   \describe{
     \item{\code{"euclidean"}}{\eqn{1 / (1 + d)}, where \eqn{d} is the
-      Euclidean dissimilarity of the ultrametrics (i.e., the sum of the
-      squared differences of \eqn{u} and \eqn{v}).}
+      Euclidean dissimilarity of the ultrametrics (i.e., the square root
+      of the sum of the squared differences of \eqn{u} and \eqn{v}).}
+    \item{\code{"manhattan"}}{\eqn{1 / (1 + d)}, where \eqn{d} is the
+      Manhattan dissimilarity of the ultrametrics (i.e., the sum of the
+      absolute differences of \eqn{u} and \eqn{v}).}
     \item{\code{"cophenetic"}}{The cophenetic correlation coefficient.
       (I.e., the product-moment correlation of the ultrametrics.)}
     \item{\code{"angle"}}{The cosine of the angle between the

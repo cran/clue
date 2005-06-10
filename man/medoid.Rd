@@ -37,7 +37,7 @@ cl_medoid(x, method = "euclidean")
   Boca Raton, FL: Chapman \& Hall/CRC.
 }  
 \seealso{
-  \code{\link{cl_median}}
+  \code{\link{cl_consensus}}
 }
 \examples{
 ## An ensemble of partitions.

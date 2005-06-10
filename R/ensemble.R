@@ -24,7 +24,7 @@ function(..., list = NULL)
     n <- sapply(clusterings, n_of_objects)
     if(any(diff(n)))
         stop("All clusterings must have the same number of objects.")
-    attr(clusterings, "n_of_objects") <- n[1]
+    attr(clusterings, "n_of_objects") <- as.integer(n[1])
 
     clusterings
 }

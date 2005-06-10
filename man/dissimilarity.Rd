@@ -36,15 +36,16 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
 
   \describe{
     \item{\code{"euclidean"}}{the Euclidean dissimilarity of the
-      memberships, i.e., the minimal sum of the squared differences of
-      \eqn{u} and all column permutations of \eqn{v}, divided by twice
-      the number of objects in the partitions.  See Dimitriadou,
-      Weingessel and Hornik (2002).}
+      memberships, i.e., the square root of the minimal sum of the
+      squared differences of \eqn{u} and all column permutations of
+      \eqn{v}.  See Dimitriadou, Weingessel and Hornik (2002).}
+    \item{\code{"manhattan"}}{the Manhattan dissimilarity of the
+      memberships, i.e., the minimal sum of the absolute differences of
+      \eqn{u} and all column permutations of \eqn{v}.}
     \item{\code{"comemberships"}}{the Euclidean dissimilarity of the
       elements of the co-membership matrices \eqn{C(u) = u u'} and
-      \eqn{C(v)}, i.e., the sum of the squared differences of \eqn{C(u)}
-      and \eqn{C(v)}, divided by the squared number of objects in the
-      partitions.}
+      \eqn{C(v)}, i.e., the square root of the sum of the squared
+      differences of \eqn{C(u)} and \eqn{C(v)}.}
   }
 
   If all components are hierarchies, available built-in methods for
@@ -53,7 +54,10 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
 
   \describe{
     \item{\code{"euclidean"}}{the Euclidean dissimilarity of the
-      ultrametrics (i.e., the sum of the squared differences of \eqn{u}
+      ultrametrics (i.e., the square root of the sum of the squared
+      differences of \eqn{u} and \eqn{v}).}
+    \item{\code{"euclidean"}}{the Manhattan dissimilarity of the
+      ultrametrics (i.e., the sum of the absolute differences of \eqn{u}
       and \eqn{v}).}
     \item{\code{"cophenetic"}}{\eqn{1 - c^2}, where \eqn{c} is the
       cophenetic correlation coefficient (i.e., the product-moment
@@ -62,7 +66,6 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
       ultrametrics (i.e., the rate of pairs \eqn{(i,j)} and \eqn{(k,l)}
       for which \eqn{u_{ij} < u_{kl}} and \eqn{v_{ij} > v_{kl}}).}
   }
-
 
   If a user-defined agreement method is to be employed, it must be a
   function taking two clusterings as its arguments.
