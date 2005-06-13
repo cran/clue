@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <values.h>
+#include <limits.h>		/* INT_MAX */
+#include <float.h>		/* DBL_MAX */
 #include <assert.h>
 #include <time.h>
 
@@ -59,9 +60,3 @@ void    preprocess(AP *p);
 void    preassign(AP *p);
 int     cover(AP *p, int *ri, int *ci);
 void    reduce(AP *p, int *ri, int *ci);
-
-
-
-
-
-
