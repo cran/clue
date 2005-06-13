@@ -397,7 +397,7 @@ void reduce(AP *p, int *ri, int *ci)
   n = p->n;
 
   /* find minimum in uncovered c-matrix */
-  min = MAXDOUBLE;
+  min = DBL_MAX;
   for(i = 1; i <= n; i++)
     for(j = 1; j <= n; j++)
       if(ri[i] == UNCOVERED && ci[j] == UNCOVERED){
@@ -450,7 +450,7 @@ void preassign(AP *p)
 
   while(TRUE){
     /* find unassigned row with least number of zeroes > 0 */
-    min = MAXINT;
+    min = INT_MAX;
     r = 0;
     for(i = 1; i <= n; i++)
       if(rz[i] > 0 && rz[i] < min && ri[i] == UNASSIGNED){
@@ -463,7 +463,7 @@ void preassign(AP *p)
     
     /* find unassigned column in row r with least number of zeroes */
     c = 0;
-    min = MAXINT;
+    min = INT_MAX;
     for(i = 1; i <= n; i++)
       if(p->c[r][i] == 0 && cz[i] < min && ci[i] == UNASSIGNED){
 	min = cz[i];
