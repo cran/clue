@@ -17,7 +17,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2005-06-10}
+\date{2005-06-17}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -41,7 +41,7 @@
 <<echo=FALSE>>=
 options(width = 60)
 library("clue")
-@ 
+@ %
 
 \section{Introduction}
 \label{sec:introduction}
@@ -177,10 +177,11 @@ otherwise.
 \subsubsection{Hierarchies}
 
 The hierarchies considered in \pkg{clue} are \emph{total indexed
-  hierarchies} and hence correspond in a one-to-one manner to
-\emph{ultrametrics} (distances $u_{ij}$ between pairs of objects $i$ and
-$j$ which satisfy the ultrametric constraint $u_{ij} = \max(u_{ik},
-u_{jk})$ for all triples $i$, $j$, and $k$).
+  hierarchies}, also known as \emph{$n$-valued trees}, and hence
+correspond in a one-to-one manner to \emph{ultrametrics} (distances
+$u_{ij}$ between pairs of objects $i$ and $j$ which satisfy the
+ultrametric constraint $u_{ij} = \max(u_{ik}, u_{jk})$ for all triples
+$i$, $j$, and $k$).  See e.g.~\cite[Page~69--71]{cluster:Gordon:1999}.
 
 Function \code{cl\_ultrametric(x)} computes the associated ultrametric
 from an R object \code{x} representing a hierarchy of objects.  If
@@ -235,7 +236,7 @@ penalizing violations of the constraints such that $P(u)$ is zero iff $u
 $\rho_{k+1} = q \rho_k$ for some constant $q > 1$, until convergence is
 obtained in the sense that e.g.\ the Euclidean distance between
 successive solutions $u_k$ and $u_{k+1}$ is small enough.  Optionally,
-the final $u_k$ is the suitably projected onto $\mathcal{U}$.
+the final $u_k$ is then suitably projected onto $\mathcal{U}$.
 
 For \code{ls\_fit\_ultrametric()}, we obtain the starting value $u_0$ by
 \dQuote{random shaking} of the given dissimilarity object, and use the
@@ -296,7 +297,7 @@ function(x)
 is.cl_hard_partition.glvq <-
 function(x)
     TRUE
-@ 
+@ %
 
 \subsection{Cluster ensembles}
 
@@ -354,10 +355,10 @@ closest prototype).  In fact, we believe that for unsupervised learning
 methods such as clustering, \emph{reweighting} is conceptually superior
 to resampling, and have therefore recently enhanced package~\pkg{e1071}
 to provide an implementation of weighted fuzzy $c$-means, and
-package~\pkg{flexclust}~\citep[not yet released]{cluster:Leisch:2005}
-contains an implementation of weighted $k$-means.  We are currently
-experimenting with interfaces for providing ``direct'' support for
-reweighting via \code{cl\_boot()}.
+package~\pkg{flexclust}~\citep{cluster:Leisch:2005} contains an
+implementation of weighted $k$-means.  We are currently experimenting
+with interfaces for providing ``direct'' support for reweighting via
+\code{cl\_boot()}.
 
 \subsection{Cluster proximities}
 
@@ -423,14 +424,15 @@ taken as a user-defined method, making it reasonably straightforward to
 add methods.
 
 Function \code{cl\_agreement()} has the same interface as
-\code{cl\_dissimilarity()}, returning cluster similarity objects of
-classes~\class{cl\_agreement} and \class{cl\_cross\_agreement},
-respectively.  Built-in methods for computing dissimilarities may
-coincide (in which case they are transforms of each other), but do not
-necessarily do so, as there typically are no canonical transformations.
-E.g., according to needs and scientific community, agreements might be
-transformed to dissimilarities via $d = - \log(s)$ or the square root
-thereof \citep[e.g.,][]{cluster:Strehl+Ghosh:2003b}, or via $d = 1 - s$.
+\code{cl\_dissimilarity()}, returning cluster similarity objects with
+respective classes~\class{cl\_agreement} and
+\class{cl\_cross\_agreement}.  Built-in methods for computing
+dissimilarities may coincide (in which case they are transforms of each
+other), but do not necessarily do so, as there typically are no
+canonical transformations.  E.g., according to needs and scientific
+community, agreements might be transformed to dissimilarities via $d = -
+\log(s)$ or the square root thereof
+\citep[e.g.,][]{cluster:Strehl+Ghosh:2003b}, or via $d = 1 - s$.
 
 \subsubsection{Partition proximities}
 
@@ -461,7 +463,7 @@ the default measure used by \code{cl\_dissimilarity()} and
 Euclidean partition dissimilarity
 \citep{cluster:Dimitriadou+Weingessel+Hornik:2002} is defined as
 \begin{displaymath}
-  d(M, \tilde{M}) = \min\nolimits_\Pi \| M - \tilde{M} \Pi \|^2 / 2n
+  d(M, \tilde{M}) = \min\nolimits_\Pi \| M - \tilde{M} \Pi \|
 \end{displaymath}
 where the minimum is taken over all permutation matrices~$\Pi$,
 $\|\cdot\|$ is the Frobenius norm (so that $\|Y\|^2 = \trace(Y'Y)$), and
@@ -475,7 +477,7 @@ which for hard partitions is the number of objects with the same label
 in the partitions given by $M$ and $\tilde{M}\Pi$.  Finding the optimal
 $\Pi$ is thus recognized as an instance of the \emph{linear sum
   assignment problem} (LSAP, also known as the weighted bipartite graph
-matching problem).  The LSAP can be solved by linear programming, e.g.\
+matching problem).  The LSAP can be solved by linear programming, e.g.,
 using Simplex-style primal algorithms as done by
 function~\code{lp.assign()} in
 package~\pkg{lpSolve}~\citep{cluster:Buttrey:2005}, but primal-dual
@@ -497,6 +499,10 @@ of angle between the memberships, and maximal co-classification rate,
 where both maxima are taken over all column permutations of the
 membership matrices) are based on solving the same LSAP as for Euclidean
 dissimilarity.
+
+Finally, Manhattan partition dissimilarity is defined as the minimal sum
+of the absolute differences of $M$ and all column permutations of
+$\tilde{M}$, and can again be computed efficiently by solving an LSAP.
 
 Note when assessing proximity that agreements for soft partitions are
 always (and quite often considerably) lower than the agreements for the
@@ -526,25 +532,27 @@ these extension issues.
 \subsubsection{Hierachy proximities}
 
 Available built-in dissimilarity measures for hierarchies include
-\emph{Euclidean} dissimilarity (again, the default measure used by
-\code{cl\_dissimilarity()}), which is simply Euclidean dissimilarity
-(sum of squared differences) between the associated ultrametrics.
-Cophenetic dissimilarity is defined as $1 - c^2$, where $c$ is the
-cophenetic correlation coefficient \citep{cluster:Sokal+Rohlf:1962},
-i.e., the Pearson product-moment correlation between the ultrametrics.
-Finally, gamma dissimilarity is the rate of inversions between the
-associated ultrametrics $u$ and $v$ (i.e., the rate of pairs $(i,j)$ and
-$(k,l)$ for which $u_{ij} < u_{kl}$ and $v_{ij} > v_{kl}$).  This
-measure is a linear transformation of Kruskal's~$\gamma$.  Associated
-agreement measures are obtained by suitable transformations of the
-dissimilarities~$d$; for Euclidean proximities, we prefer to use $1 / (1
-+ d)$ rather than e.g.\ $\exp(-d)$.
+\emph{Euclidean} (again, the default measure used by
+\code{cl\_dissimilarity()}) and Manhattan dissimilarity, which are
+simply the Euclidean (square root of the sum of squared differences) and
+Manhattan (sum of the absolute differences) dissimilarities between the
+associated ultrametrics.  Cophenetic dissimilarity is defined as $1 -
+c^2$, where $c$ is the cophenetic correlation coefficient
+\citep{cluster:Sokal+Rohlf:1962}, i.e., the Pearson product-moment
+correlation between the ultrametrics.  Finally, gamma dissimilarity is
+the rate of inversions between the associated ultrametrics $u$ and $v$
+(i.e., the rate of pairs $(i,j)$ and $(k,l)$ for which $u_{ij} < u_{kl}$
+and $v_{ij} > v_{kl}$).  This measure is a linear transformation of
+Kruskal's~$\gamma$.  Associated agreement measures are obtained by
+suitable transformations of the dissimilarities~$d$; for Euclidean
+proximities, we prefer to use $1 / (1 + d)$ rather than e.g.\
+$\exp(-d)$.
 
 One should note that whereas cophenetic and gamma dissimilarities are
-invariant to linear transformations, Euclidean ones are not.  Hence, if
-only the relative ``structure'' of the dendrograms is of interest,
-Euclidean dissimilarities should only be used after transforming the
-ultrametrics to a common range of values (e.g., to $[0,1]$).
+invariant to linear transformations, Euclidean and Manhattan ones are
+not.  Hence, if only the relative ``structure'' of the dendrograms is of
+interest, these dissimilarities should only be used after transforming
+the ultrametrics to a common range of values (e.g., to $[0,1]$).
 
 \subsection{Consensus clusterings}
 
@@ -577,10 +585,10 @@ set of all possible base clusterings, or the set $\{ C_1, \ldots, C_B
 \emph{least squares} consensus clusterings (generalized means).
 
 For computing consensus clusterings, package~\pkg{clue} provides
-function \code{cl\_consensus()} which has synopsis
-\code{cl\_consensus(x, method = NULL, weights = 1, control = list())}.
-This allows (similar to the functions for computing cluster proximities,
-see Section~\ref{synopsis} on Page~\pageref{synopsis}) argument
+function \code{cl\_consensus()} with synopsis \code{cl\_consensus(x,
+  method = NULL, weights = 1, control = list())}.  This allows (similar
+to the functions for computing cluster proximities, see
+Section~\ref{synopsis} on Page~\pageref{synopsis}) argument
 \code{method} to be a character string specifying one of the built-in
 methods discussed below, or a function to be taken as a user-defined
 method (taking an ensemble, the case weights, and a list of control
@@ -639,9 +647,10 @@ This is an instance of the \emph{multi-dimensional assignment problem}
 via reduction to 3-DIMENSIONAL MATCHING,][]{cluster:Garey+Johnson:1979},
 and can e.g.\ be approached using randomized parallel algorithms
 \citep{cluster:Oliveira+Pardalos:2004}.  Branch-and-bound approaches
-suggested in the literature are unfortunately computationally infeasible
-for ``typical'' sizes of cluster ensembles ($B \ge 20$, maybe even in
-the hundreds).
+suggested in the literature
+\citep[e.g.,][]{cluster:Grundel+Oliveira+Pardalos:2005} are
+unfortunately computationally infeasible for ``typical'' sizes of
+cluster ensembles ($B \ge 20$, maybe even in the hundreds).
 
 Package~\pkg{clue} provides two heuristics for (approximately) finding
 the soft least squares consensus partition for Euclidean dissimilarity.
@@ -818,12 +827,12 @@ The data set is shown in Figure~\ref{fig:Cassini}.
 data("Cassini")
 plot(Cassini$x, col = as.integer(Cassini$classes),
      xlab = "", ylab = "")
-@ 
+@ %
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
 <<Cassini-data>>
-@ 
+@ %
   \caption{The Cassini data set.}
   \label{fig:Cassini}
 \end{figure}
@@ -832,12 +841,12 @@ dissimilarities of the elements of the $k$-means ensemble.
 <<CKME,eval=FALSE>>=
 data("CKME")
 plot(hclust(cl_dissimilarity(CKME)), labels = FALSE)
-@ 
+@ %
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
 <<CKME>>
-@ 
+@ %
   \caption{A dendrogram of the Euclidean dissimilarities of 50 $k$-means
     partitions of the Cassini data into 3 classes.}
   \label{fig:CKME}
@@ -849,16 +858,16 @@ ensemble
 <<>>=
 m1 <- cl_medoid(CKME)
 table(Medoid = cl_class_ids(m1), "True Classes" = Cassini$classes)
-@ 
+@ %
 and inspecting it (Figure~\ref{fig:Cassini-medoid}):
 <<Cassini-medoid,eval=FALSE>>=
 plot(Cassini$x, col = cl_class_ids(m1), xlab = "", ylab = "")
-@ 
+@ %
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
 <<Cassini-medoid>>
-@ 
+@ %
   \caption{Medoid of the Cassini $k$-means ensemble.}
   \label{fig:Cassini-medoid}
 \end{figure}
@@ -869,20 +878,22 @@ we obtain
 <<>>=
 set.seed(1)
 m2 <- cl_consensus(CKME)
-@ 
-with confusion matrix
+@ %
+where here and below we set the random seed for reproducibility, noting
+that one should really use several replicates of the consensus
+heuristic.  This consensus partition has confusion matrix
 <<>>=
 table(Consensus = cl_class_ids(m2), "True Classes" = Cassini$classes)
-@ 
-and details as displayed in Figure~\ref{fig:Cassini-mean}:
+@ %
+and class details as displayed in Figure~\ref{fig:Cassini-mean}:
 <<Cassini-mean,eval=FALSE>>=
 plot(Cassini$x, col = cl_class_ids(m2), xlab = "", ylab = "")
-@ 
+@ %
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
 <<Cassini-mean>>
-@ 
+@ %
   \caption{Least Squares Consensus of the Cassini $k$-means ensemble.}
   \label{fig:Cassini-mean}
 \end{figure}
@@ -920,29 +931,32 @@ GVME
 set.seed(1)
 m1 <- cl_consensus(GVME, method = "GV1",
                    control = list(k = 2, verbose = TRUE))
-@ 
-(Here, we set the random seed for reproducibility.  Of course, one
-should really use several replicates of the consensus heuristic.)
-
+@ %
 This results in a soft partition with average Euclidean dissimilarity
 (the criterion function to be optimized by the consensus partition) of
 <<>>=
-mean(cl_dissimilarity(GVME, m1))
-@ 
+mean(cl_dissimilarity(GVME, m1) ^ 2)
+@ %
 We compare this to the consensus solution given in
 \cite{cluster:Gordon+Vichi:2001}:
 <<>>=
 data("GVME_Consensus")
 m2 <- GVME_Consensus[["MF1"]]
-mean(cl_dissimilarity(GVME, m2))
+mean(cl_dissimilarity(GVME, m2) ^ 2)
 table(CLUE = cl_class_ids(m1), GV2001 = cl_class_ids(m2))
-@ 
-Interestingly, we are able to obtain a better solution, which is
+@ %
+Interestingly, we are able to obtain a ``better'' solution, which is
 markedly different from the one reported in the literature, and results
 in different classifications for the following countries:
 <<>>=
 rownames(m2)[cl_class_ids(m1) != cl_class_ids(m2)]
-@ 
+@ %
+We note however that \cite{cluster:Gordon+Vichi:2001} solve a different
+optimization problem, as in the case of partitions with different
+numbers of classes they only use the matched classes when computing
+dissimilarity, discarding the unmatched ones (see their Example~2).  As
+this results in dissimilarity measures which are discontinuous over the
+space of soft partitions, our definition should be preferred.
 
 \subsection{Rosenberg-Kim kinship terms data}
 
@@ -967,36 +981,31 @@ Kinship82
 set.seed(1)
 m1 <- cl_consensus(Kinship82, method = "GV3",
                    control = list(k = 3, verbose = TRUE))
-@ 
-(See above for setting the random seed.)
-
+@ %
 This results in a soft partition with average co-membership
 dissimilarity (the criterion function to be optimized by the consensus
 partition) of
 <<>>=
-mean(cl_dissimilarity(Kinship82, m1, "comem"))
-@ 
+mean(cl_dissimilarity(Kinship82, m1, "comem") ^ 2)
+@ %
 Again, we compare this to the corresponding consensus solution given in
 \cite{cluster:Gordon+Vichi:2001}:
 <<>>=
 data("Kinship82_Consensus")
 m2 <- Kinship82_Consensus[["JMF"]]
-mean(cl_dissimilarity(Kinship82, m2, "comem"))
-@ 
+mean(cl_dissimilarity(Kinship82, m2, "comem") ^ 2)
+@ %
 Interestingly, again we obtain a (this time only ``slightly'') better
 solution, with
 <<>>=
 cl_dissimilarity(m1, m2, "comem")
 table(CLUE = cl_class_ids(m1), GV2001 = cl_class_ids(m2))
-@ 
+@ %
 indicating that the two solutions are reasonably close, even though
 <<>>=
 cl_fuzziness(cl_ensemble(m1, m2))
-@ 
+@ %
 shows that our solution is ``softer''.
-
-
-
 
 \subsection{Miller-Nicely consonant phoneme confusion data}
 
@@ -1017,29 +1026,33 @@ follows.
 <<>>=
 data("Phonemes")
 d <- 1 - as.dist(Phonemes)
-@
+@ %
 (Note that the data set has the consonant misclassification
 probabilities, i.e., the similarities between the phonemes.)
 <<>>=
 u <- ls_fit_ultrametric(d, control = list(verbose = TRUE))
 @ %
-This gives an ultrametric~$u$ for which plotting the corresponding
-dendrogram (Figure~\ref{fig:Phonemes}) ``basically'' reproduces Figure~1
+This gives an ultrametric~$u$ for which Figure~\ref{fig:Phonemes} plots
+the corresponding dendrogram, ``basically'' reproducing Figure~1
 in \cite{cluster:DeSoete:1986}.
+<<Phonemes,eval=FALSE>>=
+plot(u)
+@ %
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
-plot(u)
-@
+<<Phonemes>>
+@ %
   \caption{Dendrogram for least squares fit to the Miller-Nicely 
     consonant phoneme confusion data.}
   \label{fig:Phonemes}
 \end{figure}
+
 We can also compare the least squares fit obtained to that of other
 hierarchical clusterings of $d$, e.g.\ those obtained by
 \code{hclust()}.  The ``optimal''~$u$ has Euclidean dissimilarity
 <<>>=
-round(sum((d - u) ^ 2), 4)
+round(sqrt(sum((d - u) ^ 2)), 4)
 @ %
 to $d$.  (Note that we currently cannot use \code{cl\_dissimilarity()}
 here, as $d$ does not correspond to a hierarchy.)  For the
@@ -1050,7 +1063,8 @@ hclust_methods <- c("ward", "single", "complete", "average", "mcquitty",
 hens <- cl_ensemble(list = lapply(hclust_methods,
                                   function(m) hclust(d, m)))
 names(hens) <- hclust_methods
-sapply(hens, function(h) round(sum((d - cl_ultrametric(h)) ^ 2), 4))
+sapply(hens,
+       function(h) round(sqrt(sum((d - cl_ultrametric(h)) ^ 2)), 4))
 @ %
 which all exhibit greater Euclidean dissimilarity to $d$ than $u$.  We
 can also compare the ``structure'' of the different hierarchies, e.g.\
@@ -1058,7 +1072,7 @@ by looking at the rate of inversions between them:
 <<>>=
 ahens <- c(L2opt = cl_ensemble(u), hens)
 round(cl_dissimilarity(ahens, method = "gamma"), 2)
-@ 
+@ %
 
 \section{Outlook}
 \label{sec:outlook}

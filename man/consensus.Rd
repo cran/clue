@@ -179,12 +179,12 @@ data("Kinship82")
 m1 <- cl_consensus(Kinship82, method = "GV3",
                    control = list(k = 3, verbose = TRUE))
 ## (Note that one should really use several replicates of this.)
-## Total co-membership dissimilarity:
-sum(cl_dissimilarity(Kinship82, m1, "comem"))
+## Value for criterion function to be minimized:
+sum(cl_dissimilarity(Kinship82, m1, "comem") ^ 2)
 ## Compare to the consensus solution given in Gordon & Vichi (2001).
 data("Kinship82_Consensus")
 m2 <- Kinship82_Consensus[["JMF"]]
-sum(cl_dissimilarity(Kinship82, m2, "comem"))
+sum(cl_dissimilarity(Kinship82, m2, "comem") ^ 2)
 ## Seems we get a better solution ...
 ## How dissimilar are these solutions?
 cl_dissimilarity(m1, m2, "comem")
@@ -202,13 +202,15 @@ set.seed(1)
 m1 <- cl_consensus(GVME, method = "GV1",
                    control = list(k = 2, verbose = TRUE))
 ## (Note that one should really use several replicates of this.)
-## Total Euclidean dissimilarity:
-sum(cl_dissimilarity(GVME, m1))
+## Value of criterion function to be minimized:
+sum(cl_dissimilarity(GVME, m1) ^ 2)
 ## Compare to the consensus solution given in Gordon & Vichi (2001).
 data("GVME_Consensus")
 m2 <- GVME_Consensus[["MF1"]]
-sum(cl_dissimilarity(GVME, m2))
+sum(cl_dissimilarity(GVME, m2) ^ 2)
 ## Seems we get a better solution ...
+## (But note that for partitions with different numbers of classes,
+## they only use the matches classes for computing dissimilarities.)
 ## And in fact, it is qualitatively different:
 table(as.cl_hard_partition(m1),
       as.cl_hard_partition(m2))
