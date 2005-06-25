@@ -70,6 +70,11 @@ S3method("cl_membership", "fclust")
 S3method("cl_membership", "kmeans")
 S3method("cl_membership", "partition")
 
+S3method("cl_predict", "cclust")
+S3method("cl_predict", "default")
+S3method("cl_predict", "fclust")
+S3method("cl_predict", "kmeans")
+
 S3method("cl_validity", "agnes")
 S3method("cl_validity", "default")
 S3method("cl_validity", "diana")

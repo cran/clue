@@ -244,6 +244,35 @@ function(A, B, method = "manhattan")
     out
 }
 
+.rxdist <-
+function(A, B, method = c("euclidean", "manhattan"))
+{
+    ## Return the row cross distance matrix of A and B.
+    ## I.e., the matrix C = [c_{j,k}] with
+    ##   c_{j,k} = distance(A[j, ], B[k, ])
+    
+    ## <NOTE>
+    ## Could also do something like
+    ##   ind <- seq(length = NROW(B))
+    ##   as.matrix(dist(rbind(B, A)))[-ind, ind]
+    ## but that is *very* inefficient for the "usual" data by prototype
+    ## case (where NROW(B) << NROW(A)).
+    ## </NOTE>
+    
+    ## No fancy pmatching for methods for the time being.
+    method <- match.arg(method)
+    
+    ## Workhorse: Full A, single row of b.
+    FOO <- if(method == "euclidean")
+        function(A, b) sqrt(rowSums(sweep(A, 2, b) ^ 2))
+    else
+        function(A, b) rowSums(abs(sweep(A, 2, b)))
+        
+    out <- matrix(0, NROW(A), NROW(B))
+    for(k in seq(length = NROW(B)))
+        out[, k] <- FOO(A, B[k, ])
+    out
+}
 
 ### Local variables: ***
 ### mode: outline-minor ***

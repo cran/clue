@@ -3,12 +3,31 @@ function(x, B, k = NULL,
          algorithm = if(is.null(k)) "hclust" else "kmeans",
          parameters = list(), resample = FALSE)
 {
-    if(resample)
-        stop("Resampling is currently not supported.")
-    x <- rep.int(list(x), B)
-    clusterings <-
+    clusterings <- if(!resample) {
+        x <- rep.int(list(x), B)        
         eval(as.call(c(list(as.name("lapply"), x, algorithm),
                        if(!is.null(k)) list(k),
                        parameters)))
+    }
+    else {
+        replicate(B,
+                  expr = {
+                      algorithm <- match.fun(algorithm)
+                      ## <NOTE>
+                      ## This is not quite perfect.  We have
+                      ## cl_predict() to encapsulate the process of
+                      ## assigning objects to classes, but for sampling
+                      ## from the objects we assume that they correspond
+                      ## to the *rows* of 'x'.  Argh.
+                      ## </NOTE>
+                      ind <- sample(NROW(x), replace = TRUE)
+                      out <- eval(as.call(c(list(algorithm, x[ind, ]),
+                                            if(!is.null(k)) list(k),
+                                            parameters)))
+                      cl_predict(out, x)
+                  },
+                  simplify = FALSE)
+    }
+
     cl_ensemble(list = clusterings)
 }
