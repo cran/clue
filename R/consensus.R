@@ -31,7 +31,7 @@ function(x, method = NULL, weights = 1, control = list())
     if(!is.function(method)) {
         builtin_methods <-
             if(is_partition_ensemble)
-                c("DWH", "GV1", "GV3")
+                c("DWH", "GV1", "GV3", "HBH")
             else
                 c("cophenetic")
         if(is.null(method))
@@ -94,15 +94,42 @@ function(clusterings, weights, control)
     cl_membership(as.cl_membership(M[, 1 : k]), k)    
 }
 
-### ** .cl_consensus_partition_GV1
+### ** .cl_consensus_partition_AO
 
-.cl_consensus_partition_GV1 <-
-function(clusterings, weights, control)
+.cl_consensus_partition_AO <-
+function(clusterings, weights, control, type = c("soft", "hard"))
 {
+    ## The start of a general purpose optimizer for determining
+    ## consensus partitions by minimizing
+    ##   \sum_b d(M, M_b) ^ p
+    ##     = \sum_b \min_{P_b} f(M, M_b P_b) ^ p
+    ## for dissimilarity measures d involving explicitly matching
+    ## labels via permutation matrices P_b.  The AO ("alternative
+    ## optimization") proceeds by alternatively by matching the M_b to
+    ## M by minimizing f(M, M_b P_b) over P_b, and fitting M by
+    ## minimizing \sum_b f(M, M_b P_b) ^ p for fixed matchings.
+    ##
+    ## Such a procedure requires three ingredients: a function for
+    ## matching M_b to M (in fact simply replacing M_b by the matched
+    ## M_b P_b); a function for fitting M to the \{M_b P_b\}, and a
+    ## function for computing the value of the criterion function
+    ## corresponding to this fit (so that one can stop if the relative
+    ## improvement is small enough).
+    ##
+    ## For the time being, we only use this to determine soft and hard
+    ## Euclidean least squares consensus partitions (soft and hard
+    ## Euclidean means), so the interface does not yet reflect the
+    ## generality of the approach (which would either pass the three
+    ## functions, or even set up family objects encapsulating the three
+    ## functions).
+
     ## <TODO>
     ## Could make things more efficient by subscripting on positive
     ## weights.
     ## </TODO>
+
+    ## For the time being ...
+    type <- match.arg(type)
     
     match_memberships <- function(M, N) {
         ## Return the M[, ind] column permutation of M optimally
@@ -145,30 +172,55 @@ function(clusterings, weights, control)
     k_max <- max(k, max_n_of_classes)
     if(k_max > k)
         M <- cbind(M, matrix(0, nrow(M), k_max - k))
-    
-    ## This algorithm works by iteratively finding permutations P_i so
-    ## that M_1 P_1 \approx M, ..., M_B P_B \approx M, and then updating
-    ## M <- \sum_b w_b M_b P_b.
 
+    ## <NOTE>
     ## As successive column permutations are column permutations of the
     ## original matrices, we work with the *current* M_b P_b.  We could
     ## use a 3-dimensional array so that M_b <=> memberships[ , , b],
     ## but prefer to work with a list of memberships.
+    ## </NOTE>
 
+    ## Function for fitting M to (fixed) memberships M_b P_b.
+    ## <NOTE>
+    ## In general, this clearly needs to know how many classes/columns
+    ## to use, and hence needs an explicit argument 'k'.  Both 'n' and
+    ## 'k_max' can always be determined from the memberships ensemble,
+    ## but could also be passed on explicitly for efficiency reasons.
+    ## </NOTE>
+    if(type == "soft")
+        fit_memberships <- function(memberships) {
+            ## Update M as \sum w_b M_b P_b.
+            M <- matrix(rowSums(mapply("*", memberships, w)), n)
+            ## If k_max > k, "project" as indicated in Gordon & Vichi
+            ## (2001), p. 238.
+            if(k_max > k)
+                M <- .project_to_leading_columns(M, k)
+            M
+        }
+    else {
+        ## For hard partitions, we currently cannot handle the case
+        ## where k < k_max.
+        if(k < k_max)
+            stop("Currently cannot compute soft means for reduced 'k'.")
+        fit_memberships <- function(memberships) {
+            ## Compute M as \sum w_b M_b P_b.
+            M <- matrix(rowSums(mapply("*", memberships, w)), n)
+            ## And compute a closest hard partition H(M) from that.
+            cl_membership(as.cl_membership(max.col(M)), k)
+        }
+    }
+            
     memberships <- lapply(clusterings, cl_membership, k_max)
     memberships <- lapply(memberships, match_memberships, M)
     old_value <- value(memberships, M, w)
     iter <- 1
 
     while(iter <= maxiter) {
-        ## Update M as \sum w_b M_b P_b.
-        M <- matrix(rowSums(mapply("*", memberships, w)), n)
-        ## If k_max > k, "project" as indicated in Gordon & Vichi
-        ## (2001), p. 238.
-        if(k_max > k)
-            M <- .project_to_leading_columns(M, k)
+        ## Fit M to the M_b P_b.
+        M <- fit_memberships(memberships)
         ## Match the M_b P_b to M.
         memberships <- lapply(memberships, match_memberships, M)
+        ## Update value.
         new_value <- value(memberships, M, w)
         if(verbose)
             cat("Iteration:", iter,
@@ -186,6 +238,19 @@ function(clusterings, weights, control)
     rownames(M) <- rownames(memberships[[1]])
     cl_membership(as.cl_membership(M[, 1 : k]), k)
 }
+    
+
+### ** .cl_consensus_partition_GV1
+
+.cl_consensus_partition_GV1 <-
+function(clusterings, weights, control)
+    .cl_consensus_partition_AO(clusterings, weights, control, "soft")
+
+### ** .cl_consensus_partition_HBH
+
+.cl_consensus_partition_HBH <-
+function(clusterings, weights, control)
+    .cl_consensus_partition_AO(clusterings, weights, control, "hard")
 
 ### ** .cl_consensus_partition_GV3
 
@@ -321,7 +386,7 @@ function(clusterings, weights, control)
     ## Note that we need to ensure that labels get preserved ...
     ## (which is also why we use lapply() rather than sapply() above).
     labels <- attr(ultrametrics[[1]], "Labels")
-    d <- clue:::.dist_from_vector(dissimilarities, labels = labels)
+    d <- .dist_from_vector(dissimilarities, labels = labels)
     ## </FIXME>
     ls_fit_ultrametric(d, control)
 }

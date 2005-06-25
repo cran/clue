@@ -136,6 +136,38 @@ as.cl_membership.matrix <-
 function(x)
     .cl_membership_from_memberships(x)
 
+### * .memberships_from_cross_dissimilarities
+
+.memberships_from_cross_dissimilarities <-
+function(d, power = 2)
+{
+    ## For a given matrix of cross-dissimilarities [d_{bj}], return a
+    ## matrix [u_{bj}] such that \sum_{b,j} u_{bj}^p d_{bj}^q => min!
+    ## under the constraint that u is a stochastic matrix.
+    ## If only one power is given, it is taken as p, with q as 1.
+    ## <NOTE>
+    ## This returns a plain matrix of membership values and not a
+    ## cl_membership object (so that it does not deal with possibly
+    ## dropping or re-introducing unused classes).
+    ## </NOTE>
+    exponent <- if(length(power) == 1)
+        1 / (power - 1)
+    else
+        power[2] / (power[1] - 1)
+    u <- matrix(0, nrow(d), ncol(d))
+    FUN <- function(s, t) (s / t) ^ exponent
+    zero_incidences <- (d == 0)
+    n_of_zeroes <- rowSums(zero_incidences)
+    if(any(ind <- (n_of_zeroes > 0)))
+        u[ind, ] <- zero_incidences[ind, ] / n_of_zeroes[ind]
+    if(any(!ind)) {
+        u[!ind, ] <-
+            t(apply(d[!ind, ], 1,
+                    function(s) 1 / rowSums(outer(s, s, FUN))))
+    }
+    u
+}
+
 ### * print.cl_membership
 
 print.cl_membership <-

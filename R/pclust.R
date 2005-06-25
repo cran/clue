@@ -42,8 +42,7 @@ function(x, k, m = 1, control = list())
     
     ## Take random memberships as prototypes.
     ## It may be better to use random soft partitions.
-    prototypes <-
-        memberships[sample(1 : B, k)]
+    prototypes <- memberships[sample(1 : B, k)]
     dissimilarities <- cl_dissimilarity(memberships, prototypes) ^ 2
 
     if(m == 1) {
@@ -81,26 +80,8 @@ function(x, k, m = 1, control = list())
     }
     else {
         ## Soft secondary partitions.
-        ## Need an auxiliary function which takes [d_{bj}] and returns
-        ## [u_{bj}] such that \sum_{b,j} u_{bj}^m d_{bj} => min! under
-        ## the constraint that u is a membership matrix.
-        exponent <- 1 / (m - 1)
-        u_from_d <- function(d) {
-            u <- matrix(0, nrow(d), ncol(d))
-            FUN <- function(s, t) (s / t) ^ exponent
-            zero_incidences <- (d == 0)
-            n_of_zeroes <- rowSums(zero_incidences)
-            if(any(ind <- (n_of_zeroes > 0)))
-                u[ind, ] <- zero_incidences[ind, ] / n_of_zeroes[ind]
-            if(any(!ind)) {
-                u[!ind, ] <-
-                    t(apply(d[!ind, ], 1,
-                            function(s) 1 / rowSums(outer(s, s, FUN))))
-            }
-            u
-        }
         value <- function(u, d) sum(u ^ m * d)
-        u <- u_from_d(dissimilarities)
+        u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
         old_value <- value(u, dissimilarities)
         iter <- 1        
         while(iter <= maxiter) {
@@ -116,7 +97,7 @@ function(x, k, m = 1, control = list())
             ## Update u.
             dissimilarities <-
                 cl_dissimilarity(memberships, prototypes) ^ 2
-            u <- u_from_d(dissimilarities)
+            u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
             new_value <- value(u, dissimilarities)
             if(abs(old_value - new_value)
                < reltol * (abs(old_value) + reltol))
