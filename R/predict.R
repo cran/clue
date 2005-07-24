@@ -17,6 +17,72 @@ function(object, newdata = NULL, ...)
     as.cl_membership(max.col(- .rxdist(newdata, object$centers)))
 }
 
+## Package cluster:
+## * fanny() cannot make "new" predictions.
+## * clara() gives medoids, and takes metric data using Euclidean or
+##   Manhattan dissimilarities (and we can figure out which by looking
+##   at the call and the default values).
+## * pam() gives medoids, but might have been called with dissimilarity
+##   data, so is tricky.  We can always find out which by looking at the
+##   medoids: as in the dissimilarity input case this is a vector of
+##   class labels, and a matrix with in each row the coordinates of one
+##   medoid otherwise.  We then still need to figure out whether
+##   Euclidean or Manhattan distances were used by looking at the call
+##   and the default values.
+## Both pam() and clara() show that the interfaces could be improved to
+## accomodate modern needs, e.g., for bagging.
+
+cl_predict.fanny <-
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+    stop("Cannot make new predictions.")
+}    
+
+cl_predict.clara <-
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+    ## <FIXME>
+    ## Add support eventually ...
+    if(identical(object$call$stand, TRUE))
+        warning("Standardization is currently not supported.")
+    ## </FIXME>
+    method <- object$call$metric
+    if(is.null(method)) {
+        ## Not given in the call, hence use default value.
+        method <- formals(cluster::clara)$metric
+        ## (Or hard-wire the default value: "euclidean".)
+    }
+    d <- .rxdist(newdata, object$medoids, method)
+    as.cl_membership(max.col(-d))
+}
+
+cl_predict.pam <- 
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+    prototypes <- object$medoids
+    if(!is.matrix(prototypes))
+        stop("Cannot make new predictions.")
+    ## <FIXME>
+    ## Add support eventually ...
+    if(identical(object$call$stand, TRUE))
+        warning("Standardization is currently not supported.")
+    ## </FIXME>
+    method <- object$call$metric
+    if(is.null(method)) {
+        ## Not given in the call, hence use default value.
+        method <- formals(cluster::pam)$metric
+        ## (Or hard-wire the default value: "euclidean".)
+    }
+    d <- .rxdist(newdata, object$medoids, method)
+    as.cl_membership(max.col(-d))
+}
+
 ## Package cclust: cclust().
 cl_predict.cclust <-
 function(object, newdata = NULL, ...)
@@ -29,54 +95,119 @@ function(object, newdata = NULL, ...)
     cl_membership(predict(object, newdata))
 }
 
-## Package e1071: cmeans(), cshell(), and ufcl() give objects of class
-## "fclust".
+## Package e1071: cmeans() gives objects of class "fclust".
 cl_predict.fclust <-
 function(object, newdata = NULL, ...)
 {
     if(is.null(newdata))
         return(cl_membership(object))
 
-    ## ARGH, the 'fclust' objects returned by cmeans() do not directly
-    ## contain the information on the fuzzification parameter m and the
-    ## distance (euclidean/manhattan) employed, so we have to engineer
-    ## this from the matched call and the default arguments.
+    ## Note that the 'fclust' objects returned by cmeans() do not always
+    ## directly contain the information on the fuzzification parameter m
+    ## and the distance (Euclidean/Manhattan) employed, so we have to
+    ## engineer this from the matched call and the default arguments.
     nms <- names(object$call)
     ## Note that we cannot directly use object$call$m, as this could
-    ## the 'method' argument if 'm' was not given.
+    ## give the 'method' argument if 'm' was not given.
     m <- if("m" %in% nms)
         object$call$m
-    else
-        formals(cmeans)$m
+    else {
+        ## Not given in the call, hence use default value.
+        formals(e1071::cmeans)$m
+        ## (Or hard-wire the default value: 2.)
+    }
     method <- if("dist" %in% nms)
         object$call$dist
-    else
-        formals(cmeans)$dist
-
-    d <- .rxdist(newdata, object$centers, method)    
+    else {
+        ## Not given in the call, hence use default value.        
+        formals(e1071::cmeans)$dist
+        ## (Or hard-wire the default value: "euclidean".)
+    }
+    
+    d <- .rxdist(newdata, object$centers, method)
     power <- c(m, if(method == "euclidean") 2 else 1)
 
     as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
 }
 
-## <FIXME>
-## Currently, there is no support for partitioning algorithms from
-## packages cluster and Mclust.
-##
-## Re cluster:
-## * fanny() cannot make predictions.
-## * clara() gives medoids, and takes metric data using Euclidean or
-##   Manhattan dissimilarities, so should be straightforward.
-## * pam() gives medoids, but might have been called with dissimilarity
-##   data, so is tricky.  We can always find out which by looking at the
-##   medoids: as in the dissimilarity input case this is a vector of
-##   class labels, and a matrix with in each row the coordinates of one
-##   medoid otherwise.  We then still need to figure out whether
-##   Euclidean or Manhattan distances were used by looking at the call
-##   and the default values.
-## Both pam() and clara() show that the interfaces could be improved to
-## accomodate modern needs, e.g. for bagging.
-##
-## Re mclust: not clear why there are no predict() methods for Mclust
-## objects ...?
-## </FIXME>
+## Package e1071: cshell().
+cl_predict.cshell <-
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+
+    ## Not surprisingly, this is rather similar to what we do for fclust
+    ## objects.  Only dissimiliraties (and exponents) need to be
+    ## computed differently ...
+    nms <- names(object$call)
+    m <- if("m" %in% nms)
+        object$call$m
+    else {
+        ## Not given in the call, hence use default value.
+        formals(e1071::cshell)$m
+        ## (Or hard-wire the default value: 2.)
+    }
+    method <- if("dist" %in% nms)
+        object$call$dist
+    else {
+        ## Not given in the call, hence use default value.        
+        formals(e1071::cshell)$dist
+        ## (Or hard-wire the default value: "euclidean".)
+    }
+
+    d <- .rxdist(newdata, object$centers, method)
+    d <- sweep(d, 2, object$radius) ^ 2
+    as.cl_membership(.memberships_from_cross_dissimilarities(d, m))
+}
+
+## Package e1071: bclust().
+## <NOTE>
+## One might argue that it would be better to use the 'dist.method'
+## employed for the hierarchical clustering, but it seems that class
+## labels ("clusters") are always assigned using Euclidean distances.
+cl_predict.bclust <- cl_predict.kmeans
+## </NOTE>
+
+## Package mclust: Ron Wehrens will add a predict method for Mclust
+## objects eventually (as suggested by us).
+
+## Package clue: cl_pclust().
+cl_predict.cl_pclust <-
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+
+    ## Unfortunately, this is really very tricky.
+    ##
+    ## Currently, cl_plclust() is documented to partition by minimizing
+    ## \sum u_{bj}^m d(x_b, p_j)^2, where d is Euclidean dissimilarity.
+    ## But the approach more generally works for the criterion function
+    ## \sum u_{bj}^m d(x_b, p_j)^e with dissimilarity d and exponent e,
+    ## provided that there is a (weighted) consensus method for solving
+    ## \min_p \sum u_{bj}^m d(x_b, p)^e.  (Control parameters 'method'
+    ## and 'control' allow the specification of the method and control
+    ## parameters to be used for cl_consensus().)
+    ##
+    ## Hence, we should be able to infer d and e from the consensus
+    ## method used, e.g. by having consensus method family objects which
+    ## do not only provide the actual method called by cl_consensus(),
+    ## but also information on d and e (where applicable).
+    ##
+    ## Action plan:
+    ## Step 0. Short term, proceed according to the documentation.
+    ## Step 1. Have cl_pclust() at least return its call.
+    ## Step 2. Add some reflectance for the built-in consensus methods,
+    ##   e.g. by providing something like
+    ##     .builtin_consensus_method(type, name = NULL)
+    ##   (with 'type' indicating partition or hierarchy and 'name' the
+    ##   name of the method, such as "euclidean").
+    ##   See also the comments in .cl_consensus_partition_AO().
+    ## Step 3. Find a general solution ...
+    
+    d <- cl_dissimilarity(newdata, object$prototypes)
+    power <- c(object$m, 2)
+
+    as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
+}

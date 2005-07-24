@@ -80,3 +80,7 @@ function(x, ...)
                              "objects")))
     invisible(x)
 }
+
+unique.cl_ensemble <-
+function (x, incomparables = FALSE, ...)
+    cl_ensemble(list = NextMethod("unique"))

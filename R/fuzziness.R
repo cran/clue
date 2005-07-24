@@ -18,9 +18,9 @@ function(x, method = NULL, normalize = TRUE)
             ind <- 1
         else if(is.na(ind <- pmatch(tolower(method),
                                     tolower(builtin_methods))))
-            stop(paste("Value", sQuote(method),
-                       "is not a valid abbreviation",
-                       "for a fuzziness method."))
+            stop(gettextf("Value '%s' is not a valid abbreviation for a fuzziness method.",
+                          method),
+                 domain = NA)
         method <- paste(".cl_fuzziness_partition", builtin_methods[ind],
                         sep = "_")
         method_name <- builtin_method_names[ind]

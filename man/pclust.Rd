@@ -35,6 +35,7 @@ cl_pclust(x, k, m = 1, control = list())
     \code{\link[cluster]{silhouette}}.} 
   \item{validity}{precomputed validity measures for the partition.}
   \item{m}{the softness control argument.}
+  \item{call}{the matched call.}
 }
 \details{
   For \eqn{m = 1}, a generalization of the Lloyd-Forgy variant of the

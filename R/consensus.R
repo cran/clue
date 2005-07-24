@@ -38,9 +38,9 @@ function(x, method = NULL, weights = 1, control = list())
             ind <- 1
         else if(is.na(ind <- pmatch(tolower(method),
                                     tolower(builtin_methods))))
-            stop(paste("Value", sQuote(method),
-                       "is not a valid abbreviation",
-                       "for a consensus method."))
+            stop(gettextf("Value '%s' is not a valid abbreviation for a consensus method.",
+                          method),
+                 domain = NA)
         method <- get(paste(".cl_consensus",
                             if(is_partition_ensemble)
                             "partition"                        

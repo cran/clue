@@ -22,12 +22,16 @@ cl_boot(x, B, k = NULL,
     the base algorithm.}
   \item{resample}{a logical indicating whether the data should be
     resampled in addition to \dQuote{sampling from the algorithm}.
-    Currently, only \code{FALSE} is supported, and an error is given
-    otherwise.}
+    If resampling is used, the class memberships of the objects given in
+    \code{x} are predicted from the results of running the base
+    algorithm on bootstrap samples of \code{x}.}
 }
 \value{
-  A cluster ensemble with the results of the \eqn{B} runs of the base
-  algorithm on the data set.
+  A cluster ensemble of length \eqn{B}, with either (if resampling is
+  not used, default) the results of running the base algorithm on the
+  given data set, or (if resampling is used) the memberships for the
+  given data predicted from the results of running the base algorithm on
+  bootstrap samples of the data.
 }
 \details{
   This is a rather simple-minded function with limited applicability,
