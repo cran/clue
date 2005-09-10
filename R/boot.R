@@ -21,7 +21,8 @@ function(x, B, k = NULL,
                       ## to the *rows* of 'x'.  Argh.
                       ## </NOTE>
                       ind <- sample(NROW(x), replace = TRUE)
-                      out <- eval(as.call(c(list(algorithm, x[ind, ]),
+                      train <- if(length(dim(x)) == 2) x[ind, ] else x[ind]
+                      out <- eval(as.call(c(list(algorithm, train),
                                             if(!is.null(k)) list(k),
                                             parameters)))
                       cl_predict(out, x)

@@ -34,37 +34,36 @@ function(x, k = n_of_classes(x))
 
 ## Package stats: kmeans() (R 2.1.0 or better).
 cl_membership.kmeans <- cl_membership.default
-## Package cclust: cclust().
-cl_membership.cclust <- cl_membership.default
-## Package e1071: cmeans(), cshell(), and ufcl() give objects of class
-## "fclust".
-cl_membership.fclust <-
-function(x, k = n_of_classes(x))
-    .cl_membership_from_memberships(x$membership, k)
+
 ## Package cluster: clara(), fanny(), and pam() give objects of the
 ## respective class inheriting from class "partition".
-cl_membership.fanny <- cl_membership.fclust
+cl_membership.fanny <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_memberships(x$membership, k)
 cl_membership.partition <- cl_membership.default
+
+## Package cclust: cclust().
+cl_membership.cclust <- cl_membership.default
+
+## Package e1071: cmeans() gives objects of class "fclust".
+cl_membership.fclust <- cl_membership.fanny
+## Package e1071: cshell().
+cl_membership.cshell <- cl_membership.fanny
+## Package e1071: bclust().
+cl_membership.bclust <- cl_membership.default
+
 ## Package mclust: Mclust().
 cl_membership.Mclust <- cl_membership.default
 
-## Memberships.
+## Package clue: Memberships.
 cl_membership.cl_membership <-
 function(x, k = n_of_classes(x))
     .cl_membership_from_memberships(x, k)
 ## (Note: we cannot simply return x in case k equals n_of_classes(x),
 ## because ncol(x) might be different.)
 
-## cl_pclust.
-cl_membership.cl_pclust <- cl_membership.fclust
-
-
-print.cl_membership <-
-function(x, ...)
-{
-    print.default(unclass(x), ...)
-    invisible(x)
-}
+## Package clue: cl_pclust().
+cl_membership.cl_pclust <- cl_membership.fanny
 
 ### * .cl_membership_from_class_ids
 

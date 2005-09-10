@@ -876,7 +876,7 @@ We see that the $k$-means base clusterers cannot resolve the underlying
 non-convex structure.  For the least squares consensus of the ensemble,
 we obtain
 <<>>=
-set.seed(1)
+set.seed(1234)
 m2 <- cl_consensus(CKME)
 @ %
 where here and below we set the random seed for reproducibility, noting
@@ -897,8 +897,8 @@ plot(Cassini$x, col = cl_class_ids(m2), xlab = "", ylab = "")
   \caption{Least Squares Consensus of the Cassini $k$-means ensemble.}
   \label{fig:Cassini-mean}
 \end{figure}
-This has drastically improved performance, and perfect recovery of the
-two outer shapes.  In fact,
+This has drastically improved performance, and almost perfect recovery
+of the two outer shapes.  In fact,
 \cite{cluster:Dimitriadou+Weingessel+Hornik:2002} show that almost
 perfect classification can be obtained by suitable combinations of
 different base clusterers ($k$-means, fuzzy $c$-means, and unsupervised

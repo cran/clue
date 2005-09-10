@@ -24,10 +24,13 @@ cl_validity(x, ...)
   \code{cl_validity} is a generic function.
 
   For partitions, its default method gives the \dQuote{dissimilarity
-    accounted for}, defined as
-  \deqn{\sum_{i,j} \sum_k m_{ik}m_{jk} d_{ij} / \sum_{i,j} d_{ij}}
+    accounted for}, defined as \eqn{1 - a_w / a_t}, where \eqn{a_t} is
+  the average total dissimilarity, and the \dQuote{average within
+    dissimilarity} \eqn{a_w} is given by
+  \deqn{\sum_{i,j} \sum_k m_{ik}m_{jk} d_{ij} /
+        \sum_{i,j} \sum_k m_{ik}m_{jk}} 
   where \eqn{d} and \eqn{m} are the dissimilarities and memberships,
-  respectively, and the sum is over all pairs of objects and all
+  respectively, and the sums are over all pairs of objects and all
   classes.
 
   For hierarchies, currently no validity measures are computed by

@@ -119,7 +119,8 @@ function(x, k, m = 1, control = list())
                 silhouette = silhouette(class_ids,
                                         dmatrix = dissimilarities),
                 validity = cl_validity(u, dissimilarities),
-                m = m)
+                m = m,
+                call = match.call())
     attr(out, "converged") <- (iter <= maxiter)
     class(out) <- "cl_pclust"
     out
