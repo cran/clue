@@ -1,7 +1,6 @@
 \documentclass[fleqn]{article}
 \usepackage[round,longnamesfirst]{natbib}
-\usepackage{graphicx,keyval}
-\usepackage{url}
+\usepackage{graphicx,keyval,thumbpdf,url}
 
 \newcommand\argmin{\mathop{\mathrm{arg min}}}
 \newcommand\trace{\mathop{\mathrm{tr}}}
@@ -17,7 +16,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2005-06-17}
+\date{2005-09-28}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -67,15 +66,19 @@ using ensemble methods to improve the quality and robustness of cluster
 solutions.  Cluster ensembles can also be utilized to aggregate base
 results over conditioning or grouping variables in multi-way data, to
 reuse existing knowledge, and to accommodate the needs of distributed
-computing, see e.g.\ \cite{cluster:Hornik:2005} and
+computing, see e.g.\ \cite{cluster:Hornik:2005a} and
 \cite{cluster:Strehl+Ghosh:2003a} for more information.
 
 Package~\pkg{clue} is an extension package for R~\citep{cluster:R:2005}
 providing a computational environment for creating and analyzing cluster
-ensembles.  In Section~2, we describe the underlying data structures,
-and the functionality for measuring proximity, obtaining consensus
-clusterings, and ``secondary'' clusterings.  Four examples are discussed
-in Section~3.  Section~4 concludes the paper.
+ensembles.  In Section~\ref{sec:structures+algorithms}, we describe the
+underlying data structures, and the functionality for measuring
+proximity, obtaining consensus clusterings, and ``secondary''
+clusterings.  Four examples are discussed in Section~\ref{sec:examples}.
+Section~\ref{sec:outlook} concludes the paper.
+
+A previous version of this manuscript was published in the \emph{Journal
+  of Statistical Software} \citep{cluster:Hornik:2005b}.
 
 
 \section{Data structures and algorithms}
@@ -190,8 +193,8 @@ package~\pkg{stats} is used to obtain the ultrametric (also known as
 cophenetic) distances from the hierarchy, which in turn by default calls
 the S3 generic \code{as.hclust()} (also in \pkg{stats}) on the
 hierarchy.  Support for classes which represent hierarchies can thus be
-added by providing \code{as.hclust()} methods for this class.  In R
-2.1.0 or better (again as part of the work on \pkg{clue}),
+added by providing \code{as.hclust()} methods for this class.  In
+R~2.1.0 or better (again as part of the work on \pkg{clue}),
 \code{cophenetic} is an S3 generic as well, and one can also more
 directly provide methods for this if necessary.
 
@@ -331,10 +334,10 @@ a cluster ensemble.
 
 Available methods for cluster ensembles include those for subscripting,
 \code{c()}, \code{rep()}, and \code{print()}.  Future versions of
-\pkg{clue} will add to this list.  E.g., R 2.1.1 will provide a
-\code{unique()} method for lists, making it rather straightforward to
-provide cluster ensemble methods for finding unique and duplicated
-elements, and to tabulate the elements of the ensemble.
+\pkg{clue} will add to this list.  E.g., R~2.1.1 added a \code{unique()}
+method for lists, making it rather straightforward to provide cluster
+ensemble methods for finding unique and duplicated elements, and to
+tabulate the elements of the ensemble.
 
 Function \code{cl\_boot()} generates cluster ensembles with bootstrap
 replicates of the results of applying a \dQuote{base} clustering
@@ -487,7 +490,7 @@ the optimum in time $O(k^3)$
 published implementations include TOMS 548
 \citep{cluster:Carpaneto+Toth:1980}, which however is restricted to
 integer weights and $k < 131$.  One can also transform the LSAP into a
-network flow problem, and use e.g. RELAX-IV
+network flow problem, and use e.g.~RELAX-IV
 \citep{cluster:Bertsekas+Tseng:1994} for solving this, as is done in
 package~\pkg{optmatch}~\citep{cluster:Hansen:2005}.  In
 package~\pkg{clue}, we use an efficient C implementation of the
@@ -559,7 +562,7 @@ the ultrametrics to a common range of values (e.g., to $[0,1]$).
 Consensus clusterings ``synthesize'' the information in the elements of
 a cluster ensemble into a single clustering.  There are three main
 approaches to obtaining consensus clusterings
-\citep{cluster:Hornik:2005,cluster:Gordon+Vichi:2001}: in the
+\citep{cluster:Hornik:2005a,cluster:Gordon+Vichi:2001}: in the
 \emph{constructive} approach, one specifies a way to construct a
 consensus clustering.  In the \emph{axiomatic} approach, emphasis is on
 the investigation of existence and uniqueness of consensus clusterings
@@ -906,7 +909,7 @@ fuzzy competitive learning).
 
 \subsection{Gordon-Vichi macroeconomic data}
 
-\citet[Table 1]{cluster:Gordon+Vichi:2001} provide soft partitions of 21
+\citet[Table~1]{cluster:Gordon+Vichi:2001} provide soft partitions of 21
 countries based on macroeconomic data for the years 1975, 1980, 1985,
 1990, and 1995.  These partitions were obtained using fuzzy $c$-means on
 measurements of the following variables: the annual per capita gross
@@ -915,7 +918,7 @@ of GDP provided by agriculture; the percentage of employees who worked
 in agriculture; and gross domestic investment, expressed as a percentage
 of the GDP.
 
-Table 4 in \cite{cluster:Gordon+Vichi:2001} gives 2-class consensus
+Table~4 in \cite{cluster:Gordon+Vichi:2001} gives 2-class consensus
 partitions obtained by applying their models 1, 2, and 3 and the
 approach in \cite{cluster:Sato+Sato:1994}.
 
@@ -965,11 +968,11 @@ similarities of the kinship terms were obtained from six different
 ``sorting'' experiments.  In one of these, 85 female undergraduates at
 Rutgers University were asked to sort 15 English terms into classes ``on
 the basis of some aspect of meaning''.  These partitions were printed in
-\citet[Table 7.1]{cluster:Rosenberg:1982}.  Comparison with the original
+\citet[Table~7.1]{cluster:Rosenberg:1982}.  Comparison with the original
 data indicates that the partition data have the ``nephew'' and ``niece''
 columns interchanged, which is corrected in data set \code{Kinship82}.
 
-\citet[Table 6]{cluster:Gordon+Vichi:2001} provide consensus partitions
+\citet[Table~6]{cluster:Gordon+Vichi:2001} provide consensus partitions
 for these data based on their models 1--3 (available in data set
 \code{Kinship82\_Consensus}).  We compare their results using
 co-membership dissimilarities (model 3) to ours as obtained by
