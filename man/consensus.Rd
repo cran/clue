@@ -51,6 +51,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     w_b d(x_b, x)^2} over all soft partitions with \eqn{k} classes).
 
   Available methods are as follows.
+  
   \describe{
     \item{\code{"DWH"}}{an extension of the greedy algorithm in
       Dimitriadou, Weingessel and Hornik (2002) for approximately
@@ -134,17 +135,36 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
   }
   
-  By default, method \code{"DWH"} is used.
+  By default, method \code{"DWH"} is used for ensembles of partitions.
   
-  If all elements of the ensemble are hierarchies, the built-in method
-  (named \code{"cophenetic"}) for computing consensus hierarchies is
-  based on minimizing \eqn{L(u) = \sum w_b d(x_b, u) ^ 2} over all
-  ultrametrics, where \eqn{d} is Euclidean dissimilarity.  This is
-  equivalent to finding the best least squares ultrametric approximation
-  of the weighted average \eqn{d = \sum w_b u_b} of the ultrametrics
-  \eqn{u_b} of the hierarchies \eqn{x_b}, which is attempted by calling
-  \code{\link{ls_fit_ultrametric}} on \eqn{d} with appropriate control
-  parameters.
+  If all elements of the ensemble are hierarchies, the following
+  built-in methods for computing consensus hierarchies are available.
+  
+  \describe{
+    \item{\code{"cophenetic"}}{an algorithm for minimizing
+      \eqn{L(u) = \sum w_b d(x_b, u) ^ 2} over all ultrametrics, where
+      \eqn{d} is Euclidean dissimilarity.  This is equivalent to finding
+      the best least squares ultrametric approximation of the weighted
+      average \eqn{d = \sum w_b u_b} of the ultrametrics \eqn{u_b} of
+      the hierarchies \eqn{x_b}, which is attempted by calling
+      \code{\link{ls_fit_ultrametric}} on \eqn{d} with appropriate
+      control parameters.}
+    
+    \item{\code{"majority"}}{a hierarchy obtained from an extension of
+      the majority consensus tree of Margush and McMorris (1981), which
+      minimizes \eqn{L(u) = \sum w_b d(x_b, u)} over all ultrametrics,
+      where \eqn{d} is the symmetric difference dissimilarity.  The
+      unweighted majority tree is the \eqn{n}-tree (hierarchy in the
+      strict sense) consisting of all subsets of objects contained in
+      more than half the \eqn{n}-trees $T_b$ induced by the dendrograms.
+      In the weighted case, it consists of all subsets \eqn{A} for which
+      \eqn{\sum_{b: A \in T_b} w_b > W / 2}, where \eqn{W = \sum_b w_b}.
+      The majority ultrametric returned is a representation of the
+      majority tree where all splits have height one.}
+  }
+
+  By default, method \code{"cophenetic"} is used for ensembles of
+  hierarchies.
 
   If a user-defined agreement method is to be employed, it must be a
   function taking the cluster ensemble, the case weights, and a list of
@@ -168,6 +188,10 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
   Boca Raton, FL: Chapman \& Hall/CRC.
+
+  T. Margush and F. R. McMorris (1981).
+  Consensus \eqn{n}-trees.
+  \emph{Bulletin of Mathematical Biology}, \bold{43}, 239--244.
 }
 \seealso{
   \code{\link{cl_medoid}}

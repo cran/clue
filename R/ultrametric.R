@@ -53,7 +53,8 @@ function(x)
 }
 as.cl_ultrametric.matrix <-
 function(x)
-    .cl_ultrametric_from_veclh(x[row(x) > col(x)])
+    .cl_ultrametric_from_veclh(x[row(x) > col(x)],
+                               labels = rownames(x))
 
 ### * as.dendrogram.cl_ultrametric
 
@@ -277,6 +278,83 @@ function(x, max = FALSE)
            x, nrow(x), fn = double(1),
            PACKAGE = "clue")$fn
 }
+
+### .get_classes_in_hierarchy
+
+## <FIXME>
+## We should really have a class for representing n-trees.
+## In principle, these could be considered as hierarchies in the clue
+## sense, because there is always one "minimal" standardized ultrametric
+## representing them.
+## But let's think about this some more, and perhaps just add class
+## "n_tree" to what is returned by .get_classes_in_hierarchy().
+## Then we could have .cl_ultrametric_from_classes() be
+## as.cl_ultrametric.n_tree() ...
+## Of course, we could also turn .get_classes_in_hierarchy() into (a
+## method of) as.n_tree().
+## (Still, not entirely sure about this ...)
+## </FIXME>
+
+.get_classes_in_hierarchy <-
+function(x)
+{
+    x <- as.hclust(x)
+    n <- n_of_objects(x)
+    labels <- seq(length = n)
+    groups <- cutree(x, labels)
+    ## Give a list with the (unique) sets of numbers of the objects.
+    out <- unique(unlist(sapply(split(groups, col(groups)),
+                                function(k) split(labels, k)),
+                         recursive = FALSE,
+                         use.names = FALSE))
+    ## Preserve labels if possible, and re-order according to
+    ## cardinality.
+    structure(out[order(sapply(out, length))], labels = x$labels)
+}
+
+### .cl_ultrametric_from_classes
+
+.cl_ultrametric_from_classes <-
+function(x)
+{
+
+    ## Compute an ultrametric from a hierarchy of classes (i.e., an
+    ## n-tree).
+    
+    ## .get_classes_in_hierarchy() orders according to cardinality, but
+    ## a consensus method may forget to ...
+    x[] <- x[order(sapply(x, length))]
+
+    ## Get the objects (unique codes in the classes).
+    objects <- sort(unique(unlist(x)))
+    ## (Could also look at the classes of length 1.)
+
+    ## Recursively compute the heights of the classes.
+    heights <- double(length = length(x))
+    for(i in which(sapply(x, length) > 1)) {
+        ## Find the relevant classes.
+        j <- sapply(x[seq(length = i - 1)],
+                    function(s) all(s %in% x[[i]]))
+        heights[i] <- max(heights[j]) + 1
+    }
+
+    ## Next, create an incidence matrix (objects by classes).
+    incidences <- sapply(x, function(s) objects %in% s)
+
+    ## Now that we have the heights and incidences, we can compute
+    ## distances, using the idea that
+    ##     distance(i, j) = min(height(A): A contains i and j)
+    n <- length(objects)
+    d <- matrix(0, n, n)
+    for(i in objects)
+        d[i, ] <- heights[apply((rep(incidences[i, ], each = n)
+                                 & incidences),
+                                1, which.max)]
+    dimnames(d) <- rep(list(attr(x, "labels")), 2)
+
+    as.cl_ultrametric(d)
+}
+
 
 ### Local variables: ***
 ### mode: outline-minor ***

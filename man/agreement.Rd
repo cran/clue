@@ -47,18 +47,18 @@ cl_agreement(x, y = NULL, method = "euclidean")
       sum of the absolute differences of \eqn{u} and all column
       permutations of \eqn{v}, and \eqn{m} is an upper bound for the
       maximal Manhattan dissimilarity.}
-    \item{\code{"Rand"}}{The Rand index (the rate of distinct pairs of
+    \item{\code{"Rand"}}{the Rand index (the rate of distinct pairs of
       objects both in the same class or both in different classes in
       both partitions), see Rand (1971) or Gordon (1999), page 198.
       For soft partitions, (currently) the Rand index of the
       corresponding \dQuote{nearest} hard partitions is used.}
-    \item{\code{"cRand"}}{The Rand index corrected for agreement by
+    \item{\code{"cRand"}}{the Rand index corrected for agreement by
       chance, see Hubert and Arabie (1985) or Gordon (1999), page 198.
       Can only be used for hard partitions.}
     \item{\code{"NMI"}}{Normalized Mutual Information, see Strehl and
       Ghosh (2002).  For soft partitions, (currently) the NMI of the
       corresponding \dQuote{nearest} hard partitions is used.} 
-    \item{\code{"KP"}}{The Katz-Powell index, i.e., the product-moment
+    \item{\code{"KP"}}{the Katz-Powell index, i.e., the product-moment
       correlation coefficient between the elements of the co-membership
       matrices \eqn{C(u) = u u'} and \eqn{C(v)}, respectively, see Katz
       and Powell (1953).  For soft partitions, (currently) the
@@ -66,11 +66,25 @@ cl_agreement(x, y = NULL, method = "euclidean")
       partitions is used.  (Note that for hard partitions, the
       \eqn{(i,j)} entry of \eqn{C(u)} is one iff objects \eqn{i} and
       \eqn{j} are in the same class.)}
-    \item{\code{"angle"}}{The maximal cosine of the angle between the
+    \item{\code{"angle"}}{the maximal cosine of the angle between the
       elements of \eqn{u} and all column permutations of \eqn{v}.}
-    \item{\code{"diag"}}{The maximal co-classification rate, i.e., the
+    \item{\code{"diag"}}{the maximal co-classification rate, i.e., the
       maximal rate of objects with the same class ids in both
       partitions after arbitrarily permuting the ids.}
+    \item{\code{"Jaccard"}}{the Jaccard index, i.e., the ratio of the
+      numbers of distinct pairs of objects in the same class in both
+      partitions and in at least one partition, respectively.
+      For soft partitions, (currently) the Jaccard index of the
+      corresponding \dQuote{nearest} hard partitions is used.}
+    \item{\code{"FM"}}{the index of Fowlkes and Mallows (1983), i.e.,
+      the ratio \eqn{N_{xy} / \sqrt{N_x N_y}}{N_xy / sqrt(N_x N_y)} of
+      the number \eqn{N_{xy}}{N_xy} of distinct pairs of objects in the
+      same class in both partitions and the geometric mean of the
+      numbers \eqn{N_x} and \eqn{N_y} of distinct pairs of objects in
+      the same class in partition \eqn{x} and partition \eqn{y},
+      respectively.
+      For soft partitions, (currently) the Fowlkes-Mallows index of the
+      corresponding \dQuote{nearest} hard partitions is used.}
   }
 
   If all components are hierarchies, available built-in methods for
@@ -86,7 +100,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
       absolute differences of \eqn{u} and \eqn{v}).}
     \item{\code{"cophenetic"}}{The cophenetic correlation coefficient.
       (I.e., the product-moment correlation of the ultrametrics.)}
-    \item{\code{"angle"}}{The cosine of the angle between the
+    \item{\code{"angle"}}{the cosine of the angle between the
       ultrametrics.}
     \item{\code{"gamma"}}{\eqn{1 - d}, where \eqn{d} is the rate of
       inversions between the associated ultrametrics (i.e., the rate of
@@ -111,6 +125,11 @@ cl_agreement(x, y = NULL, method = "euclidean")
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
     Intelligence}, \bold{16}, 901--912.
+
+  E. B. Fowlkes and C. L. Mallows (1983).
+  A method for comparing two hierarchical clusterings.
+  \emph{Journal of the American Statistical Association}, \bold{78},
+  553--569.
   
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
@@ -133,7 +152,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
   A. Strehl and J. Ghosh (2002).
   Cluster ensembles --- A knowledge reuse framework for combining
   multiple partitions.
-  \emph{Journal on Machine Learning Research}, \bold{3}, 583--617.
+  \emph{Journal of Machine Learning Research}, \bold{3}, 583--617.
 }
 \seealso{
   \code{\link{cl_dissimilarity}};

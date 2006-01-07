@@ -3,24 +3,20 @@ function(x, k, m = 1, control = list())
 {
     ## Partition a cluster ensemble x into (at most) k classes by
     ## minimizing
-    ##   \sum_b \sum_j u_{bj}^m d(x_b, p_j) ^ 2
-    ## for suitable soft partition prototypes p_1, ..., p_k, where
-    ## 1 <= m < \infty, with 1 corresponding to hard (secondary)
-    ## partitions, and d is euclidean dissimilarity.
+    ##   \sum_b \sum_j u_{bj}^m d(x_b, p_j) ^ e
+    ## for "suitable" prototypes p_1, ..., p_k, where 1 <= m < \infty,
+    ## with 1 corresponding to hard (secondary) partitions, and d a
+    ## dissimilarity measure (such as Euclidean dissimilarity of
+    ## partitions or hierarchies).
+    ##
+    ## The algorithm works whenever there is a consensus method for
+    ## solving
+    ##   \sum_b u_{bj}^m d(x_b, p) ^ e => \min_p
+    ##
+    ## As we refer to consensus methods by their *name* (e.g., 'HBH'),
+    ## we rely on the registration mechanism (set_cl_consensus_method())
+    ## to provide the required information about d and e.
 
-    ## <NOTE>
-    ## The algorithm actually more generally works for minimizing
-    ##   \sum_b \sum_j u_{bj}^m d(x_b, p_j)
-    ## for "suitable" dissimilarity measures d (such as squared
-    ## Euclidean dissimilarity in the above), provided that suitable
-    ## consensus methods for solving
-    ##   \sum_b u_{bj}^m d(x_b, p) => \min_p
-    ## are available.
-    ## For the time being, we only work with squared Euclidean
-    ## dissimilarities.
-    ## </NOTE>
-
-    ## Control parameters.
     maxiter <- control$maxiter
     if(is.null(maxiter))
         maxiter <- 100
@@ -35,15 +31,50 @@ function(x, k, m = 1, control = list())
     clusterings <- as.cl_ensemble(x)
     B <- length(clusterings)
 
-    memberships <- lapply(clusterings, cl_membership,
-                          max(sapply(clusterings, n_of_classes)))
-    ## Be careful to turn this into a cl_ensemble (of cl_memberships).
-    memberships <- cl_ensemble(list = memberships)
+    is_partition_ensemble <-
+        inherits(clusterings, "cl_partition_ensemble")
+
+    if(is_partition_ensemble) {
+        ## Canonicalize by turning into an ensemble of membership
+        ## matrices with the same (minimal) number of columns.
+        memberships <- lapply(clusterings, cl_membership,
+                              max(sapply(clusterings, n_of_classes)))
+        clusterings <- cl_ensemble(list = memberships)
+    }
+
+    if(is.null(method)) {
+        ## Default: use squared Euclidean dissimilarities.  Note that
+        ## there is a small catch, as the default consensus methods for
+        ## partitions and hierarchies are *not* named "euclidean".
+        ## Hence, fill in d and e ourselves ...
+        e <- 2
+        d <- function(x, y = NULL)
+            cl_dissimilarity(x, y, method = "euclidean")
+    }
+    else {
+        ## Get required information on d and e from the registry.        
+        if(!inherits(method, "cl_consensus_method")) {
+            type <- if(is_partition_ensemble)
+                "partition"
+            else
+                "hierarchy" 
+            method <- get_cl_consensus_method(method, type)
+            ## Note that this avoids registry lookup in subsequent
+            ## calls to cl_consensus().
+        }
+        if(is.null(method$exponent))
+            stop("No information on exponent in consensus method used.")
+        e <- method$exponent
+        if(is.null(method$dissimilarity))
+            stop("No information on dissimilarity in consensus method used.")
+        d <- function(x, y = NULL)
+            cl_dissimilarity(x, y, method = method$dissimilarity)
+    }
     
-    ## Take random memberships as prototypes.
-    ## It may be better to use random soft partitions.
-    prototypes <- memberships[sample(1 : B, k)]
-    dissimilarities <- cl_dissimilarity(memberships, prototypes) ^ 2
+    ## Take random clusterings as prototypes.
+    ## For partitions, it may be better to use random soft partitions.
+    prototypes <- clusterings[sample(1 : B, k)]
+    dissimilarities <- d(clusterings, prototypes) ^ e
 
     if(m == 1) {
         ## Hard secondary partitions.
@@ -56,16 +87,15 @@ function(x, k, m = 1, control = list())
             ## <NOTE>
             ## Splitting lists is broken in R versions up to 2.0.1, so
             ## we use a loop here.  Something based on
-            ##   lapply(split(memberships, class_ids), cl_consensus)
-            ## would be nicer ...
+            ##   lapply(split(clusterings, class_ids), cl_consensus, ...)
+            ## would be nicer.
             for(j in unique(class_ids))
                 prototypes[[j]] <-
-                    cl_consensus(memberships[class_ids %in% j],
+                    cl_consensus(clusterings[class_ids %in% j],
                                  method = method, control = control)
             ## </NOTE>
             ## Update the class ids.
-            dissimilarities <-
-                cl_dissimilarity(memberships, prototypes) ^ 2
+            dissimilarities <- d(clusterings, prototypes) ^ e
             class_ids <- max.col( - dissimilarities )
             new_value <-
                 sum(.one_entry_per_column(dissimilarities, class_ids))
@@ -80,23 +110,24 @@ function(x, k, m = 1, control = list())
     }
     else {
         ## Soft secondary partitions.
-        value <- function(u, d) sum(u ^ m * d)
+        value <- function(u, dissimilarities)
+            sum(u ^ m * dissimilarities)
         u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
         old_value <- value(u, dissimilarities)
         iter <- 1        
         while(iter <= maxiter) {
             ## Update the prototypes.
             ## This amounts to solving, for each j:
-            ##   \sum_b u_{bj}^m d(x_b, p_j) => \min_p
-            ## I.e., p_j is the *weighted* least squares consensus
-            ## clustering of the x_b with corresponding weights u_{bj}^m.
-            for(j in 1 : k)
+            ##   \sum_b u_{bj}^m d(x_b, p) ^ e => \min_p
+            ## I.e., p_j is the *weighted* consensus clustering of the
+            ## x_b with corresponding weights u_{bj}^m.
+            for(j in 1 : k) {
                 prototypes[[j]] <-
-                    cl_consensus(memberships, weights = u[, j] ^ m,
+                    cl_consensus(clusterings, weights = u[, j] ^ m,
                                  method = method, control = control)
+            }
             ## Update u.
-            dissimilarities <-
-                cl_dissimilarity(memberships, prototypes) ^ 2
+            dissimilarities <- d(clusterings, prototypes) ^ e
             u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
             new_value <- value(u, dissimilarities)
             if(abs(old_value - new_value)
@@ -108,7 +139,7 @@ function(x, k, m = 1, control = list())
         class_ids <- max.col(u)
     }
 
-    dissimilarities <- as.matrix(cl_dissimilarity(memberships) ^ 2)
+    dissimilarities <- as.matrix(d(clusterings) ^ e)
     ## Note that our dissimilarities inherit from "cl_proximity" but not
     ## "dist", and as.dist() is not a generic function.
     u <- cl_membership(as.cl_membership(u), k)
@@ -119,7 +150,7 @@ function(x, k, m = 1, control = list())
                 silhouette = silhouette(class_ids,
                                         dmatrix = dissimilarities),
                 validity = cl_validity(u, dissimilarities),
-                m = m,
+                m = m, d = d, e = e,
                 call = match.call())
     attr(out, "converged") <- (iter <= maxiter)
     class(out) <- "cl_pclust"

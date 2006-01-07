@@ -184,7 +184,7 @@ The hierarchies considered in \pkg{clue} are \emph{total indexed
 correspond in a one-to-one manner to \emph{ultrametrics} (distances
 $u_{ij}$ between pairs of objects $i$ and $j$ which satisfy the
 ultrametric constraint $u_{ij} = \max(u_{ik}, u_{jk})$ for all triples
-$i$, $j$, and $k$).  See e.g.~\cite[Page~69--71]{cluster:Gordon:1999}.
+$i$, $j$, and $k$).  See e.g.~\citet[Page~69--71]{cluster:Gordon:1999}.
 
 Function \code{cl\_ultrametric(x)} computes the associated ultrametric
 from an R object \code{x} representing a hierarchy of objects.  If

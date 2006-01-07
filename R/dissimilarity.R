@@ -11,38 +11,19 @@ function(x, y = NULL, method = "euclidean")
         method <- y
         y <- NULL
     }
-    
-    if(!is.function(method)) {
-        builtin_methods <- if(is_partition_ensemble)
-            c("euclidean", "manhattan", "comemberships")
-        else
-            c("euclidean", "manhattan", "cophenetic", "gamma")
-        builtin_method_names <- if(is_partition_ensemble)
-            c("minimal euclidean membership distances",
-              "minimal manhattan membership distances",
-              "euclidean comembership distances")
-        else
-            c("euclidean ultrametric distances",
-              "manhattan ultrametric distances",
-              "cophenetic correlations",
-              "rate of inversions")
-        if(is.na(ind <- pmatch(tolower(method),
-                               tolower(builtin_methods))))
 
-            stop(gettextf("Value '%s' is not a valid abbreviation for a dissimilarity method.",
-                          method),
-                 domain = NA)
-        method <- paste(".cl_dissimilarity",
-                        if(is_partition_ensemble)
-                        "partition"                        
-                        else
-                        "hierarchy",
-                        builtin_methods[ind],
-                        sep = "_")
-        method_name <- builtin_method_names[ind]
-    }
-    else {
+    if(is.function(method))
         method_name <- "user-defined method"
+    else {
+        if(!inherits(method, "cl_dissimilarity_method")) {
+            ## Get the method definition and description from the
+            ## registry. 
+            type <- ifelse(is_partition_ensemble,
+                           "partition", "hierarchy")
+            method <- get_cl_dissimilarity_method(method, type)
+        }
+        method_name <- method$description
+        method <- method$definition
     }
               
     if(!is.null(y)) {
@@ -108,7 +89,7 @@ function(x, y)
     M_y <- cl_membership(y, k)
     C <- .cxdist(M_x, M_y, "manhattan")
     ind <- solve_LSAP(C)
-    sum(C[seq(along = ind), ind])
+    sum(C[cbind(seq(along = ind), ind)])
 }    
 
 ### ** .cl_dissimilarity_partition_comemberships
@@ -133,6 +114,52 @@ function(x, y)
     sqrt(sum(crossprod(M_x) ^ 2)
          - 2 * sum(crossprod(M_x, M_y) ^ 2)
          + sum(crossprod(M_y) ^ 2))
+}
+
+### ** .cl_dissimilarity_partition_symdiff
+
+.cl_dissimilarity_partition_symdiff <-
+function(x, y)
+{
+    ## Cardinality of the symmetric difference of the partitions
+    ## regarded as binary equivalence relations, i.e., the number of
+    ## discordant pairs.
+
+    ## Handle soft partitions using the corresponding hard ones.
+    ## (At least, for the time being.)
+
+    n <- n_of_objects(x)
+    .cl_dissimilarity_partition_Rand(x, y) * choose(n, 2)
+}
+    
+### ** .cl_dissimilarity_partition_Rand
+
+.cl_dissimilarity_partition_Rand <-
+function(x, y)    
+{
+    ## Handle soft partitions using the corresponding hard ones.
+    ## (At least, for the time being.)
+
+    1 - .cl_agreement_partition_Rand(x, y)
+}
+
+### ** .cl_dissimilarity_partition_GV1
+
+.cl_dissimilarity_partition_GV1 <-
+function(x, y)
+{    
+    k_x <- n_of_classes(x)
+    k_y <- n_of_classes(y)
+    M_x <- cl_membership(x, k_x)
+    M_y <- cl_membership(y, k_y)
+    C <- outer(colSums(M_x ^ 2), colSums(M_y ^ 2), "+") -
+        2 * crossprod(M_x, M_y)
+    if(k_x < k_y)
+        C <- rbind(C, matrix(0, nr = k_y - k_x, nc = k_y))
+    else if(k_x > k_y)
+        C <- cbind(C, matrix(0, nr = k_x, nc = k_x - k_y))
+    ind <- solve_LSAP(C)
+    sqrt(sum(C[cbind(seq(along = ind), ind)]))
 }
 
 ### ** .cl_dissimilarity_hierarchy_euclidean
@@ -172,6 +199,29 @@ function(x, y)
        u, v, n, count = double(1),
        PACKAGE = "clue") $ count / choose(n, 2)
 }
+
+### ** .cl_dissimilarity_hierarchy_symdiff
+
+.cl_dissimilarity_hierarchy_symdiff <-
+function(x, y)
+{
+    ## Cardinality of the symmetric difference of the n-trees when
+    ## regarded as sets of subsets (classes) of the set of objects.
+
+    n <- n_of_objects(x)
+    x <- .get_classes_in_hierarchy(x)
+    y <- .get_classes_in_hierarchy(y)
+    lx <- sapply(x, length)
+    ly <- sapply(y, length)
+    s <- 0
+    for(i in seq(length = n)) {
+        sx <- x[lx == i]
+        sy <- y[lx == i]
+        s <- s + sum(is.na(match(sx, sy))) + sum(is.na(match(sy, sx)))
+    }
+    s
+}
+    
 
 ### * as.dist.cl_dissimilarity
 

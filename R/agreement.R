@@ -17,43 +17,18 @@ function(x, y = NULL, method = "euclidean")
         y <- NULL
     }
 
-    if(!is.function(method)) {
-        builtin_methods <- if(is_partition_ensemble)
-            c("euclidean", "manhattan", "Rand", "cRand", "NMI", "KP",
-              "angle", "diag")
-        else
-            c("euclidean", "manhattan", "cophenetic", "angle", "gamma")
-        builtin_method_names <- if(is_partition_ensemble)
-            c("minimal euclidean membership distances",
-              "minimal manhattan membership distances",
-              "Rand index",
-              "corrected Rand index",
-              "normalized mutual information",
-              "Katz-Powell index",
-              "maximal angle between memberships",
-              "maximal co-classification rate")
-        else
-            c("euclidean ultrametric distances",
-              "manhattan ultrametric distances",              
-              "cophenetic correlations",
-              "angle between ultrametrics",
-              "rate of inversions")
-        if(is.na(ind <- pmatch(tolower(method),
-                               tolower(builtin_methods))))
-            stop(gettextf("Value '%s' is not a valid abbreviation for an agreement method.",
-                          method),
-                 domain = NA)
-        method <- paste(".cl_agreement",
-                        if(is_partition_ensemble)
-                        "partition"                        
-                        else
-                        "hierarchy",
-                        builtin_methods[ind],
-                        sep = "_")
-        method_name <- builtin_method_names[ind]
-    }
-    else {
+    if(is.function(method))
         method_name <- "user-defined method"
+    else {
+        if(!inherits(method, "cl_agreement_method")) {
+            ## Get the method definition and description from the
+            ## registry. 
+            type <- ifelse(is_partition_ensemble,
+                           "partition", "hierarchy")
+            method <- get_cl_agreement_method(method, type)
+        }
+        method_name <- method$description
+        method <- method$definition
     }
 
     if(!is.null(y)) {
@@ -256,6 +231,86 @@ function(x, y)
     ind <- solve_LSAP(crossprod(M_x, M_y), max = TRUE)
     sum(M_x * M_y[, ind]) / n_of_objects(x)
 }
+
+### ** .cl_agreement_partition_FM
+
+.cl_agreement_partition_FM <-
+function(x, y)
+{
+    ## Fowlkes-Mallows index.
+
+    n <- n_of_objects(x)    
+
+    ## Handle soft partitions using the corresponding hard ones.
+    ## (At least, for the time being.)
+    x <- table(cl_class_ids(x), cl_class_ids(y))
+
+    (sum(x ^ 2) - n) /
+        sqrt((sum(rowSums(x) ^ 2) - n) * (sum(colSums(x) ^ 2) - n))
+    
+}
+
+### ** .cl_agreement_partition_Jaccard
+
+.cl_agreement_partition_Jaccard <-
+function(x, y)
+{
+    ## Jaccard index.
+
+    n <- n_of_objects(x)    
+
+    ## Handle soft partitions using the corresponding hard ones.
+    ## (At least, for the time being.)
+    x <- table(cl_class_ids(x), cl_class_ids(y))
+
+    Z <- sum(x ^ 2) - n
+
+    Z / (sum(rowSums(x) ^ 2) + sum(colSums(x) ^ 2) - Z)
+    
+}
+
+## Some computations useful for interpreting some of the above.
+##
+## Consider two hard partitions A and B and write
+##   a_{ik} ... indicator of object i in class k for partition A
+##   b_{il} ... indicator of object i in class l for partition B
+## (so that the a_{ik} and b_{il} are of course the membership matrices
+## of the partitions).
+##
+## Then obviously
+##   \sum_i a_{ik} b_{il} = m_{kl}
+## is the number of objects in class k for A and in class l for B, and
+##   \sum_i a_{ik} = m_{k.} = # objects in class k for A
+##   \sum_i b_{il} = m_{.l} = # objects in class l for B
+##
+## Number of pairs of objects in the same classes for both A and B:
+##   \sum_{i, j, k, l} a_{ik} a_{jk} b_{il} b_{jl}
+##     = \sum_{k, l} \sum_i a_{ik} b_{il} \sum_j a_{jk} b_{jl}
+##     = \sum_{k, l} m_{kl} ^ 2
+## This includes the n pairs with identical objects, hence:
+## Number of distinct pairs of objects in the same classes for both A
+## and B:
+##   (\sum_{k, l} m_{kl} ^ 2 - n) / 2
+##
+## Number of pairs of objects in the same class for A:
+##   \sum_{i, j, k} a_{ik} a_{jk}
+##     = \sum_k \sum_i a_{ik} \sum_j a_{jk}
+##     = \sum_k m_{k.} ^ 2
+## Again, this includes the n pairs with identical objects, hence:
+## Number of distinct pairs of objects in the same class for A:
+##   (\sum_k m_{k.} ^ 2 - n) / 2
+##
+## Similarly, \sum_l m_{.l} ^ 2 corresponds to the number of pairs of
+## objects in the same class for B.
+##
+## Finally, to get the number of pairs of objects in different classes
+## for both A and B, we note that this is the total number of pairs,
+## minus the sum of the numbers of those in the same class for A and for
+## B, respectively, plus the number of pairs in the same class for both
+## A and B.
+##
+## This makes e.g. the interpretation of some of the Fowlkes-Mallows or
+## Rand agreement indices rather straightforward.
 
 ### ** .cl_agreement_hierarchy_euclidean
 

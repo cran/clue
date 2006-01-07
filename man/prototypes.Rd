@@ -9,7 +9,7 @@
 cl_prototypes(x)
 }
 \arguments{
-  \item{x}{an R objects representing a partition of objects.}
+  \item{x}{an R object representing a partition of objects.}
 }
 \details{
   Many partitioning methods are based on prototypes (\dQuote{centers},
