@@ -206,8 +206,8 @@ function(object, newdata = NULL, ...)
     ##   See also the comments in .cl_consensus_partition_AO().
     ## Step 3. Find a general solution ...
     
-    d <- cl_dissimilarity(newdata, object$prototypes)
-    power <- c(object$m, 2)
+    d <- object$d(newdata, object$prototypes)
+    power <- c(object$m, object$e)
 
     as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
 }

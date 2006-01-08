@@ -29,25 +29,19 @@ function(x, method = NULL, weights = 1, control = list())
         inherits(clusterings, "cl_partition_ensemble")
 
     if(!is.function(method)) {
-        builtin_methods <-
-            if(is_partition_ensemble)
-                c("DWH", "GV1", "GV3", "HBH")
-            else
-                c("cophenetic")
-        if(is.null(method))
-            ind <- 1
-        else if(is.na(ind <- pmatch(tolower(method),
-                                    tolower(builtin_methods))))
-            stop(gettextf("Value '%s' is not a valid abbreviation for a consensus method.",
-                          method),
-                 domain = NA)
-        method <- get(paste(".cl_consensus",
-                            if(is_partition_ensemble)
-                            "partition"                        
-                            else
-                            "hierarchy",
-                            builtin_methods[ind],
-                            sep = "_"))
+        if(!inherits(method, "cl_consensus_method")) {
+            ## Get the method definition from the registry.
+            type <- ifelse(is_partition_ensemble,
+                           "partition", "hierarchy")
+            if(is.null(method)) {
+                ## Defaults: change to SBH (Soft Boehm-Hornik)
+                ## eventually. 
+                method <- ifelse(is_partition_ensemble,
+                                 "DWH", "cophenetic")
+            }
+            method <- get_cl_consensus_method(method, type)
+        }
+        method <- method$definition
     }
 
     method(clusterings, weights, control)
@@ -78,8 +72,9 @@ function(clusterings, weights, control)
     clusterings <- clusterings[order]
     weights <- weights[order]
 
-    k_max <- max(k, max_n_of_classes)    
+    k_max <- max(k, max_n_of_classes)
     s <- weights / cumsum(weights)
+    s[is.na(s)] <- 0                    # Division by zero ...
     
     M <- cl_membership(clusterings[[1]], k_max)
     for(b in seq(along = clusterings)[-1]) {
@@ -391,6 +386,28 @@ function(clusterings, weights, control)
     ls_fit_ultrametric(d, control)
 }
 
+### ** .cl_consensus_hierarchy_majority
+
+.cl_consensus_hierarchy_majority <-
+function(clusterings, weights, control)
+{
+    ## Have no use for control arguments.
+
+    w <- weights / sum(weights)
+
+    classes <- lapply(clusterings, .get_classes_in_hierarchy)
+    all_classes <- unique(unlist(classes, recursive = FALSE))
+    gamma <- double(length = length(all_classes))
+    for(i in seq(along = classes))
+        gamma <- gamma + w[i] * !is.na(match(all_classes, classes[[i]]))
+
+    maj_classes <- all_classes[gamma > 1 / 2]
+    attr(maj_classes, "labels") <- attr(classes[[1]], "labels")
+
+    .cl_ultrametric_from_classes(maj_classes)
+}
+
+
 ### * .project_to_leading_columns
 
 .project_to_leading_columns <-
@@ -404,6 +421,7 @@ function(x, k)
                matrix(0, nrow(y), ncol(x) - k))
     ## (Use the pmax to ensure that entries remain nonnegative.)
 }
+
 
 ### Local variables: ***
 ### mode: outline-minor ***

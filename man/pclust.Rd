@@ -3,15 +3,16 @@
 \title{Prototype-Based Partitions of Clusterings}
 \description{
   Compute prototype-based partitions of a cluster ensemble by minimizing
-  \eqn{\sum u_{bj}^m d(x_b, p_j)^2}, the sum of the membership-weighted
-  squared Euclidean dissimilarities between the elements \eqn{x_b} of
-  the ensemble and the prototypes \eqn{p_j}.
+  \eqn{\sum u_{bj}^m d(x_b, p_j)^e}, the sum of the membership-weighted
+  \eqn{e}-th powers of the dissimilarities between the elements
+  \eqn{x_b} of the ensemble and the prototypes \eqn{p_j}, for suitable
+  dissimilarities \eqn{d} and exponents \eqn{e}.
 }
 \usage{
 cl_pclust(x, k, m = 1, control = list())
 }
 \arguments{
-  \item{x}{an ensemble of partitions or hierarchies, or or something
+  \item{x}{an ensemble of partitions or hierarchies, or something
     coercible to that (see \code{\link{cl_ensemble}}).}
   \item{k}{an integer giving the number of classes to be used in the
     partition.}
@@ -36,19 +37,21 @@ cl_pclust(x, k, m = 1, control = list())
   \item{validity}{precomputed validity measures for the partition.}
   \item{m}{the softness control argument.}
   \item{call}{the matched call.}
+  \item{d}{the dissimilarity function \eqn{d = d(x, p)} employed.}
+  \item{e}{the exponent \eqn{e} employed.}
 }
 \details{
   For \eqn{m = 1}, a generalization of the Lloyd-Forgy variant of the
   \eqn{k}-means algorithm is used, which iterates between reclassifying
   objects to their closest prototypes, and computing new prototypes as
-  the least squares consensus clusterings for the classes.  This may
-  result in degenerate solutions, and will be replaced by a
-  Hartigan-Wong style algorithm eventually.
+  consensus clusterings for the classes.  This may result in degenerate
+  solutions, and will be replaced by a Hartigan-Wong style algorithm
+  eventually.
 
   For \eqn{m > 1}, a generalization of the fuzzy \eqn{c}-means recipe
   (e.g., Bezdek (1981)) is used, which alternates between computing
   optimal memberships for fixed prototypes, and computing new prototypes
-  as the least squares consensus clusterings for the classes.
+  as the consensus clusterings for the classes.
 
   This procedure is repeated until convergence occurs, or the maximal
   number of iterations is reached.
@@ -66,6 +69,12 @@ cl_pclust(x, k, m = 1, control = list())
     \item{\code{control}}{control parameters to be used in
       \code{\link{cl_consensus}}.}
   }
+
+  The dissimilarities \eqn{d} and exponent \eqn{e} are implied by the
+  consensus method employed, and inferred via a registration mechanism
+  currently only made available to built-in consensus methods.  The
+  default methods compute Least Squares Euclidean consensus clusterings,
+  i.e., use Euclidean dissimilarity \eqn{d} and \eqn{e = 2}.
 
   The fixed point approach employed is a heuristic which cannot be
   guaranteed to find the global minimum (as this is already true for the
@@ -94,7 +103,8 @@ plot(hc)
 ## This suggests using a partition with three classes, which can be
 ## obtained using cutree(hc, 3).  Could use cl_consensus() to compute
 ## prototypes as the least squares consensus clusterings of the classes,
-## or alternatively: 
+## or alternatively:
+set.seed(123)
 x1 <- cl_pclust(CKME, 3, m = 1)
 x2 <- cl_pclust(CKME, 3, m = 2)
 ## Agreement of solutions.
