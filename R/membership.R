@@ -52,8 +52,15 @@ cl_membership.cshell <- cl_membership.fanny
 ## Package e1071: bclust().
 cl_membership.bclust <- cl_membership.default
 
+## Package flexmix: class "flexmix".
+cl_membership.flexmix <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_memberships(flexmix::posterior(x), k)
+
 ## Package mclust: Mclust().
-cl_membership.Mclust <- cl_membership.default
+cl_membership.Mclust <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_memberships(x$z, k)
 
 ## Package clue: Memberships.
 cl_membership.cl_membership <-

@@ -66,6 +66,15 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
       \eqn{u} and \eqn{v}.}
   }
 
+  For hard partitions, both Manhattan and squared Euclidean
+  dissimilarity give twice the \emph{transfer distance} (Charon et al.,
+  2005), which is the minimum number of objects that must be removed so
+  that the implied partitions (restrictions to the remaining objects)
+  are identical.  This is also known as the \emph{\eqn{R}-metric} in Day
+  (1981), i.e., the number of augmentations and removals of single
+  objects needed to transform one partition into the other, and the
+  \emph{partition-distance} in Gusfield (2002).
+
   If all components are hierarchies, available built-in methods for
   measuring agreement between two hierarchies with respective
   ultrametrics \eqn{u} and \eqn{v} are as follows.
@@ -106,8 +115,20 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   extend this class), thus making it possible to use them directly for
   clustering algorithms based on dissimilarity matrices of this class,
   see the examples.
+
+  
 }
 \references{
+  I. Charon and L. Denoeud and A. Guénoche and O. Hudry (2005).
+  \emph{Maximum Transfer Distance Between Partitions}.
+  Technical Report 2005D003, Ecole Nationale Supérieure des
+  Télécommunications --- Paris.
+  \url{http://www.enst.fr/_data/files/docs/id_515_1128675112_271.pdf}
+  
+  W. E. H. Day (1981).
+  The complexity of computing metric distances between partitions.
+  \emph{Mathematical Social Sciences}, \bold{1}, 269--287.
+  
   E. Dimitriadou and A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
@@ -116,6 +137,11 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   A. D. Gordon and M. Vichi (2001).
   Fuzzy partition models for fitting a set of partitions.
   \emph{Psychometrika}, \bold{66}, 229--248.
+
+  D. Gusfield (2002).
+  Partition-distance: A problem and class of perfect graphs arising in
+  clustering.
+  \emph{Information Processing Letters}, \bold{82}, 159--164.
 }  
 \seealso{
   \code{\link{cl_agreement}}

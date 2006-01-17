@@ -176,6 +176,15 @@ cl_class_ids.partition <-
 function(x)
     x$clustering
 
+## Package cba: ccfkms().
+cl_class_ids.ccfkms <-
+function(x)
+    as.vector(x$cl)
+## Package cba: rockCluster() returns objects of class "rock".
+cl_class_ids.rock <-
+function(x)
+    as.vector(x$cl)
+
 ## Package cclust: cclust().
 cl_class_ids.cclust <- cl_class_ids.default
 
@@ -185,6 +194,23 @@ cl_class_ids.fclust <- cl_class_ids.default
 cl_class_ids.cshell <- cl_class_ids.default
 ## Package e1071: bclust().
 cl_class_ids.bclust <- cl_class_ids.default
+
+## Package flexclust: kcca() returns objects of S4 class "kcca" which
+## extends S4 class "flexclust".
+cl_class_ids.kcca <-
+function(x)
+    flexclust::cluster(x)
+
+## Package flexmix: class "flexmix".
+cl_class_ids.flexmix <-
+function(x)
+    flexmix::cluster(x)
+
+## Package kernlab: specc() and kkmeans() return objects of S4 class
+## "specc".
+cl_class_ids.specc <-
+function(x)
+    as.vector(unclass(x))
 
 ## Package mclust: Mclust().
 cl_class_ids.Mclust <-
@@ -229,6 +255,11 @@ is.cl_partition.kmeans <- .true
 ## respective class inheriting from class "partition".
 is.cl_partition.partition <- .true
 
+## Package cba: ccfkms().
+is.cl_partition.ccfkms <- .true
+## Package cba: rockCluster() returns objects of class "rock".
+is.cl_partition.rock <- .true
+
 ## Package cclust: cclust().
 is.cl_partition.cclust <- .true
 
@@ -239,6 +270,17 @@ is.cl_partition.cshell <- .true
 ## Package e1071: bclust().
 is.cl_partition.bclust <- .true
 
+## Package flexclust: kcca() returns objects of S4 class "kcca" which
+## extends S4 class "flexclust".
+is.cl_partition.kcca <- .true
+
+## Package flexmix: class "flexmix".
+is.cl_partition.flexmix <- .true
+
+## Package kernlab: specc() and kkmeans() return objects of S4 class
+## "specc".
+is.cl_partition.specc <- .true
+
 ## Package mclust: Mclust().
 is.cl_partition.Mclust <- .true
 
@@ -246,6 +288,15 @@ is.cl_partition.Mclust <- .true
 is.cl_partition.cl_membership <- .true
 ## Package clue: cl_pclust().
 is.cl_partition.cl_pclust <- .true
+
+### * as.cl_partition
+
+## Note that cl_partition conceptually is a virtual class, so there are
+## no prototypes and no cl_partition() creator.
+
+as.cl_partition <-
+function(x)
+    if(is.cl_partition(x)) x else as.cl_membership(x)
 
 ### * is.cl_hard_partition
 
@@ -282,6 +333,11 @@ function(x)
 ## </NOTE>
 is.cl_hard_partition.partition <- .true
 
+## Package cba: ccfkms().
+is.cl_hard_partition.ccfkms <- .true
+## Package cba: rockCluster() returns objects of class "rock".
+is.cl_hard_partition.rock <- .true
+
 ## Package cclust: cclust().
 is.cl_hard_partition.cclust <- .true
 
@@ -292,8 +348,19 @@ is.cl_hard_partition.cshell <- is.cl_hard_partition.fanny
 ## Package e1071: bclust().
 is.cl_hard_partition.bclust <- .true
 
+## Package flexclust: kcca() returns objects of S4 class "kcca" which
+## extends S4 class "flexclust".
+is.cl_hard_partition.kcca <- .true
+
+## Package flexmix: class "flexmix".
+is.cl_hard_partition.flexmix <- is.cl_hard_partition.fanny
+
+## Package kernlab: specc() and kkmeans() return objects of S4 class
+## "specc".
+is.cl_hard_partition.specc <- .true
+
 ## Package mclust: Mclust().
-is.cl_hard_partition.Mclust <- .true
+is.cl_hard_partition.Mclust <- is.cl_hard_partition.fanny
 
 ## Package clue: Memberships.
 is.cl_hard_partition.cl_membership <-
@@ -306,7 +373,23 @@ is.cl_hard_partition.cl_pclust <- is.cl_hard_partition.fanny
 
 as.cl_hard_partition <-
 function(x)
-    as.cl_membership(cl_class_ids(x))
+{
+    if(is.cl_hard_partition(x)) x
+    else if(is.cl_partition(x)) {
+        ## A soft cl_partition ...
+        .cl_membership_from_class_ids(labels(x)[[2]][cl_class_ids(x)])
+    }
+    else if(is.matrix(x)) {
+        ## A matrix of raw memberships, hopefully ...
+        .cl_membership_from_class_ids(labels(x)[[2]][max.col(x)])
+    }
+    else if(is.atomic(x)) {
+        ## A vector of raw class ids, hopefully ...
+        .cl_membership_from_class_ids(x)
+    }
+    else
+        stop("Cannot coerce to 'cl_hard_partition'.")
+}
 
 ### * is.cl_soft_partition
 
@@ -329,6 +412,8 @@ function(x)
 .maybe_is_proper_soft_partition.fanny <- .true
 .maybe_is_proper_soft_partition.fclust <- .true
 .maybe_is_proper_soft_partition.cshell <- .true
+.maybe_is_proper_soft_partition.flexmix <- .true
+.maybe_is_proper_soft_partition.Mclust <- .true
 .maybe_is_proper_soft_partition.cl_membership <-
 function(x)
     !attr(x, "is_cl_hard_partition")
@@ -360,6 +445,16 @@ is.cl_hierarchy.mona <- .true
 
 ## Package clue: Ultrametrics.
 is.cl_hierarchy.cl_ultrametric <- .true
+
+### * as.cl_hierarchy
+
+## Note that cl_partition conceptually is a virtual class, so there are
+## no prototypes and no cl_hierarchy() creator.
+
+as.cl_hierarchy <-
+function(x)
+    if(is.cl_hierarchy(x)) x else as.cl_ultrametric(x)
+
 
 ### Local variables: ***
 ### mode: outline-minor ***

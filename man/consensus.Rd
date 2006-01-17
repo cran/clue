@@ -236,8 +236,7 @@ sum(cl_dissimilarity(GVME, m2) ^ 2)
 ## (But note that for partitions with different numbers of classes,
 ## they only use the matches classes for computing dissimilarities.)
 ## And in fact, it is qualitatively different:
-table(as.cl_hard_partition(m1),
-      as.cl_hard_partition(m2))
+table(cl_class_ids(m1), cl_class_ids(m2))
 ## Hmm ...
 }
 \keyword{cluster}

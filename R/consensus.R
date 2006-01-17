@@ -196,7 +196,7 @@ function(clusterings, weights, control, type = c("soft", "hard"))
         ## For hard partitions, we currently cannot handle the case
         ## where k < k_max.
         if(k < k_max)
-            stop("Currently cannot compute soft means for reduced 'k'.")
+            stop("Currently cannot compute hard means for reduced 'k'.")
         fit_memberships <- function(memberships) {
             ## Compute M as \sum w_b M_b P_b.
             M <- matrix(rowSums(mapply("*", memberships, w)), n)
