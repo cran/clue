@@ -33,11 +33,43 @@ cl_validity(x, ...)
   respectively, and the sums are over all pairs of objects and all
   classes.
 
-  For hierarchies, currently no validity measures are computed by
-  default.  For the results of using \code{\link[cluster]{agnes}} and
+  For hierarchies, the validity measures computed by default are
+  \dQuote{variance accounted for} (VAF, e.g., Hubert, Arabie \& Meulman,
+  2006) and \dQuote{deviance accounted for} (DEV, e.g., Smith, 2001).
+  If \code{u} is the ultrametric corresponding to the hierarchy \code{x}
+  and \code{d} the dissimilarity \code{x} was obtained from, these
+  validity measures are given by
+  \deqn{\mathrm{VAF} =
+    \max\left(1 - \sum_{i,j} (d_{ij} - u_{ij})^2 /
+    \sum_{i,j} (d_{ij} - \mathrm{mean}(d)) ^ 2, 0\right)}{
+    max(1 - sum_{i,j} (d_{ij} - u_{ij})^2 /
+    sum_{i,j} (d_{ij} - mean(d))^2, 0)}
+  and
+  \deqn{\mathrm{DEV} =
+    \max\left(1 - \sum_{i,j} |d_{ij} - u_{ij}| /
+    \sum_{i,j} |d_{ij} - \mathrm{median}(d)| ^ 2, 0\right)}{
+    max(1 - sum_{i,j} |d_{ij} - u_{ij}| /
+    sum_{i,j} |d_{ij} - median(d)|, 0)}
+  respectively.  Note that VAF and DEV are not invariant under rescaling
+  \code{u}, and may be \dQuote{arbitrarily small} (i.e., 0 using the
+  above definitions) even though \code{u} and \code{d} are
+  \dQuote{structurally close} in some sense.
+  
+  For the results of using \code{\link[cluster]{agnes}} and
   \code{\link[cluster]{diana}}, the agglomerative and divisive
-  coefficients are provided.
+  coefficients are provided in addition to the default ones.
 }
+\references{
+  L. Hubert and P. Arabie and J. Meulman (2006).
+  \emph{The structural representation of proximity matrices with
+    MATLAB}.
+  Philadelphia, PA: SIAM.
+
+  T. J. Smith (2001).
+  Constructing ultrametric and additive trees based on the \eqn{L_1}
+  norm.
+  \emph{Journal of Classification}, \bold{18}/2, 185--207.
+}  
 \seealso{
   \code{\link[fpc]{cluster.stats}} in package \pkg{fpc} for a variety of
   cluster validation statistics;

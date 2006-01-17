@@ -25,6 +25,9 @@ function(x)
     p
 }
 
+## Package cba: ccfkms().
+cl_prototypes.ccfkms <- cl_prototypes.kmeans
+
 ## Package cclust: cclust().
 cl_prototypes.cclust <- cl_prototypes.kmeans
 
@@ -34,6 +37,18 @@ cl_prototypes.fclust <- cl_prototypes.kmeans
 cl_prototypes.cshell <- cl_prototypes.kmeans
 ## Package e1071: bclust().
 cl_prototypes.bclust <- cl_prototypes.kmeans
+
+## Package flexclust: kcca() returns objects of S4 class "kcca" which
+## extends S4 class "flexclust".
+cl_prototypes.kcca <-
+function(x)
+    methods::slot(x, "centers")
+
+## Package kernlab: specc() and kkmeans() return objects of S4 class
+## "specc".
+cl_prototypes.specc <-
+function(x)
+    kernlab::centers(x)
 
 ## Package mclust: Mclust().
 cl_prototypes.Mclust <-

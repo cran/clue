@@ -16,7 +16,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2005-09-28}
+\date{2006-01-17}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -158,8 +158,19 @@ one can measure distance between objects and prototypes, and e.g.\
 classify objects to their closest prototype.  Such partitioning methods
 can also induce partitions of the entire feature space (rather than
 ``just'' the set of objects to be partitioned).  Currently, package
-\pkg{clue} provides no support for this ``additional'' structure, and
-all computations on partitions are based on their memberships.
+\pkg{clue} has only minimal support for this ``additional'' structure,
+providing a \code{cl\_prototypes()} generic for extracting the
+prototypes, and is mostly focused on computations on partitions which
+are based on their memberships.
+
+Many algorithms resulting in partitions of a given set of objects can be
+taken to induce a partition of the underlying feature space for the
+measurements on the objects, so that class memberships for ``new''
+objects can be obtained from the induced partition.  Examples include
+partitions based on assigning objects to their ``closest'' prototypes,
+or providing mixture models for the distribution of objects in feature
+space.  Package~\pkg{clue} provides a \code{cl\_predict()} generic for
+predicting the class memberships of new objects (if possible).
 
 Function \code{cl\_fuzziness()} computes softness (fuzziness) measures
 for (ensembles) of partitions.  Built-in measures are the partition
@@ -278,9 +289,13 @@ replications of the base algorithm.
 The methods provided in package~\pkg{clue} handle the partitions and
 hierarchies obtained from clustering functions in the base R
 distribution, as well as packages
+\pkg{cba}~\citep{cluster:Buchta+Hahsler:2005},
 \pkg{cclust}~\citep{cluster:Dimitriadou:2005}, \pkg{cluster},
-\pkg{e1071}~\citep{cluster:Dimitriadou+Hornik+Leisch:2005}, and
-\pkg{mclust} (and of course, \pkg{clue} itself).
+\pkg{e1071}~\citep{cluster:Dimitriadou+Hornik+Leisch:2005},
+\pkg{flexclust}~\citep{cluster:Leisch:2006a},
+\pkg{flexmix}~\citep{cluster:Leisch:2004},
+\pkg{kernlab}~\citep{cluster:Karatzoglou+Smola+Hornik:2004},
+and \pkg{mclust} (and of course, \pkg{clue} itself).
 
 Extending support to other packages is straightforward, provided that
 clusterings are instances of classes.  Suppose e.g.\ that a package has
@@ -333,11 +348,11 @@ computations on the individual clusterings in (i.e., the components of)
 a cluster ensemble.
 
 Available methods for cluster ensembles include those for subscripting,
-\code{c()}, \code{rep()}, and \code{print()}.  Future versions of
-\pkg{clue} will add to this list.  E.g., R~2.1.1 added a \code{unique()}
-method for lists, making it rather straightforward to provide cluster
-ensemble methods for finding unique and duplicated elements, and to
-tabulate the elements of the ensemble.
+\code{c()}, \code{rep()}, \code{print()}, and \code{unique()}, where the
+last is based on a \code{unique()} method for lists added in R~2.1.1,
+and makes it possible to find unique and duplicated elements in cluster
+ensembles.  The elements of the ensemble can be tabulated using
+\code{cl\_tabulate()}.
 
 Function \code{cl\_boot()} generates cluster ensembles with bootstrap
 replicates of the results of applying a \dQuote{base} clustering
@@ -351,17 +366,16 @@ respective cluster ensemble has to be generated explicitly (most
 conveniently by using \code{replicate()} to create a list \code{lst} of
 suitable instances of clusterings obtained by the base algorithm, and
 using \code{cl\_ensemble(list = lst)} to create the ensemble).
-Resampling the objects will be made possible along with adding basic
-infrastructure for dealing with hard prototype-based partitioning (as
-for such methods, one can classify the out-of-bag objects to their
-closest prototype).  In fact, we believe that for unsupervised learning
-methods such as clustering, \emph{reweighting} is conceptually superior
-to resampling, and have therefore recently enhanced package~\pkg{e1071}
-to provide an implementation of weighted fuzzy $c$-means, and
-package~\pkg{flexclust}~\citep{cluster:Leisch:2005} contains an
-implementation of weighted $k$-means.  We are currently experimenting
-with interfaces for providing ``direct'' support for reweighting via
-\code{cl\_boot()}.
+Resampling the training data is possible for base algorithms which can
+predict the class memberships of new data using \code{cl\_predict}
+(e.g., by classifying the out-of-bag data to their closest prototype).
+In fact, we believe that for unsupervised learning methods such as
+clustering, \emph{reweighting} is conceptually superior to resampling,
+and have therefore recently enhanced package~\pkg{e1071} to provide an
+implementation of weighted fuzzy $c$-means, and package~\pkg{flexclust}
+contains an implementation of weighted $k$-means.  We are currently
+experimenting with interfaces for providing ``direct'' support for
+reweighting via \code{cl\_boot()}.
 
 \subsection{Cluster proximities}
 
@@ -506,6 +520,16 @@ dissimilarity.
 Finally, Manhattan partition dissimilarity is defined as the minimal sum
 of the absolute differences of $M$ and all column permutations of
 $\tilde{M}$, and can again be computed efficiently by solving an LSAP.
+
+For hard partitions, both Manhattan and squared Euclidean dissimilarity
+give twice the \emph{transfer distance}
+\citep{cluster:Charon+Denoeud+Guenoche:2005}, which is the minimum
+number of objects that must be removed so that the implied partitions
+(restrictions to the remaining objects) are identical.  This is also
+known as the \emph{$R$-metric} in \cite{cluster:Day:1981}, i.e., the
+number of augmentations and removals of single objects needed to
+transform one partition into the other, and the
+\emph{partition-distance} in \cite{cluster:Gusfield:2002}.
 
 Note when assessing proximity that agreements for soft partitions are
 always (and quite often considerably) lower than the agreements for the
@@ -742,7 +766,7 @@ optimum.  Standard practice would recommend to use the best solution
 found in ``sufficiently many'' replications of the methods.
 
 Alternative recent approaches to obtaining consensus partitions include
-``Bagged Clustering'' \citep[implemented in
+``Bagged Clustering'' \citep[provided by \code{bclust()} in
 package~\pkg{e1071}]{cluster:Leisch:1999}, the ``evidence accumulation''
 framework of \cite{cluster:Fred+Jain:2002}, the NMI optimization and
 graph-partitioning methods in \cite{cluster:Strehl+Ghosh:2003a},
@@ -755,11 +779,13 @@ standard hierarchical clustering of the average co-membership matrix.
 Procedure~BagClust1 of \cite{cluster:Dudoit+Fridlyand:2003} amounts to
 computing $B^{-1} \sum_b M_b\Pi_b$, where each $\Pi_b$ is determined by
 optimal Euclidean matching of $M_b$ to a fixed reference membership
-$M_0$.  (In the corresponding ``Bagged Clustering'' framework, $M_0$ and
+$M_0$.  In the corresponding ``Bagged Clustering'' framework, $M_0$ and
 the $M_b$ are obtained by applying the base clusterer to the original
-data set and bootstrap samples from it, respectively.)  Finally, the
-approach of \cite{cluster:Fern+Brodley:2004} solves an LSAP for an
-asymmetric cost matrix based on object-by-all-classes incidences.
+data set and bootstrap samples from it, respectively.  This is
+implemented as method \code{"DFBC1"} of \code{cl\_bag()} in
+package~\pkg{clue}.  Finally, the approach of
+\cite{cluster:Fern+Brodley:2004} solves an LSAP for an asymmetric cost
+matrix based on object-by-all-classes incidences.
 
 \subsection{Cluster partitions}
 
@@ -777,14 +803,14 @@ partitions of clusterings, they can be determined post-hoc by finding
 suitable consensus clusterings in the classes of the partition, e.g.,
 using \code{cl\_consensus()} or \code{cl\_medoid()}.
 
-For at least Euclidean dissimilarities~$d$ between clusterings,
-package~\pkg{clue} additionally provides \code{cl\_pclust()} for direct
-prototype-based partitioning based on minimizing the criterion function
-$\sum u_{bj}^m d(x_b, p_j)^2$, the sum of the membership-weighted
-squared dissimilarities between the elements~$x_b$ of the ensemble and
-the prototypes~$p_j$.  (The underlying feature spaces are that of
-membership matrices and ultrametrics, respectively, for partitions and
-hierarchies.)
+Package~\pkg{clue} additionally provides \code{cl\_pclust()} for direct
+prototype-based partitioning based on minimizing criterion functions of
+the form $\sum u_{bj}^m d(x_b, p_j)^e$, the sum of the
+membership-weighted $e$-th powers of the dissimilarities between the
+elements~$x_b$ of the ensemble and the prototypes~$p_j$, for suitable
+dissimilarities~$d$ and exponents~$e$.  (The underlying feature spaces
+are that of membership matrices and ultrametrics, respectively, for
+partitions and hierarchies.)
 
 Parameter~$m$ must not be less than one and controls the softness of the
 obtained partitions, corresponding to the \dQuote{fuzzification
@@ -792,19 +818,22 @@ obtained partitions, corresponding to the \dQuote{fuzzification
 generalization of the Lloyd-Forgy variant \citep{cluster:Lloyd:1957,
   cluster:Forgy:1965, cluster:Lloyd:1982} of the $k$-means algorithm is
 used, which iterates between reclassifying objects to their closest
-prototypes, and computing new prototypes as the least squares consensus
-clusterings of the classes.  This may result in degenerate solutions,
-and will be replaced by a Hartigan-Wong
-\citep{cluster:Hartigan+Wong:1979} style algorithm eventually.  For $m >
-1$, a generalization of the fuzzy $c$-means recipe
-\citep[e.g.,][]{cluster:Bezdek:1981} is used, which alternates between
-computing optimal memberships for fixed prototypes, and computing new
-prototypes as the least squares consensus clusterings of the classes.
+prototypes, and computing new prototypes as consensus clusterings for
+the classes.  This may result in degenerate solutions, and will be
+replaced by a Hartigan-Wong \citep{cluster:Hartigan+Wong:1979} style
+algorithm eventually.  For $m > 1$, a generalization of the fuzzy
+$c$-means recipe \citep[e.g.,][]{cluster:Bezdek:1981} is used, which
+alternates between computing optimal memberships for fixed prototypes,
+and computing new prototypes as the consensus clusterings for the
+classes.
 
 This procedure is repeated until convergence occurs, or the maximal
-number of iterations is reached.  Least squares consensus clusterings
-are computed using (one of the methods provided by)
-\code{cl\_consensus()}.
+number of iterations is reached.  Consensus clusterings are computed
+using (one of the methods provided by) \code{cl\_consensus}, with
+dissimilarities~$d$ and exponent~$e$ implied by method employed, and
+obtained via a registration mechanism.  The default methods compute
+Least Squares Euclidean consensus clusterings, i.e., use Euclidean
+dissimilarity~$d$ and $e = 2$.
 
 \section{Examples}
 \label{sec:examples}
@@ -1090,10 +1119,7 @@ Many extensions to the available functionality are possible and in fact
 planned (some of these enhancements were already discussed in more
 detail in the course of this paper).
 \begin{itemize}
- \item Add data structures for hard/soft partitions based on
-  prototypes.
  \item Provide mechanisms to generate cluster ensembles based on
-  resampling (assuming prototype-based base partitional clusterers) or
   reweighting (assuming base clusterers allowing for case weights) the
   data set.
  \item Explore recent advances (e.g., parallelized random search) in
@@ -1102,7 +1128,7 @@ detail in the course of this paper).
   \citep[e.g.,][]{cluster:Barthelemy+Guenoche:1991}.
  \item Add heuristics for finding least squares fits based on iterative
   projection on convex sets of constraints, see e.g.\
-  \cite{cluster:Hubert+Arabie+Meulman:2004} and the accompanying MATLAB
+  \cite{cluster:Hubert+Arabie+Meulman:2006} and the accompanying MATLAB
   code available at \url{http://cda.psych.uiuc.edu/srpm_mfiles} for
   using these methods (instead of SUMT approaches) to fit ultrametrics
   and additive trees to proximity data.
@@ -1122,8 +1148,9 @@ detail in the course of this paper).
  \item Add facilities for tuning hyper-parameters (most prominently, the
   number of classes employed) and ``cluster validation'' of partitioning
   algorithms, as recently proposed by
-  \cite{cluster:Roth+Lange+Braun:2002} and
-  \cite{cluster:Dudoit+Fridlyand:2002}.
+  \cite{cluster:Roth+Lange+Braun:2002},
+  \cite{cluster:Dudoit+Fridlyand:2002},
+  and \cite{cluster:Tibshirani+Walther:2005}.
 \end{itemize}
 We are hoping to be able to provide many of these extensions in the near
 future.

@@ -21,9 +21,9 @@ cl_prototypes(x)
 
   This is a generic function.  The methods provided in package
   \pkg{clue} handle the partitions obtained from clustering functions in
-  the base R distribution, as well as packages \pkg{cclust},
-  \pkg{cluster}, \pkg{e1071}, and \pkg{mclust} (and of course,
-  \pkg{clue} itself).
+  the base R distribution, as well as packages \pkg{cba}, \pkg{cclust},
+  \pkg{cluster}, \pkg{e1071}, \pkg{flexclust}, \pkg{flexmix},
+  \pkg{kernlab}, and \pkg{mclust} (and of course, \pkg{clue} itself).
 }
 \examples{
 ## Show how prototypes ("centers") vary across k-means runs on

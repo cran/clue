@@ -1,7 +1,6 @@
 \name{membership}
 \alias{cl_membership}
 \alias{as.cl_membership}
-\alias{as.cl_hard_partition}
 \title{Memberships of Partitions}
 \description{
   Compute the memberships values for objects representing partitions.
@@ -9,8 +8,6 @@
 \usage{
 cl_membership(x, k = n_of_classes(x))
 as.cl_membership(x)
-
-as.cl_hard_partition(x)
 }
 \arguments{
   \item{x}{an R object representing a partition of objects.}
@@ -21,19 +18,15 @@ as.cl_hard_partition(x)
 \value{
   An object of class \code{"cl_membership"} with the matrix of
   membership values.
-  
-  For \code{as.cl_hard_partition}, an object of class
-  \code{"cl_membership"} with the membership values of the hard
-  partition obtained by taking the class ids of the (first) maximal
-  membership values.
 }
 \details{
   \code{cl_membership} is a generic function.
 
   The methods provided in package \pkg{clue} handle the partitions
   obtained from clustering functions in the base R distribution, as
-  well as packages \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, and
-  \pkg{mclust} (and of course, \pkg{clue} itself).
+  well as packages \pkg{cba}, \pkg{cclust}, \pkg{cluster}, \pkg{e1071},
+  \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and
+  of course, \pkg{clue} itself).
 
   \code{as.cl_membership} can be used for coercing \dQuote{raw} class
   ids (given as atomic vectors) or membership values (given as numeric

@@ -83,6 +83,25 @@ function(object, newdata = NULL, ...)
     as.cl_membership(max.col(-d))
 }
 
+## Package cba: ccfkms().
+cl_predict.ccfkms <-
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+    as.cl_membership(as.vector(predict(object, newdata)$cl))
+}
+## Package cba: rockCluster() returns objects of class "rock".
+## Currently, no predictions.
+## Note that if x is a Rock object, fitted(x) and predict(x, newdata)
+## can result in missing classifications, as
+##   In the case a 'drop' value greater than zero is specified, all
+##   clusters with size equal or less than this value are removed from
+##   the classifier. Especially, 'fitted' uses a threshold of one
+##   because for singleton clusters the neighborhood is empty.
+## so we need to discuss with CeeBoo whether this is really what we
+## want, or if e.g. cl_predict() should use drop = 0.
+
 ## Package cclust: cclust().
 cl_predict.cclust <-
 function(object, newdata = NULL, ...)
@@ -168,6 +187,10 @@ function(object, newdata = NULL, ...)
 ## labels ("clusters") are always assigned using Euclidean distances.
 cl_predict.bclust <- cl_predict.kmeans
 ## </NOTE>
+
+# Package flexclust: kcca() returns objects of S4 class "kcca" which
+## extends S4 class "flexclust".
+cl_predict.kcca <- cl_predict.default
 
 ## Package mclust: Ron Wehrens will add a predict method for Mclust
 ## objects eventually (as suggested by us).

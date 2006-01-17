@@ -17,7 +17,12 @@ function(x, d, ...)
         out <- list("Dissimilarity accounted for" = v)
     }
     else if(is.cl_hierarchy(x)) {
-        ## Currently nothing.
+        x <- cl_ultrametric(x)
+        d <- as.dist(d)
+        out <- list("Variance accounted for" =
+                    .cl_validity_hierarchy_variance_a_f(x, d),
+                    "Deviance accounted for" =
+                    .cl_validity_hierarchy_deviance_a_f(x, d))
         ## Consider adding e.g. the Agglomerative Coefficient or
         ## Divisive Coeffcient for more than cluster::agnes() and
         ## cluster::diana(), respectively.
@@ -31,6 +36,10 @@ cl_validity.agnes <-
 function(x, ...)
 {
     out <- list("Agglomerative coefficient" = x$ac)
+    ## According to the docs, agnes objects always have a diss
+    ## component, but let's be defensive ...
+    if(!is.null(d <- x$diss))
+        out <- c(out, cl_validity.default(x, d))
     class(out) <- "cl_validity"
     out
 }
@@ -39,6 +48,10 @@ cl_validity.diana <-
 function(x, ...)
 {
     out <- list("Divisive coefficient" = x$dc)
+    ## According to the docs, diana objects always have a diss
+    ## component, but let's be defensive ...
+    if(!is.null(d <- x$diss))
+        out <- c(out, cl_validity.default(x, d))
     class(out) <- "cl_validity"
     out
 }
@@ -75,3 +88,33 @@ function(m, d)
     average_within_d <- within_sums[1] / within_sums[2]
     1 - average_within_d / mean(d)
 }
+
+.cl_validity_hierarchy_variance_a_f <-
+function(u, d)
+{
+    ## *Variance accounted for*.
+    ## See e.g. Hubert, Arabie, & Meulman (2006), The structural
+    ## representation of proximity matrices with MATLAB:
+    ## variance_accounted_for = 
+    ##   1 - \frac{\sum_{i < j} (d_{ij} - u_{ij}) ^ 2}
+    ##            {\sum_{i < j} (d_{ij} - mean(d)) ^ 2}
+    ## As this can be arbitrarily negative, we cut at 0.
+    
+    max(1 - sum((d - u) ^ 2) / sum((d - mean(d)) ^ 2), 0)
+}
+
+.cl_validity_hierarchy_deviance_a_f <-
+function(u, d)
+{
+    ## *Deviance accounted for* (i.e., absolute deviation).
+    ## See e.g. Smith (2001), Constructing ultrametric and additive
+    ## trees based on the ${L}_1$ norm, Journal of Classification.
+    ## deviance_accounted_for = 
+    ##   1 - \frac{\sum_{i < j} |d_{ij} - u_{ij}|}
+    ##            {\sum_{i < j} |d_{ij} - median(d)|}
+    ## As this can be arbitrarily negative, we cut at 0.
+
+    max(1 - sum(abs(d - u)) / sum(abs(d - median(d))), 0)
+
+}
+

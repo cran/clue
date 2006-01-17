@@ -25,8 +25,9 @@ cl_class_ids(x)
 
   The methods provided in package \pkg{clue} handle the partitions
   obtained from clustering functions in the base R distribution, as
-  well as packages \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, and
-  \pkg{mclust} (and of course, \pkg{clue} itself).
+  well as packages \pkg{cba}, \pkg{cclust}, \pkg{cluster}, \pkg{e1071},
+  \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and
+  of course, \pkg{clue} itself).
 
   Note that the number of classes is taken as the number of distinct
   class ids actually used in the partition, and may differ from the
