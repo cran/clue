@@ -58,12 +58,54 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
     \item{\code{"Rand"}}{the Rand distance, i.e., the rate of distinct
       pairs of objects in the same class in exactly one of the
       partitions.  For soft partitions, (currectly) the Rand distance of
-      the of the corresponding \dQuote{nearest} hard partitions is used.}
+      the corresponding \dQuote{nearest} hard partitions is used.}
     \item{\code{"GV1"}}{the square root of the dissimilarity
       \eqn{\Delta_1}{Delta_1} used for the first model in Gordon and
       Vichi (2001), i.e., the square root of the minimal sum of the
       squared differences of the \emph{matched} non-zero columns of
       \eqn{u} and \eqn{v}.}
+    \item{\code{"BA/\var{d}"}}{distance measures for hard partitions
+      discussed in Boorman and Arabie (1972), with \var{d} one of
+      \samp{A}, \samp{C}, \samp{D}, or \samp{E}.  For soft partitions,
+      the distances of the corresponding closest hard partitions are
+      used.
+
+      \code{"BA/A"} is the minimum number of single element moves (move
+      from one class to another or a new one) needed to transform one
+      partition into the other.  Introduced in Rubin (1967).
+
+      \code{"BA/C"} is the mininum number of lattice moves for
+      transforming one partition into the other, where partitions are
+      said to be connected by a lattice move if one is \emph{just} finer
+      than the other (i.e., there is no other partition between them) in
+      the partition lattice (see \code{\link{cl_meet}}).  Equivalently,
+      with \eqn{z} the join of \code{x} and \code{y} and \eqn{S} giving
+      the number of classes, this can be written as \eqn{S(x) + S(y) - 2
+	S(z)}.  Attributed to David Pavy.
+	
+      \code{"BA/D"} is the \dQuote{pair-bonds} distance, which can be
+      defined as \eqn{S(x) + S(y) - 2 S(z)}, with \eqn{z} the meet of
+      \code{x} and \code{y} and \eqn{S} the \emph{supervaluation} (i.e.,
+      non-decreasing with respect to the partial order on the partition
+      lattice) function \eqn{\sum_i (n_i (n_i - 1)) / (n (n - 1))},
+      where the \eqn{n_i} are the numbers of objects in the respective
+      classes of the partition (such that \eqn{n_i (n_i - 1) / 2} are the
+      numbers of pair bonds in the classes), and \eqn{n} the total
+      number of objects.  This is identical to Rand distance, and can
+      also be written as the Manhattan distance between the
+      co-membership matrices corresponding to \code{x} and \code{y},
+      normalized by \eqn{n (n - 1)}.
+
+      \code{"BA/E"} is the normalized information distance, defined as
+      \eqn{1 - I / H}, where \eqn{I} is the average mutual information
+      between the partitions, and \eqn{H} is the average entropy of the
+      meet \eqn{z} of the partitions.  Introduced in Rajski (1961).
+
+      (Boorman and Arabie also discuss a distance measure (\eqn{B})
+      based on the minimum number of set moves needed to transform one
+      partition into the other, which, differently from the \eqn{A} and
+      \eqn{C} distance measures is hard to compute (Day, 1981) and
+      (currently) not provided.)}
   }
 
   For hard partitions, both Manhattan and squared Euclidean
@@ -73,7 +115,8 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   are identical.  This is also known as the \emph{\eqn{R}-metric} in Day
   (1981), i.e., the number of augmentations and removals of single
   objects needed to transform one partition into the other, and the
-  \emph{partition-distance} in Gusfield (2002).
+  \emph{partition-distance} in Gusfield (2002), and equals twice the
+  number of single element moves distance of Boorman and Arabie.
 
   If all components are hierarchies, available built-in methods for
   measuring agreement between two hierarchies with respective
@@ -119,6 +162,13 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   
 }
 \references{
+  S. A. Boorman and P. Arabie (1972).
+  Structural measures and the method of sorting.
+  In R. N. Shepard, A. K. Romney, & S. B. Nerlove (eds.),
+  \emph{Multidimensional scaling: Theory and applications in the
+    behavioral sciences, 1: Theory} (pages 225--249).
+  New York: Seminar Press. 
+  
   I. Charon and L. Denoeud and A. Guénoche and O. Hudry (2005).
   \emph{Maximum Transfer Distance Between Partitions}.
   Technical Report 2005D003, Ecole Nationale Supérieure des
@@ -142,6 +192,15 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   Partition-distance: A problem and class of perfect graphs arising in
   clustering.
   \emph{Information Processing Letters}, \bold{82}, 159--164.
+
+  C. Rajski (1961).
+  A metric space of discrete probability distributions,
+  \emph{Information and Control}, \bold{4}, 371--377.
+
+  J. Rubin, J (1967).
+  Optimal classification into groups: An approach for solving the
+  taxonomy problem.
+  \emph{Journal of Theoretical Biology}, \bold{15}, 103--144.
 }  
 \seealso{
   \code{\link{cl_agreement}}
@@ -159,5 +218,11 @@ diss[1:5, 6:7]
 ## (e.g. obtaining hierarchies of partitions):
 hc <- hclust(diss)
 plot(hc)
+
+## Example from Boorman and Arabie (1972).
+P1 <- as.cl_partition(c(1, 2, 2, 2, 3, 3, 2, 2))
+P2 <- as.cl_partition(c(1, 1, 2, 2, 3, 3, 4, 4))
+cl_dissimilarity(P1, P2, "BA/A")
+cl_dissimilarity(P1, P2, "BA/C")
 }
 \keyword{cluster}

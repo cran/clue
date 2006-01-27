@@ -164,6 +164,49 @@ function(x, y)
     ## classes.)
 }
 
+### ** .cl_dissimilarity_partition_BA_A
+
+.cl_dissimilarity_partition_BA_A <-
+function(x, y)
+{
+    .cl_dissimilarity_partition_manhattan(as.cl_hard_partition(x),
+                                          as.cl_hard_partition(y)) / 2
+    ## Could to this more efficiently, of course ...
+}
+
+### ** .cl_dissimilarity_partition_BA_C
+
+.cl_dissimilarity_partition_BA_C <-
+function(x, y)
+{
+    n_of_classes(x) + n_of_classes(y) - 2 * n_of_classes(cl_join(x, y))
+}
+
+### ** .cl_dissimilarity_partition_BA_D
+
+.cl_dissimilarity_partition_BA_D <-
+    .cl_dissimilarity_partition_Rand
+
+### ** .cl_dissimilarity_partition_BA_E
+
+.cl_dissimilarity_partition_BA_E <-
+function(x, y)
+{
+    z <- table(cl_class_ids(x), cl_class_ids(y))
+    z <- z / sum(z)
+
+    ## Average mutual information between the partitions.
+    y <- outer(rowSums(z), colSums(z))
+    i <- which((z > 0) & (y > 0))
+    I <- sum(z[i] * log(z[i] / y[i]))
+
+    ## Entropy of meet(x, y).
+    i <- which(z > 0)
+    H <- - sum(z[i] * log(z[i]))
+
+    1 - I / H
+}
+
 ### ** .cl_dissimilarity_hierarchy_euclidean
 
 .cl_dissimilarity_hierarchy_euclidean <-
