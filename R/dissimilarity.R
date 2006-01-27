@@ -160,6 +160,8 @@ function(x, y)
         C <- cbind(C, matrix(0, nr = k_x, nc = k_x - k_y))
     ind <- solve_LSAP(C)
     sqrt(sum(C[cbind(seq(along = ind), ind)]))
+    ## (Note that this sum really only includes matched non-dummy
+    ## classes.)
 }
 
 ### ** .cl_dissimilarity_hierarchy_euclidean

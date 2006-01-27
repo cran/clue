@@ -46,9 +46,10 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   See also Gordon (1999) for more information.
   
   If all elements of the ensemble are partitions, the built-in consensus
-  methods compute soft least squares consensus partitions for Euclidean
-  and co-membership dissimilarities (i.e., minima of \eqn{L(x) = \sum
-    w_b d(x_b, x)^2} over all soft partitions with \eqn{k} classes).
+  methods compute soft least squares consensus partitions for Euclidean,
+  GV1 and co-membership dissimilarities (i.e., minima of \eqn{L(x) =
+    \sum w_b d(x_b, x)^2} over all soft partitions with \eqn{k}
+  classes).
 
   Available methods are as follows.
   
@@ -81,12 +82,12 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
     \item{\code{"GV1"}}{the fixed-point algorithm for the \dQuote{first
 	model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
-      \eqn{d} again being Euclidean dissimilarity.  This iterates
-      between individually matching all partitions to the current
-      approximation to the consensus partition, and computing the next
-      approximation as a weighted average of the memberships of all
-      partitions after permuting their columns for the optimal matchings
-      of class ids.
+      \eqn{d} being GV1 dissimilarity.  This iterates between
+      individually matching all partitions to the current approximation
+      to the consensus partition, and computing the next approximation
+      as the membership matrix closest to a suitable weighted average of
+      the memberships of all partitions after permuting their columns
+      for the optimal matchings of class ids.
 
       The following control parameters are available for this method.
       \describe{
@@ -106,6 +107,13 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 	  \code{getOption("verbose")}.}
       }
 
+    }
+
+    \item{\code{"SE"}}{a fixed-point algorithm for obtaining least
+      squares Euclidean consensus partitions similar to \code{"GV1"}
+      (which however is based on GV1 rather than Euclidean
+      dissimilarity).  Available control parameters are the same as for
+      \code{"GV1"}.
     }
 
     \item{\code{"GV3"}}{a SUMT algorithm for the \dQuote{third model} in
@@ -223,20 +231,36 @@ cl_dissimilarity(as.cl_hard_partition(m1),
 ## partition data based on Euclidean dissimilarities.
 data("GVME")
 set.seed(1)
+## First, using k=2 classes.
 m1 <- cl_consensus(GVME, method = "GV1",
                    control = list(k = 2, verbose = TRUE))
 ## (Note that one should really use several replicates of this.)
 ## Value of criterion function to be minimized:
-sum(cl_dissimilarity(GVME, m1) ^ 2)
+sum(cl_dissimilarity(GVME, m1, "GV1") ^ 2)
 ## Compare to the consensus solution given in Gordon & Vichi (2001).
 data("GVME_Consensus")
-m2 <- GVME_Consensus[["MF1"]]
-sum(cl_dissimilarity(GVME, m2) ^ 2)
-## Seems we get a better solution ...
-## (But note that for partitions with different numbers of classes,
-## they only use the matches classes for computing dissimilarities.)
-## And in fact, it is qualitatively different:
+m2 <- GVME_Consensus[["MF1/2"]]
+sum(cl_dissimilarity(GVME, m2, "GV1") ^ 2)
+## Seems we get a slightly  better solution ...
+## But note that
+cl_dissimilarity(m1, m2, "GV1")
+## and that the maximal deviation is
+max(abs(m1 - m2))
+## so the differences seem to be due to rounding.
+## Do the "nearest" hard partitions fully agree?
 table(cl_class_ids(m1), cl_class_ids(m2))
-## Hmm ...
+
+## And now for k=3 classes.
+m1 <- cl_consensus(GVME, method = "GV1",
+                   control = list(k = 3, verbose = TRUE))
+sum(cl_dissimilarity(GVME, m1, "GV1") ^ 2)
+## Compare to the consensus solution given in Gordon & Vichi (2001).
+m2 <- GVME_Consensus[["MF1/3"]]
+sum(cl_dissimilarity(GVME, m2, "GV1") ^ 2)
+## This time we look much better ...
+## How dissimilar are these solutions?
+cl_dissimilarity(m1, m2, "GV1")
+## Do the "nearest" hard partitions fully agree?
+table(cl_class_ids(m1), cl_class_ids(m2))
 }
 \keyword{cluster}
