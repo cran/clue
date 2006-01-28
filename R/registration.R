@@ -71,17 +71,21 @@ set_cl_consensus_method("DWH", "partition",
                         .cl_consensus_partition_DWH,
                         dissimilarity = "euclidean",
                         exponent = 2)
+set_cl_consensus_method("SE", "partition",
+                        .cl_consensus_partition_SE,
+                        dissimilarity = "euclidean",
+                        exponent = 2)
+set_cl_consensus_method("HE", "partition",
+                        .cl_consensus_partition_HE,
+                        dissimilarity = "euclidean",
+                        exponent = 2)
 set_cl_consensus_method("GV1", "partition",
                         .cl_consensus_partition_GV1,
-                        dissimilarity = "euclidean",
+                        dissimilarity = "GV1",
                         exponent = 2)
 set_cl_consensus_method("GV3", "partition",
                         .cl_consensus_partition_GV3,
                         dissimilarity = "comemberships",
-                        exponent = 2)
-set_cl_consensus_method("HBH", "partition",
-                        .cl_consensus_partition_HBH,
-                        dissimilarity = "euclidean",
                         exponent = 2)
 set_cl_consensus_method("cophenetic", "hierarchy",
                         .cl_consensus_hierarchy_cophenetic,

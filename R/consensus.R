@@ -47,7 +47,7 @@ function(x, method = NULL, weights = 1, control = list())
     method(clusterings, weights, control)
 }
 
-### ** .cl_consensus_partition_DWH
+### * .cl_consensus_partition_DWH
 
 .cl_consensus_partition_DWH <-
 function(clusterings, weights, control)
@@ -89,20 +89,24 @@ function(clusterings, weights, control)
     cl_membership(as.cl_membership(M[, 1 : k]), k)    
 }
 
-### ** .cl_consensus_partition_AO
+### * .cl_consensus_partition_AOS
 
-.cl_consensus_partition_AO <-
-function(clusterings, weights, control, type = c("soft", "hard"))
+.cl_consensus_partition_AOS <-
+function(clusterings, weights, control, type = c("SE", "HE"))
 {
     ## The start of a general purpose optimizer for determining
     ## consensus partitions by minimizing
-    ##   \sum_b d(M, M_b) ^ p
-    ##     = \sum_b \min_{P_b} f(M, M_b P_b) ^ p
-    ## for dissimilarity measures d involving explicitly matching
-    ## labels via permutation matrices P_b.  The AO ("alternative
-    ## optimization") proceeds by alternatively by matching the M_b to
-    ## M by minimizing f(M, M_b P_b) over P_b, and fitting M by
-    ## minimizing \sum_b f(M, M_b P_b) ^ p for fixed matchings.
+    ##   \sum_b w_b d(M, M_b) ^ e
+    ##     = \sum_b \min_{P_b} w_b f(M, M_b P_b) ^ e
+    ## for the special case where the criterion function is based on
+    ## M and M_b P_b (i.e., column permutations of M_b), as opposed to
+    ## the general case where d(M, M_b) = \min_{P_b} f(M, P_b, M_b)
+    ## handled by .cl_consensus_partition_AOG().
+    ##
+    ## The AO ("alternative optimization") proceeds by alternatively
+    ## matching the M_b to M by minimizing f(M, M_b P_b) over P_b, and
+    ## fitting M by minimizing \sum_b w_b f(M, M_b P_b) ^ e for fixed
+    ## matchings.
     ##
     ## Such a procedure requires three ingredients: a function for
     ## matching M_b to M (in fact simply replacing M_b by the matched
@@ -117,33 +121,23 @@ function(clusterings, weights, control, type = c("soft", "hard"))
     ## generality of the approach (which would either pass the three
     ## functions, or even set up family objects encapsulating the three
     ## functions).
-
-    ## <TODO>
-    ## Could make things more efficient by subscripting on positive
-    ## weights.
-    ## </TODO>
+    ##
+    ## This special case is provided for efficiency and convenience.
+    ## Using the special form of the criterion function, we can simply
+    ## always work memberships with the same maximal number of columns,
+    ## and with the permuted \{ M_b P_b \}.
 
     ## For the time being ...
     type <- match.arg(type)
-    
-    match_memberships <- function(M, N) {
-        ## Return the M[, ind] column permutation of M optimally
-        ## matching N.
-        M[, solve_LSAP(crossprod(N, M), max = TRUE)]
-    }
 
-    value <- function(memberships, M, w) {
-        sum(w * sapply(memberships, function(u) sum((u - M) ^ 2)))
-    }
-
-    B <- length(clusterings)    
+    w <- weights / sum(weights)    
     n <- n_of_objects(clusterings)
-    max_n_of_classes <- max(sapply(clusterings, n_of_classes))
+    k_max <- max(sapply(clusterings, n_of_classes))
 
     ## Control parameters.
     k <- control$k
     if(is.null(k))
-        k <- max_n_of_classes
+        k <- k_max
     maxiter <- control$maxiter
     if(is.null(maxiter))
         maxiter <- 100
@@ -163,60 +157,61 @@ function(clusterings, weights, control, type = c("soft", "hard"))
     else
         M <- start
 
-    w <- weights / sum(weights)
-    k_max <- max(k, max_n_of_classes)
-    if(k_max > k)
-        M <- cbind(M, matrix(0, nrow(M), k_max - k))
+    ## The maximal (possible) number of classes in M and the \{ M_b \}.
+    k_all <- max(k, k_max)
 
-    ## <NOTE>
-    ## As successive column permutations are column permutations of the
-    ## original matrices, we work with the *current* M_b P_b.  We could
-    ## use a 3-dimensional array so that M_b <=> memberships[ , , b],
-    ## but prefer to work with a list of memberships.
-    ## </NOTE>
+    if(k < k_all)
+        M <- cbind(M, matrix(0, nrow(M), k_all - k))
 
-    ## Function for fitting M to (fixed) memberships M_b P_b.
-    ## <NOTE>
-    ## In general, this clearly needs to know how many classes/columns
-    ## to use, and hence needs an explicit argument 'k'.  Both 'n' and
-    ## 'k_max' can always be determined from the memberships ensemble,
-    ## but could also be passed on explicitly for efficiency reasons.
-    ## </NOTE>
-    if(type == "soft")
-        fit_memberships <- function(memberships) {
+    ## Currently, only Euclidean dissimilarities ...
+    value <- function(M, memberships, w) {
+        sum(w * sapply(memberships, function(u) sum((u - M) ^ 2)))
+    }
+    match_memberships <- function(M, N) {
+        ## Return the M[, ind] column permutation of M optimally
+        ## matching N.
+        M[, solve_LSAP(crossprod(N, M), max = TRUE)]
+    }
+    ## Function for fitting M to (fixed) memberships \{ M_b P_b \}.
+    ## As we use a common number of columns for all membership matrices
+    ## involved, we need to pass the desired 'k' ...
+    if(type == "SE")
+        fit_M <- function(memberships, w, k) {
             ## Update M as \sum w_b M_b P_b.
-            M <- matrix(rowSums(mapply("*", memberships, w)), n)
-            ## If k_max > k, "project" as indicated in Gordon & Vichi
+            M <- matrix(rowSums(mapply("*", memberships, w)), nrow(M))
+            ## If k < k_all, "project" as indicated in Gordon & Vichi
             ## (2001), p. 238.
-            if(k_max > k)
+            if(k < ncol(M))
                 M <- .project_to_leading_columns(M, k)
             M
         }
-    else {
-        ## For hard partitions, we currently cannot handle the case
-        ## where k < k_max.
-        if(k < k_max)
-            stop("Currently cannot compute hard means for reduced 'k'.")
-        fit_memberships <- function(memberships) {
+    else if(type == "HE")
+        fit_M <- function(memberships, w, k) {
             ## Compute M as \sum w_b M_b P_b.
-            M <- matrix(rowSums(mapply("*", memberships, w)), n)
-            ## And compute a closest hard partition H(M) from that.
-            cl_membership(as.cl_membership(max.col(M)), k)
+            M <- matrix(rowSums(mapply("*", memberships, w)), nrow(M))
+            ## And compute a closest hard partition H(M) from that,
+            ## using the first k columns of M.
+            cl_membership(as.cl_membership(max.col(M[ , 1 : k])),
+                          ncol(M))
+            ## <FIXME>
+            ## Perhaps more efficiently:
+            ##   .cl_membership_from_class_ids(max.col(M[ , 1 : k]),
+            ##                                 ncol(M))
+            ## </FIXME>
         }
-    }
-            
-    memberships <- lapply(clusterings, cl_membership, k_max)
+
+    memberships <- lapply(clusterings, cl_membership, k_all)
     memberships <- lapply(memberships, match_memberships, M)
-    old_value <- value(memberships, M, w)
+    old_value <- value(M, memberships, w)
     iter <- 1
 
     while(iter <= maxiter) {
         ## Fit M to the M_b P_b.
-        M <- fit_memberships(memberships)
-        ## Match the M_b P_b to M.
+        M <- fit_M(memberships, w, k)
+        ## Match the \{ M_b P_b \} to M.
         memberships <- lapply(memberships, match_memberships, M)
         ## Update value.
-        new_value <- value(memberships, M, w)
+        new_value <- value(M, memberships, w)
         if(verbose)
             cat("Iteration:", iter,
                 "Old value:", old_value,
@@ -229,25 +224,345 @@ function(clusterings, weights, control, type = c("soft", "hard"))
         iter <- iter + 1
     }
 
+    rownames(M) <- rownames(memberships[[1]])    
+    M <- cl_membership(as.cl_membership(M[, 1 : k]), k)
+
+    ## Add these attributes here, as the above would not preserve them.
     attr(M, "converged") <- (iter <= maxiter)
-    rownames(M) <- rownames(memberships[[1]])
-    cl_membership(as.cl_membership(M[, 1 : k]), k)
+    attr(M, "value") <- new_value
+
+    M
 }
+
+### ** .cl_consensus_partition_SE
+
+.cl_consensus_partition_SE <-
+function(clusterings, weights, control)
+    .cl_consensus_partition_AOS(clusterings, weights, control, "SE")
+
+### ** .cl_consensus_partition_HE
+
+.cl_consensus_partition_HE <-
+function(clusterings, weights, control)
+    .cl_consensus_partition_AOS(clusterings, weights, control, "HE")
+
+### * .cl_consensus_partition_AOG
+
+.cl_consensus_partition_AOG <-
+function(clusterings, weights, control, type = c("GV1"))
+{
+    ## The start of a general purpose optimizer for determining
+    ## consensus partitions by minimizing
+    ##   \sum_b w_b d(M, M_b) ^ p
+    ##     = \sum_b \min_{P_b} w_b f(M, M_b, P_b) ^ e
+    ## for general dissimilarity matrices which involve class matching
+    ## via permutation matrices P_b.
+    ##
+    ## The AO ("Alternative Optimization") proceeds by alternating
+    ## between determining the optimal permutations P_b by minimizing
+    ##   f(M, M_b, P_b)
+    ## for fixed M, and fitting M by minimizing
+    ##   \sum_b w_b f(M, M_b, P_b) ^ e
+    ## for fixed \{ P_b \}.
+    ##
+    ## We encapsulate this into functions fit_P() and fit_M() (and a
+    ## value() function for the criterion function to be minimized with
+    ## respect to both M and \{ P_b \}, even though the current
+    ## interface does not yet reflect the generality of the approach.
+    ##
+    ## Note that rather than passing on information about the numbers of
+    ## classes (e.g., needed for GV1) and representing all involved
+    ## membership matrices with the same maximal number of columns, we
+    ## use "minimal" representations with no dummy classes (strictly
+    ## speaking, with the possible exception of M, for which the given k
+    ## is used).
+
+    ## For the time being ...
+    type <- match.arg(type)
+
+    w <- weights / sum(weights)    
+    n <- n_of_objects(clusterings)
+    k_max <- max(sapply(clusterings, n_of_classes))
     
+    ## Control parameters.
+    k <- control$k
+    if(is.null(k))
+        k <- k_max
+    maxiter <- control$maxiter
+    if(is.null(maxiter))
+        maxiter <- 100
+    reltol <- control$reltol
+    if(is.null(reltol))
+        reltol <- sqrt(.Machine$double.eps)
+    start <- control$start
+    verbose <- control$verbose
+    if(is.null(verbose))
+        verbose <- getOption("verbose")
+
+    if(is.null(start)) {
+        ## Random starting value.
+        M <- matrix(runif(n * k), n, k)
+        M <- M / rowSums(M)
+    }
+    else
+        M <- start
+
+    ## <NOTE>
+    ## For the given memberships, we can simply use ncol() in the
+    ## computations (rather than n_of_classes(), because we used
+    ## cl_membership() to create them.  For M, the number of classes
+    ## could be smaller than the given k "target".
+    ## </NOTE>
+    
+    value <- function(M, permutations, memberships, w) {
+
+        k <- .n_of_nonzero_columns(M)
+        d <- function(u, p) {
+            ## Compute the squared GV1 dissimilarity between M and u
+            ## based on the M->u class matching p.
+            nc_u <- ncol(u)
+            if(nc_u == k) {
+                ## Simple case: all classes are matched.
+                sum((u[, p] - M) ^ 2)
+            }
+            else {
+                ## Only include the matched non-dummy classes of M ..
+                ind <- 1 : k
+                ## ... which are matched to non-dummy classes of u.
+                ind <- ind[p[ind] <= nc_u]
+                sum((u[, p[ind]] - M[, ind]) ^ 2)
+            }
+        }
+        
+        sum(w * mapply(d, memberships, permutations))
+    }
+
+    fit_P <- function(u, M) {
+        
+        ## Return a permutation representing a GV1 optimal matching of
+        ## the columns of M to the columns of u (note the order of the
+        ## arguments), using a minimal number of dummy classes (i.e., p
+        ## has max(.n_of_nonzero_columns(M), n_of_classes(u)) entries).
+
+        ## See also .cl_dissimilarity_partition_GV1().
+        
+        C <- outer(colSums(M ^ 2), colSums(u ^ 2), "+") -
+            2 * crossprod(M, u)
+        nc_M <- .n_of_nonzero_columns(M)
+        nc_u <- ncol(u)
+        ## (See above for ncol() vs n_of_classes().)
+        if(nc_M < nc_u)
+            C <- rbind(C, matrix(0, nr = nc_u - nc_M, nc = nc_u))
+        else if(nc_M > nc_u)
+            C <- cbind(C, matrix(0, nr = nc_M, nc = nc_M - nc_u))
+        
+        solve_LSAP(C)
+    }
+
+    fit_M <- function(permutations, memberships, w) {
+        
+        ## Here comes the trickiest part ...
+        ##
+        ## In general, M = [m_{iq}] is determined as follows.
+        ## Write value(M, permutations, memberships, w) as
+        ##   \sum_b \sum_i \sum_{p=1}^{k_b} \sum_{q=1}^k
+        ##      w_b (u_{ip}(b) - m_{iq})^2 x_{pq}(b)
+        ## where U(b) and X(b) are the b-th membership matrix and the
+        ## permutation matrix representing the M->U(b) non-dummy class
+        ## matching (as always, note the order of the arguments).
+        ##
+        ## Let
+        ##   \beta_{iq} = \sum_b \sum_{p=1}^{k_b} w_b u_{ip}(b) x_{pq}(b)
+        ##   \alpha_q   = \sum_b \sum_{p=1}^{k_b} w_b x_{pq}(b)
+        ## and
+        ##   \bar{m}_{iq} =
+        ##     \cases{\beta_{iq}/\alpha_q, & $\alpha_q > 0$ \cr
+        ##            0                    & otherwise}.
+        ## Then, as the cross-product terms cancel out, the value
+        ## function rewrites as
+        ##   \sum_b \sum_i \sum_{p=1}^{k_b} \sum_{q=1}^k
+        ##      w_b (u_{ip}(b) - \bar{m}_{iq})^2 x_{pq}(b)
+        ##   + \sum_i \sum_q \alpha_q (\bar{m}_{iq} - m_{iq}) ^ 2,
+        ## where the first term is a constant, and the minimum is found
+        ## by solving
+        ##   \sum_q \alpha_q (\bar{m}_{iq} - m_{iq}) ^ 2 => min!
+        ## s.t.
+        ##   m_{i1}, ..., m_{ik} >= 0, \sum_{iq} m_{iq} = 1.
+        ##
+        ## We can distinguish three cases.
+        ## A. If S_i = \sum_q \bar{m}_{iq} = 1, things are trivial.
+        ## B. If S_i = \sum_q \bar{m}_{iq} < 1.
+        ##    B1. If some \alpha_q are zero, then we can choose
+        ##        m_{iq} = \bar{m}_{iq} for those q with \alpha_q = 0;
+        ##        m_{iq} = 1 / number of zero \alpha's, otherwise.
+        ##    B2. If all \alpha_q are positive, we can simply
+        ##        equidistribute 1 - S_i over all classes as written
+        ##        in G&V.
+        ## C. If S_i > 1, things are not so clear (as equidistributing
+        ##    will typically result in violations of the non-negativity
+        ##    constraint).  We currently revert to using solve.QP() from
+        ##    package quadprog, as constrOptim() already failed in very
+        ##    simple test cases.
+        ##
+        ## Now consider \sum_{p=1}^{k_b} x_{pq}(b).  If k <= k_b for all
+        ## b, all M classes from 1 to k are matched to one of the k_b
+        ## classes in U(b), hence the sum and also \alpha_q are one.
+        ## But then
+        ##    \sum_q \bar{m}_{iq}
+        ##      =  \sum_b \sum_{p=1}^{k_b} w_b u_{ip}(b) x_{pq}(b)
+        ##      <= \sum_b \sum_{p=1}^{k_b} w_b u_{ip}(b)
+        ##      =  1
+        ## with equality if k = k_b for all b.  I.e.,
+        ## * If k = \min_b k_b = \max k_b, we are in case A.
+        ## * If k <= \min_b k_b, we are in case B2.
+        ## And it makes sense to handle these cases explicitly for
+        ## efficiency reasons.
+
+        ## And now for something completely different ... the code.
+
+        k <- .n_of_nonzero_columns(M)
+        nr_M <- nrow(M)
+        nc_M <- ncol(M)
+        nc_memberships <- sapply(memberships, ncol)
+
+        if(k <= min(nc_memberships)) {
+            ## Compute the weighted means \bar{M}.
+            M <- matrix(rowSums(mapply("*",
+                                       mapply(function(u, p)
+                                              u[ , p[1 : k]],
+                                              memberships,
+                                              permutations,
+                                              SIMPLIFY = FALSE),
+                                       w)),
+                        nr_M)
+            ## And add dummy classes if necessary.
+            if(k < nc_M)
+                M <- cbind(M, matrix(0, nr_M, nc_M - k))
+            ## If we always got the same number of classes, we are
+            ## done.  Otherwise, equidistribute ...
+            if(k < max(nc_memberships))
+                M <- pmax(M + (1 - rowSums(M)) / nc_M, 0)
+            return(M)
+        }
+
+        ## Here comes the general case.
+
+        ## First, compute the \alpha and \beta.
+        alpha <- rowSums(rep(w, each = k) *
+                         mapply(function(p, n) p[1 : k] <= n,
+                                permutations, nc_memberships))
+        ## Alternatively (more literally):
+        ##   X <- lapply(permutations, .make_X_from_p)
+        ##   alpha1 <- double(length = k)
+        ##   for(b in seq(along = permutations)) {
+        ##       alpha1 <- alpha1 +
+        ##           w[b] * colSums(X[[b]][1 : nc_memberships[b], ])
+        ##   }
+        
+        ## A helper function giving suitably permuted memberships.
+        pmem <- function(u, p) {
+            ## Only matched classes, similar to the one used in value(),
+            ## maybe merge eventually ...
+            v <- matrix(0, nr_M, k)
+            ind <- 1 : k
+            ind <- ind[p[ind] <= ncol(u)]
+            if(any(ind))
+                v[ , ind] <- u[ , p[ind]]
+            v
+        }
+        beta <- matrix(rowSums(mapply("*",
+                                       mapply(pmem,
+                                              memberships,
+                                              permutations,
+                                              SIMPLIFY = FALSE),
+                                       w)),
+                       nr_M)
+        ## Alternatively (more literally):
+        ##   beta1 <- matrix(0, nr_M, nc_M)
+        ##   for(b in seq(along = permutations)) {
+        ##     ind <- seq(length = nc_memberships[b])
+        ##     beta1 <- beta1 +
+        ##       w[b] * memberships[[b]][, ind] %*% X[[b]][ind, ]
+        ##   }
+        
+        ## Compute the weighted means \bar{M}.
+        M <- .cscale(beta, ifelse(alpha > 0, 1 / alpha, 0))
+        ## Alternatively (see comments for .cscale()):
+        ##   M1 <- beta %*% diag(ifelse(alpha > 0, 1 / alpha, 0))
+        
+        ## And add dummy classes if necessary.
+        if(k < nc_M)
+            M <- cbind(M, matrix(0, nr_M, nc_M - k))
+
+        S <- rowSums(M)
+        ## Take care of those rows with row sums < 1.
+        ind <- (S < 1)
+        if(any(ind)) {
+            i_0 <- alpha == 0
+            if(any(i_0))
+                M[ind, i_0] <- 1 / sum(i_0)
+            else
+                M[ind, ] <- pmax(M[ind, ] + (1 - S[ind]) / nc_M, 0)
+        }
+        ## Take care of those rows with row sums > 1.
+        ind <- (S > 1)
+        if(any(ind)) {
+            require("quadprog")
+            ## Argh.  Call solve.QP() for each such i.  Alternatively,
+            ## could set up on very large QP, but is this any better?
+            Dmat <- diag(alpha, nc_M)
+            Amat <- t(rbind(rep(-1, nc_M), diag(1, nc_M)))
+            bvec <- c(-1, rep(0, nc_M))
+            for(i in which(ind))
+                M[i, ] <- quadprog::solve.QP(Dmat, alpha * M[i, ],
+                                             Amat, bvec)$solution
+        }
+
+        M
+    }
+
+    memberships <- lapply(clusterings, cl_membership)
+    permutations <- lapply(memberships, fit_P, M)
+    old_value <- value(M, permutations, memberships, w)
+    iter <- 1
+
+    while(iter <= maxiter) {
+        ## Fit M.
+        M <- fit_M(permutations, memberships, w)
+        ## Fit \{ P_b \}.
+        permutations <- lapply(memberships, fit_P, M)
+        ## Update value.
+        new_value <- value(M, permutations, memberships, w)
+        if(verbose)
+            cat("Iteration:", iter,
+                "Old value:", old_value,
+                "New value:", new_value,
+                "\n")
+        if(abs(old_value - new_value)
+           < reltol * (abs(old_value) + reltol))
+            break
+        old_value <- new_value
+        iter <- iter + 1
+    }
+
+    rownames(M) <- rownames(memberships[[1]])    
+    M <- cl_membership(as.cl_membership(M[, 1 : k]), k)
+
+    ## Add these attributes here, as the above would not preserve them.
+    attr(M, "converged") <- (iter <= maxiter)
+    attr(M, "value") <- new_value
+
+    M
+}
 
 ### ** .cl_consensus_partition_GV1
 
 .cl_consensus_partition_GV1 <-
 function(clusterings, weights, control)
-    .cl_consensus_partition_AO(clusterings, weights, control, "soft")
+    .cl_consensus_partition_AOG(clusterings, weights, control, "GV1")
 
-### ** .cl_consensus_partition_HBH
 
-.cl_consensus_partition_HBH <-
-function(clusterings, weights, control)
-    .cl_consensus_partition_AO(clusterings, weights, control, "hard")
-
-### ** .cl_consensus_partition_GV3
+### * .cl_consensus_partition_GV3
 
 .cl_consensus_partition_GV3 <-
 function(clusterings, weights, control)
@@ -363,7 +678,7 @@ function(clusterings, weights, control)
     cl_membership(as.cl_membership(M), k)
 }
 
-### ** .cl_consensus_hierarchy_cophenetic
+### * .cl_consensus_hierarchy_cophenetic
 
 .cl_consensus_hierarchy_cophenetic <-
 function(clusterings, weights, control)
@@ -386,7 +701,7 @@ function(clusterings, weights, control)
     ls_fit_ultrametric(d, control)
 }
 
-### ** .cl_consensus_hierarchy_majority
+### * .cl_consensus_hierarchy_majority
 
 .cl_consensus_hierarchy_majority <-
 function(clusterings, weights, control)
@@ -407,8 +722,9 @@ function(clusterings, weights, control)
     .cl_ultrametric_from_classes(maj_classes)
 }
 
+### * Utilities
 
-### * .project_to_leading_columns
+### ** .project_to_leading_columns
 
 .project_to_leading_columns <-
 function(x, k)
@@ -422,6 +738,39 @@ function(x, k)
     ## (Use the pmax to ensure that entries remain nonnegative.)
 }
 
+### ** .make_X_from_p
+
+.make_X_from_p <-
+function(p) {
+    ## X matrix corresponding to permutation p as needed for the AO
+    ## algorithms.  I.e., x_{ij} = 1 iff j->p(j)=i.
+    X <- matrix(0, length(p), length(p))
+    i <- seq(along = p)
+    X[cbind(p[i], i)] <- 1
+    X
+}
+
+### ** .n_of_nonzero_columns
+
+## <NOTE>
+## Could turn this into n_of_classes.matrix().
+.n_of_nonzero_columns <-
+function(x)
+    sum(colSums(x) > 0)
+## </NOTE>
+
+### ** .cscale
+
+## <FIXME>
+## Move to utilities eventually ...
+.cscale <-
+function(A, x)
+{
+    ## Scale the columns of matrix A by the elements of vector x.
+    ## Formally, A %*% diag(x), but faster.
+    ## Could also use sweep(A, 2, x, "*")
+    rep(x, each = nrow(A)) * A
+}
 
 ### Local variables: ***
 ### mode: outline-minor ***

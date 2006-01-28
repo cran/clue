@@ -16,7 +16,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2006-01-17}
+\date{2006-01-27}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -511,6 +511,13 @@ package~\pkg{clue}, we use an efficient C implementation of the
 Hungarian algorithm kindly provided to us by Walter B\"ohm, which has
 been found to perform very well across a wide range of problem sizes.
 
+\cite{cluster:Gordon+Vichi:2001} use a variant of Euclidean
+dissimilarity (``GV1 dissimilarity'') which is based on the sum of the
+squared difference of the memberships of matched (non-empty) classes
+only, discarding the unmatched ones (see their Example~2).  This results
+in a measure which is discontinuous over the space of soft partitions
+with arbitrary numbers of classes.
+
 The partition agreement measures ``angle'' and ``diag'' (maximal cosine
 of angle between the memberships, and maximal co-classification rate,
 where both maxima are taken over all column permutations of the
@@ -537,15 +544,17 @@ corresponding closest hard partitions, unless the agreement measures are
 based on the latter anyways (as currently done for Rand, Katz-Powell,
 and NMI).
 
-One could easily add more proximity measures, such as the asymmetric
-agreement indices by \cite{cluster:Fowlkes+Mallows:1983a} and the
-symmetric variant by \cite{cluster:Wallace:1983}, the ``Variation of
-Information'' \citep{cluster:Meila:2003}, and the metric by
-\cite{cluster:Mirkin:1996} (which is proportional to one minus the Rand
-index).  However, all these measures are rigorously defined for hard
-partitions only.  To see why extensions to soft partitions are far from
-straightforward, consider e.g.\ measures based on the confusion matrix.
-Its entries count the cardinality of certain intersections of sets.
+Package~\pkg{clue} provides additional agreement measures, such as the
+Jaccard and Fowles-Mallows \citep[quite often incorrectly attributed to
+\cite{cluster:Wallace:1983}]{cluster:Fowlkes+Mallows:1983a} indices, and
+dissimilarity measures such as the ``symdiff'' and Rand distances (the
+latter is proportional to the metric of \cite{cluster:Mirkin:1996}).
+One could easily add more proximity measures, such as the ``Variation of
+Information'' \citep{cluster:Meila:2003}.  However, all these measures
+are rigorously defined for hard partitions only.  To see why extensions
+to soft partitions are far from straightforward, consider e.g.\ measures
+based on the confusion matrix.  Its entries count the cardinality of
+certain intersections of sets.
 \label{fuzzy} In a fuzzy context for soft partitions, a natural
 generalization would be using fuzzy cardinalities (i.e., sums of
 memberships values) of fuzzy intersections instead.  There are many
@@ -566,14 +575,17 @@ Manhattan (sum of the absolute differences) dissimilarities between the
 associated ultrametrics.  Cophenetic dissimilarity is defined as $1 -
 c^2$, where $c$ is the cophenetic correlation coefficient
 \citep{cluster:Sokal+Rohlf:1962}, i.e., the Pearson product-moment
-correlation between the ultrametrics.  Finally, gamma dissimilarity is
-the rate of inversions between the associated ultrametrics $u$ and $v$
-(i.e., the rate of pairs $(i,j)$ and $(k,l)$ for which $u_{ij} < u_{kl}$
-and $v_{ij} > v_{kl}$).  This measure is a linear transformation of
-Kruskal's~$\gamma$.  Associated agreement measures are obtained by
-suitable transformations of the dissimilarities~$d$; for Euclidean
-proximities, we prefer to use $1 / (1 + d)$ rather than e.g.\
-$\exp(-d)$.
+correlation between the ultrametrics.  Gamma dissimilarity is the rate
+of inversions between the associated ultrametrics $u$ and $v$ (i.e., the
+rate of pairs $(i,j)$ and $(k,l)$ for which $u_{ij} < u_{kl}$ and
+$v_{ij} > v_{kl}$).  This measure is a linear transformation of
+Kruskal's~$\gamma$.  Finally, symdiff dissimilarity is the cardinality
+of the symmetric set difference of the sets of classes (hierarchies in
+the strict sense) induced by the dendrograms.
+
+Associated agreement measures are obtained by suitable transformations
+of the dissimilarities~$d$; for Euclidean proximities, we prefer to use
+$1 / (1 + d)$ rather than e.g.\ $\exp(-d)$.
 
 One should note that whereas cophenetic and gamma dissimilarities are
 invariant to linear transformations, Euclidean and Manhattan ones are
@@ -628,8 +640,8 @@ package~\pkg{cluster}.
 
 If all elements of the ensemble are partitions, package~\pkg{clue}
 provides algorithms for computing soft least squares consensus
-partitions for weighted Euclidean and co-membership dissimilarities,
-respectively.  Let $M_1, \ldots, M_B$ and $M$ denote the membership
+partitions for weighted Euclidean, GV1 and co-membership
+dissimilarities.  Let $M_1, \ldots, M_B$ and $M$ denote the membership
 matrices of the elements of the ensemble and their sought least squares
 consensus partition, respectively.  For Euclidean dissimilarity, we need
 to find
@@ -691,16 +703,18 @@ $M_b \Pi_b$ to this, and taking a weighted average of $\tilde{M}_{b-1}$
 and $M_b \Pi_b$ in a way that $\tilde{M}_b$ is the weighted average of
 the first~$b$ $M_\beta \Pi_\beta$.  This simple approach could be
 further enhanced via back-fitting or several passes, in essence
-resulting in an ``on-line'' version of method \code{"GV1"}.  This, in
-turn, is a fixed-point algorithm for the ``first model'' in
-\cite{cluster:Gordon+Vichi:2001}, which iterates between updating $M$ as
+resulting in an ``on-line'' version of method \code{"SE"}.  This, in
+turn, is a fixed-point algorithm, which iterates between updating $M$ as
 the weighted average of the current $M_b \Pi_b$, and determining the
 $\Pi_b$ by optimally matching the current $M$ to the individual $M_b$.
+Finally, method \code{"GV1"} implements the fixed-point algorithm for
+the ``first model'' in \cite{cluster:Gordon+Vichi:2001}, which gives
+least squares consensus partitions for GV1 dissimilarity.
 
 In the above, we implicitly assumed that all partitions in the ensemble
 as well as the sought consensus partition have the same number of
 classes.  The more general case can be dealt with through suitable
-projection devices.
+``projection'' devices.
 
 When using co-membership dissimilarity, the least squares consensus
 partition is determined by minimizing
@@ -747,8 +761,8 @@ such a simple relaxation approach to obtaining optimal hard partitions
 is not feasible.
 
 For ensembles of hierarchies, \code{cl\_consensus()} provides a built-in
-method for approximately minimizing average weighted squared Euclidean
-dissimilarity
+method (\code{"cophenetic"}) for approximately minimizing average
+weighted squared Euclidean dissimilarity
 \begin{displaymath}
   \sum_b w_b \| U - U_b \|^2 \Rightarrow \min\nolimits_U
 \end{displaymath}
@@ -758,7 +772,13 @@ equivalent to minimizing $\| U - \bar{U} \|^2$, where $\bar{U} = s^{-1}
 \sum_b w_b U_b$ is the weighted average of the $U_b$.  The SUMT approach
 provided by function \code{ls\_fit\_ultrametric()} (see
 Section~\ref{SUMT} on Page~\pageref{SUMT}) is employed for finding the
-sought weighted least squares consensus hierarchy.
+sought weighted least squares consensus hierarchy.  
+
+In addition, method \code{"majority"} obtains a consensus hierarchy from
+an extension of the majority consensus tree of
+\cite{cluster:Margush+McMorris:1981}, which minimizes $L(U) = \sum_b w_b
+d(U_b, U)$ over all ultrametrics~$U$, where $d$ is the symmetric
+difference dissimilarity.
 
 Clearly, the available methods use heuristics for solving hard
 optimization problems, and cannot be guaranteed to find a global
@@ -947,48 +967,75 @@ of GDP provided by agriculture; the percentage of employees who worked
 in agriculture; and gross domestic investment, expressed as a percentage
 of the GDP.
 
-Table~4 in \cite{cluster:Gordon+Vichi:2001} gives 2-class consensus
+Table~5 in \cite{cluster:Gordon+Vichi:2001} gives 3-class consensus
 partitions obtained by applying their models 1, 2, and 3 and the
 approach in \cite{cluster:Sato+Sato:1994}.
 
 The partitions and consensus partitions are available in data sets
 \code{GVME} and \code{GVME\_Consensus}, respectively.  We compare the
-results of \cite{cluster:Gordon+Vichi:2001} using Euclidean
-dissimilarities (model 1) to ours as obtained by \code{cl\_consensus()}
-with method \code{"GV1"}.
+results of \cite{cluster:Gordon+Vichi:2001} using GV1 dissimilarities
+(model 1) to ours as obtained by \code{cl\_consensus()} with method
+\code{"GV1"}.
 
 <<>>=
 data("GVME")
 GVME
 set.seed(1)
 m1 <- cl_consensus(GVME, method = "GV1",
-                   control = list(k = 2, verbose = TRUE))
+                   control = list(k = 3, verbose = TRUE))
 @ %
-This results in a soft partition with average Euclidean dissimilarity
+This results in a soft partition with average squared GV1 dissimilarity
 (the criterion function to be optimized by the consensus partition) of
 <<>>=
-mean(cl_dissimilarity(GVME, m1) ^ 2)
+mean(cl_dissimilarity(GVME, m1, "GV1") ^ 2)
 @ %
 We compare this to the consensus solution given in
 \cite{cluster:Gordon+Vichi:2001}:
 <<>>=
 data("GVME_Consensus")
-m2 <- GVME_Consensus[["MF1"]]
-mean(cl_dissimilarity(GVME, m2) ^ 2)
+m2 <- GVME_Consensus[["MF1/3"]]
+mean(cl_dissimilarity(GVME, m2, "GV1") ^ 2)
 table(CLUE = cl_class_ids(m1), GV2001 = cl_class_ids(m2))
 @ %
-Interestingly, we are able to obtain a ``better'' solution, which is
-markedly different from the one reported in the literature, and results
-in different classifications for the following countries:
+Interestingly, we are able to obtain a ``better'' solution, which
+however agrees with the one reported on the literature with respect to
+their closest hard partitions.
+
+For the 2-class consensus partition, we obtain
 <<>>=
-rownames(m2)[cl_class_ids(m1) != cl_class_ids(m2)]
+set.seed(1)
+m1 <- cl_consensus(GVME, method = "GV1",
+                   control = list(k = 2, verbose = TRUE))
+@ 
+which is slightly better than the solution reported in
+\cite{cluster:Gordon+Vichi:2001}
+<<>>=
+mean(cl_dissimilarity(GVME, m1, "GV1") ^ 2)
+m2 <- GVME_Consensus[["MF1/2"]]
+mean(cl_dissimilarity(GVME, m2, "GV1") ^ 2)
+@ 
+but in fact agrees with it apart from rounding errors:
+<<>>=
+max(abs(m1 - m2))
+@ 
+It is interesting to compare these solutions to the Euclidean 2-class
+consensus partition for the GVME ensemble:
+<<>>=
+m3 <- cl_consensus(GVME, method = "GV1",
+                   control = list(k = 2, verbose = TRUE))
+@ 
+This is markedly different from the GV1 consensus partition
+<<>>=
+table(GV1 = cl_class_ids(m1), Euclidean = cl_class_ids(m3))
+@ 
+with countries
+<<>>=
+rownames(m1)[cl_class_ids(m1) != cl_class_ids(m3)]
 @ %
-We note however that \cite{cluster:Gordon+Vichi:2001} solve a different
-optimization problem, as in the case of partitions with different
-numbers of classes they only use the matched classes when computing
-dissimilarity, discarding the unmatched ones (see their Example~2).  As
-this results in dissimilarity measures which are discontinuous over the
-space of soft partitions, our definition should be preferred.
+classified differently, being with the ``richer'' class for the GV1 and
+the ``poorer'' for the Euclidean consensus partition.  (In fact, all
+these countries end up in the ``middle'' class for the 3-class GV1
+consensus partition.)
 
 \subsection{Rosenberg-Kim kinship terms data}
 
