@@ -132,6 +132,18 @@ set_cl_dissimilarity_method("Rand", "partition",
 set_cl_dissimilarity_method("GV1", "partition",
                             .cl_dissimilarity_partition_GV1,
                             "Gordon-Vichi Delta_1 dissimilarity")
+set_cl_dissimilarity_method("BA/A", "partition",
+                            .cl_dissimilarity_partition_BA_A,
+                            "Boorman/Arabie minimum element moves distance")
+set_cl_dissimilarity_method("BA/C", "partition",
+                            .cl_dissimilarity_partition_BA_C,
+                            "Boorman/Arabie minimum lattice moves distance")
+set_cl_dissimilarity_method("BA/D", "partition",
+                            .cl_dissimilarity_partition_BA_D,
+                            "Boorman/Arabie pair-bonds distance")
+set_cl_dissimilarity_method("BA/E", "partition",
+                            .cl_dissimilarity_partition_BA_E,
+                            "Boorman/Arabie normalized information distance")
 
 set_cl_dissimilarity_method("euclidean", "hierarchy",
                             .cl_dissimilarity_hierarchy_euclidean,

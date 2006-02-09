@@ -16,7 +16,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2006-01-27}
+\date{2006-02-09}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -548,8 +548,9 @@ Package~\pkg{clue} provides additional agreement measures, such as the
 Jaccard and Fowles-Mallows \citep[quite often incorrectly attributed to
 \cite{cluster:Wallace:1983}]{cluster:Fowlkes+Mallows:1983a} indices, and
 dissimilarity measures such as the ``symdiff'' and Rand distances (the
-latter is proportional to the metric of \cite{cluster:Mirkin:1996}).
-One could easily add more proximity measures, such as the ``Variation of
+latter is proportional to the metric of \cite{cluster:Mirkin:1996}) and
+the metrics discussed in \cite{cluster:Boorman+Arabie:1972}.  One could
+easily add more proximity measures, such as the ``Variation of
 Information'' \citep{cluster:Meila:2003}.  However, all these measures
 are rigorously defined for hard partitions only.  To see why extensions
 to soft partitions are far from straightforward, consider e.g.\ measures
@@ -1196,6 +1197,7 @@ detail in the course of this paper).
   number of classes employed) and ``cluster validation'' of partitioning
   algorithms, as recently proposed by
   \cite{cluster:Roth+Lange+Braun:2002},
+  \cite{cluster:Lange+Roth+Braun:2004},
   \cite{cluster:Dudoit+Fridlyand:2002},
   and \cite{cluster:Tibshirani+Walther:2005}.
 \end{itemize}
