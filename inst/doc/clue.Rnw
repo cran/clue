@@ -238,8 +238,9 @@ iterative projection on convex sets of constraints
 
 \label{SUMT}
 Function \code{ls\_fit\_ultrametric()} follows
-\cite{cluster:DeSoete:1986} to use an SUMT (Sequential Unconstrained
-Minimization Technique) approach in turn simplifying the suggestions in
+\cite{cluster:DeSoete:1986} to use an SUMT \citep[Sequential
+Unconstrained Minimization Technique;][]{cluster:Fiacco+McCormick:1968}
+approach in turn simplifying the suggestions in
 \cite{cluster:Carroll+Pruzansky:1980}.  Let $L(u)$ be the function to be
 minimized over all $u$ in some constrained set $\mathcal{U}$---in our
 case, $L(u) = \sum (d_{ij}-u_{ij})^2$ is the least squares criterion,
@@ -289,6 +290,7 @@ replications of the base algorithm.
 The methods provided in package~\pkg{clue} handle the partitions and
 hierarchies obtained from clustering functions in the base R
 distribution, as well as packages
+\pkg{RWeka}~\citep{cluster:Hornik+Hothorn+Karatzoglou:2006},
 \pkg{cba}~\citep{cluster:Buchta+Hahsler:2005},
 \pkg{cclust}~\citep{cluster:Dimitriadou:2005}, \pkg{cluster},
 \pkg{e1071}~\citep{cluster:Dimitriadou+Hornik+Leisch:2005},
@@ -540,7 +542,7 @@ transform one partition into the other, and the
 
 Note when assessing proximity that agreements for soft partitions are
 always (and quite often considerably) lower than the agreements for the
-corresponding closest hard partitions, unless the agreement measures are
+corresponding nearest hard partitions, unless the agreement measures are
 based on the latter anyways (as currently done for Rand, Katz-Powell,
 and NMI).
 
@@ -1000,7 +1002,7 @@ table(CLUE = cl_class_ids(m1), GV2001 = cl_class_ids(m2))
 @ %
 Interestingly, we are able to obtain a ``better'' solution, which
 however agrees with the one reported on the literature with respect to
-their closest hard partitions.
+their nearest hard partitions.
 
 For the 2-class consensus partition, we obtain
 <<>>=
@@ -1017,7 +1019,7 @@ mean(cl_dissimilarity(GVME, m2, "GV1") ^ 2)
 @ 
 but in fact agrees with it apart from rounding errors:
 <<>>=
-max(abs(m1 - m2))
+max(abs(cl_membership(m1) - cl_membership(m2)))
 @ 
 It is interesting to compare these solutions to the Euclidean 2-class
 consensus partition for the GVME ensemble:
@@ -1085,7 +1087,7 @@ indicating that the two solutions are reasonably close, even though
 <<>>=
 cl_fuzziness(cl_ensemble(m1, m2))
 @ %
-shows that our solution is ``softer''.
+shows that the solution found by \pkg{clue} is ``softer''.
 
 \subsection{Miller-Nicely consonant phoneme confusion data}
 
@@ -1132,25 +1134,22 @@ We can also compare the least squares fit obtained to that of other
 hierarchical clusterings of $d$, e.g.\ those obtained by
 \code{hclust()}.  The ``optimal''~$u$ has Euclidean dissimilarity
 <<>>=
-round(sqrt(sum((d - u) ^ 2)), 4)
+round(cl_dissimilarity(d, u), 4)
 @ %
-to $d$.  (Note that we currently cannot use \code{cl\_dissimilarity()}
-here, as $d$ does not correspond to a hierarchy.)  For the
-\code{hclust()} results, we get
+to $d$.  For the \code{hclust()} results, we get
 <<>>=
 hclust_methods <- c("ward", "single", "complete", "average", "mcquitty",
                     "median", "centroid")
 hens <- cl_ensemble(list = lapply(hclust_methods,
                                   function(m) hclust(d, m)))
 names(hens) <- hclust_methods
-sapply(hens,
-       function(h) round(sqrt(sum((d - cl_ultrametric(h)) ^ 2)), 4))
+round(sapply(hens, cl_dissimilarity, d), 4)
 @ %
 which all exhibit greater Euclidean dissimilarity to $d$ than $u$.  We
 can also compare the ``structure'' of the different hierarchies, e.g.\
 by looking at the rate of inversions between them:
 <<>>=
-ahens <- c(L2opt = cl_ensemble(u), hens)
+ahens <- c(L2opt = cl_ensemble(as.cl_hierarchy(u)), hens)
 round(cl_dissimilarity(ahens, method = "gamma"), 2)
 @ %
 

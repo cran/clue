@@ -86,7 +86,7 @@ function(clusterings, weights, control)
             M <- .project_to_leading_columns(M, k)
     }
 
-    cl_membership(as.cl_membership(M[, 1 : k]), k)    
+    as.cl_partition(cl_membership(as.cl_membership(M[, 1 : k]), k))
 }
 
 ### * .cl_consensus_partition_AOS
@@ -231,7 +231,7 @@ function(clusterings, weights, control, type = c("SE", "HE"))
     attr(M, "converged") <- (iter <= maxiter)
     attr(M, "value") <- new_value
 
-    M
+    as.cl_partition(M)
 }
 
 ### ** .cl_consensus_partition_SE
@@ -552,7 +552,7 @@ function(clusterings, weights, control, type = c("GV1"))
     attr(M, "converged") <- (iter <= maxiter)
     attr(M, "value") <- new_value
 
-    M
+    as.cl_partition(M)
 }
 
 ### ** .cl_consensus_partition_GV1
@@ -675,7 +675,7 @@ function(clusterings, weights, control)
     M <- matrix(pmax(m, 0), n)
     M <- M / rowSums(M)
     rownames(M) <- rownames(cl_membership(clusterings[[1]]))
-    cl_membership(as.cl_membership(M), k)
+    as.cl_partition(cl_membership(as.cl_membership(M), k))
 }
 
 ### * .cl_consensus_hierarchy_cophenetic
@@ -698,7 +698,7 @@ function(clusterings, weights, control)
     labels <- attr(ultrametrics[[1]], "Labels")
     d <- .dist_from_vector(dissimilarities, labels = labels)
     ## </FIXME>
-    ls_fit_ultrametric(d, control)
+    as.cl_hierarchy(ls_fit_ultrametric(d, control))
 }
 
 ### * .cl_consensus_hierarchy_majority
@@ -710,7 +710,7 @@ function(clusterings, weights, control)
 
     w <- weights / sum(weights)
 
-    classes <- lapply(clusterings, .get_classes_in_hierarchy)
+    classes <- lapply(clusterings, cl_classes)
     all_classes <- unique(unlist(classes, recursive = FALSE))
     gamma <- double(length = length(all_classes))
     for(i in seq(along = classes))
@@ -719,7 +719,7 @@ function(clusterings, weights, control)
     maj_classes <- all_classes[gamma > 1 / 2]
     attr(maj_classes, "labels") <- attr(classes[[1]], "labels")
 
-    .cl_ultrametric_from_classes(maj_classes)
+    as.cl_hierarchy(.cl_ultrametric_from_classes(maj_classes))
 }
 
 ### * Utilities

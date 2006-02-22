@@ -7,20 +7,24 @@
 n_of_objects(x)
 }
 \arguments{
-  \item{x}{an object representing a (hard of soft) partition or a
-    hierarchy.}
+  \item{x}{an \R object representing a (hard of soft) partition or a
+    hierarchy of objects, or dissimilarities between objects.}
 }
 \value{
-  An integer giving the number of objects in the clustering.
+  An integer giving the number of objects.
 }
 \details{
   This is a generic function.
 
   The methods provided in package \pkg{clue} handle the partitions and
   hierarchies obtained from clustering functions in the base R
-  distribution, as well as packages \pkg{cba}, \pkg{cclust},
-  \pkg{cluster}, \pkg{e1071}, \pkg{flexclust}, \pkg{flexmix},
-  \pkg{kernlab}, and \pkg{mclust} (and of course, \pkg{clue} itself).
+  distribution, as well as packages \pkg{RWeka}, \pkg{cba},
+  \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, \pkg{flexclust},
+  \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and of course,
+  \pkg{clue} itself).
+
+  There is also a method for object dissimilarities which inherit from
+  class \code{"\link{dist}"}.
 }
 \seealso{
   \code{\link{is.cl_partition}},

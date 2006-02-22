@@ -31,7 +31,7 @@ cl_pclust(x, k, m = 1, control = list())
   \item{prototypes}{a cluster ensemble with the \eqn{k} prototypes.}
   \item{membership}{an object of class \code{"\link{cl_membership}"}
     with the membership values \eqn{u_{bj}}.}
-  \item{cluster}{the class ids of the \dQuote{nearest} hard partition.}
+  \item{cluster}{the class ids of the nearest hard partition.}
   \item{silhouette}{Silhouette information for the partition, see
     \code{\link[cluster]{silhouette}}.} 
   \item{validity}{precomputed validity measures for the partition.}

@@ -37,9 +37,7 @@ function(x, y = NULL, method = "euclidean")
         d <- matrix(0, length(x), length(y))
         for(j in seq(along = y))
             d[, j] <- sapply(x, method, y[[j]])
-        dimnames(d) <-
-            list(if(is.null(names(x))) seq(along = x) else names(x),
-                 if(is.null(names(y))) seq(along = y) else names(y))
+        dimnames(d) <- list(names(x), names(y))
         description <- paste("Dissimilarities using", method_name)
         return(cl_cross_proximity(d, description,
                                   class = "cl_cross_dissimilarity"))
@@ -57,11 +55,7 @@ function(x, y = NULL, method = "euclidean")
     
     cl_proximity(unlist(d),
                  paste("Dissimilarities using", method_name),
-                 labels = {
-                     if(is.null(names(x)))
-                         seq(along = x)
-                     else
-                         names(x)},
+                 labels = names(x),
                  size = n,
                  class = c("cl_dissimilarity", "cl_proximity", "dist"))
 }
@@ -212,7 +206,12 @@ function(x, y)
 .cl_dissimilarity_hierarchy_euclidean <-
 function(x, y)
 {
-    sqrt(sum((cl_ultrametric(x) - cl_ultrametric(y)) ^ 2))
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u <- cl_object_dissimilarities(x)
+    v <- cl_object_dissimilarities(y)
+    sqrt(sum((u - v) ^ 2))
 }
 
 ### ** .cl_dissimilarity_hierarchy_manhattan
@@ -220,14 +219,26 @@ function(x, y)
 .cl_dissimilarity_hierarchy_manhattan <-
 function(x, y)
 {
-    sum(abs(cl_ultrametric(x) - cl_ultrametric(y)))
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u <- cl_object_dissimilarities(x)
+    v <- cl_object_dissimilarities(y)
+    sum(abs(u - v))
 }
 
 ### ** .cl_dissimilarity_hierarchy_cophenetic
 
 .cl_dissimilarity_hierarchy_cophenetic <-
 function(x, y)
-    1 - cor(cl_ultrametric(x), cl_ultrametric(y)) ^ 2
+{
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u <- cl_object_dissimilarities(x)
+    v <- cl_object_dissimilarities(y)
+    1 - cor(u, v) ^ 2
+}
 
 ### ** .cl_dissimilarity_hierarchy_gamma
 
@@ -237,8 +248,13 @@ function(x, y)
     ## <NOTE>
     ## This is a dissimilarity measure that works for arbitrary
     ## dissimilarities, see e.g. Bock.
-    u <- cl_ultrametric(x)
-    v <- cl_ultrametric(y)
+    ## (And the current implementation finally respects this ...)
+    ## </NOTE>
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u <- cl_object_dissimilarities(x)
+    v <- cl_object_dissimilarities(y)
     n <- length(u)
     .C("clue_dissimilarity_count_inversions",
        u, v, n, count = double(1),
@@ -254,8 +270,8 @@ function(x, y)
     ## regarded as sets of subsets (classes) of the set of objects.
 
     n <- n_of_objects(x)
-    x <- .get_classes_in_hierarchy(x)
-    y <- .get_classes_in_hierarchy(y)
+    x <- cl_classes(x)
+    y <- cl_classes(y)
     lx <- sapply(x, length)
     ly <- sapply(y, length)
     s <- 0
@@ -266,7 +282,6 @@ function(x, y)
     }
     s
 }
-    
 
 ### * as.dist.cl_dissimilarity
 
@@ -338,6 +353,8 @@ function(A, B, method = "manhattan")
         out[, k] <- colSums(abs(A - B[, k]))
     out
 }
+
+### .rxdist
 
 .rxdist <-
 function(A, B, method = c("euclidean", "manhattan"))

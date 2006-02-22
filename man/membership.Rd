@@ -24,9 +24,9 @@ as.cl_membership(x)
 
   The methods provided in package \pkg{clue} handle the partitions
   obtained from clustering functions in the base R distribution, as
-  well as packages \pkg{cba}, \pkg{cclust}, \pkg{cluster}, \pkg{e1071},
-  \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and
-  of course, \pkg{clue} itself).
+  well as packages \pkg{RWeka}, \pkg{cba}, \pkg{cclust}, \pkg{cluster},
+  \pkg{e1071}, \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and
+  \pkg{mclust} (and of course, \pkg{clue} itself).
 
   \code{as.cl_membership} can be used for coercing \dQuote{raw} class
   ids (given as atomic vectors) or membership values (given as numeric
@@ -49,16 +49,18 @@ d1 <- cl_dissimilarity(hens)
 ## And compute a soft partition.
 require("cluster")
 party <- fanny(d1, 2)
-cl_membership(party)
+round(cl_membership(party), 5)
 ## The "nearest" hard partition to this:
 as.cl_hard_partition(party)
 ## (which has the same class ids as cl_class_ids(party)).
 
-## Converting all elements in an ensemble of partitions to their
-## memberships.
+## Extracting the memberships from the elements of an ensemble of
+## partitions.
 pens <- cl_boot(USArrests, 30, 3)
 pens
-pens <- cl_ensemble(list = lapply(pens, cl_membership))
+mems <- lapply(pens, cl_membership)
+## And turning these raw memberships into an ensemble of partitions.
+pens <- cl_ensemble(list = lapply(mems, as.cl_partition))
 pens
 pens[[length(pens)]]
 }

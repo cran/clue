@@ -2,10 +2,12 @@
 
 ## Get the class membership matrix from a partition.
 
-## <TODO>
-## We should really use sparse matrices for the memberships of hard
-## partitions.
-## </TODO>
+## <NOTE>
+## We could use sparse matrices for the memberships of hard partitions.
+## Not sure if this is really that important, though, as we typically
+## use memberships in a context where dense matrices (memberships of
+## soft partitions) occur.
+## </NOTE>
 
 ## <NOTE>
 ## Currently, the number of classes to be used for the memberships must
@@ -107,7 +109,7 @@ function(x, k = NULL)
 function(x, k = NULL)
 {
     n_of_objects <- nrow(x)
-    x <- x[ , colSums(x) > 0]
+    x <- x[ , colSums(x) > 0, drop = FALSE]
     n_of_classes <- ncol(x)
     if(!is.null(k)) {
         if(k < n_of_classes)

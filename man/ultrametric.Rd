@@ -11,7 +11,8 @@ cl_ultrametric(x, size = NULL, labels = NULL)
 as.cl_ultrametric(x)
 }
 \arguments{
-  \item{x}{an R object representing a hierarchy of objects.}
+  \item{x}{an R object representing a (total indexed) hierarchy of
+    objects.}
   \item{size}{an integer giving the number of objects in the hierarchy.}
   \item{labels}{a character vector giving the names of the objects in
     the hierarchy.}

@@ -35,5 +35,5 @@ function(x, B, k = NULL,
         ind <- solve_LSAP(crossprod(M_ref, mem), max = TRUE)
         M <- M + mem[, ind]
     }
-    cl_membership(as.cl_membership(M / B), k)
+    as.cl_partition(cl_membership(as.cl_membership(M / B), k))
 }

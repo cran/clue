@@ -2,13 +2,17 @@ cl_fuzziness <-
 function(x, method = NULL, normalize = TRUE)
 {
     x <- as.cl_ensemble(x)
-    if(inherits(x, "cl_hierarchy_ensemble")) {
-        ## Currently, no fuzzy hierarchies ... hence, always 0.
-        out <- double(length(x))
-        attr(out, "description") <- "Fuzziness"
-        class(out) <- "cl_fuzziness"
+    out <- double(length(x))
+    ## <FIXME>
+    ## The docs say that we should only have partitions ...
+    attr(out, "description") <- "Fuzziness"
+    class(out) <- "cl_fuzziness"
+    parties <- sapply(x, is.cl_partition)
+    if(!(length(x) || any(parties))) {
+        ## Currently, no fuzzy hierarchies ...
         return(out)
     }
+    ## </FIXME>
 
     if(!is.function(method)) {
         builtin_methods <- c("PC", "PE")
@@ -29,9 +33,9 @@ function(x, method = NULL, normalize = TRUE)
     }
     else
         method_name <- "user-defined method"
-    out <- as.numeric(sapply(x, method, normalize))
+    
+    out[parties] <- as.numeric(sapply(x[parties], method, normalize))
     attr(out, "description") <- paste("Fuzziness using", method_name)
-    class(out) <- "cl_fuzziness"
     out 
 }
 

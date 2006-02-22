@@ -42,9 +42,7 @@ function(x, y = NULL, method = "euclidean")
         d <- matrix(0, length(x), length(y))
         for(j in seq(along = y))
             d[, j] <- sapply(x, method, y[[j]])
-        dimnames(d) <-
-            list(if(is.null(names(x))) seq(along = x) else names(x),
-                 if(is.null(names(y))) seq(along = y) else names(y))
+        dimnames(d) <- list(names(x), names(y))
         description <- paste("Agreements using", method_name)
         return(cl_cross_proximity(d, description,
                                   class = "cl_cross_agreement"))
@@ -65,11 +63,7 @@ function(x, y = NULL, method = "euclidean")
     ## </NOTE>
     cl_proximity(unlist(d),
                  paste("Agreements using", method_name),
-                 labels = {
-                     if(is.null(names(x)))
-                         seq(along = x)
-                     else
-                         names(x)},
+                 labels = names(x),
                  self = rep.int(1, length(x)),
                  size = n, class = "cl_agreement")
 }
@@ -330,7 +324,10 @@ function(x, y)
 function(x, y)
 {
     ## Cophenetic correlation.
-    cor(cl_ultrametric(x), cl_ultrametric(y))
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    cor(cl_object_dissimilarities(x), cl_object_dissimilarities(y))
 }
 
 ### ** .cl_agreement_hierarchy_angle
@@ -339,8 +336,11 @@ function(x, y)
 function(x, y)
 {
     ## Angle between ultrametrics.
-    u_x <- cl_ultrametric(x)
-    u_y <- cl_ultrametric(y)
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u_x <- cl_object_dissimilarities(x)
+    u_y <- cl_object_dissimilarities(y)
     sum(u_x * u_y) / sqrt(sum(u_x ^ 2) * sum(u_y ^ 2))
 }
 

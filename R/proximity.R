@@ -80,9 +80,12 @@ function(x)
     if(!is.null(self <- attr(x, "self"))) {
         diag(m) <- self
     }
-    if(is.null(labels <- attr(x, "Labels")))
-        labels <- 1 : size
-    dimnames(m) <- list(labels, labels)
+    ## <NOTE>
+    ## stats:::as.matrix.dist() provides default dimnames (1 : size) if
+    ## no labels are available.  We used to do this too, but ...
+    if(!is.null(labels <- attr(x, "Labels")))
+        dimnames(m) <- list(labels, labels)
+    ## </NOTE>
     m
 }
 
