@@ -10,23 +10,28 @@ as.cl_ensemble(x)
 is.cl_ensemble(x)
 }
 \arguments{
-  \item{\dots}{R objects representing clusterings of the same kind
-    (either all partitions or all hierarchies) on the same objects.}
+  \item{\dots}{R objects representing clusterings or dissimilarities on
+    the same objects.}
   \item{list}{a list of R objects as in \code{\dots}.}
   \item{x}{for \code{as.cl_ensemble}, an R object as in \code{\dots};
     for \code{is.cl_ensemble}, an arbitrary R object.}
 }
 \details{
-  \code{cl_ensemble} creates cluster ensembles, which are realized as
-  lists of clusterings with additional class information.   All
-  clusterings in an ensemble must be of the same kind, and have the same
-  number of objects.  If all clusterings are partitions, this list has
-  class \code{"cl_partition_ensemble"} and inherits from
-  \code{"cl_ensemble"}; if all clusterings are hierarchies, it has class
-  \code{"cl_hierarchy_ensemble"} and inherits from
-  \code{"cl_ensemble"}.   Empty ensembles
-  cannot be categorized according to the kind of clusterings they
-  contain, and hence only have class \code{"cl_ensemble"}.
+  \code{cl_ensemble} creates \dQuote{cluster ensembles}, which are
+  realized as lists of clusterings (or dissimilarities) with additional
+  class information, always inheriting from \code{"cl_ensemble"}.  All
+  elements of the ensemble must have the same number of objects.
+
+  If all elements are partitions, the ensemble has class
+  \code{"cl_partition_ensemble"};
+  if all elements are dendrograms, it has class
+  \code{"cl_dendrogram_ensemble"} and inherits from
+  \code{"cl_hierarchy_ensemble"};
+  if all elements are hierarchies (but not always dendrograms), it has
+  class \code{"cl_hierarchy_ensemble"}.
+  Note that empty or \dQuote{mixed} ensembles cannot be categorized
+  according to the kind of elements they contain, and hence only have
+  class \code{"cl_ensemble"}.
 
   The list representation makes it possible to use \code{lapply} for
   computations on the individual clusterings in (i.e., the components
@@ -41,8 +46,9 @@ is.cl_ensemble(x)
   may change eventually.
 }
 \value{
-  \code{cl_ensemble} returns a list of the given clusterings, with
-  additional class information (see \bold{Details}).
+  \code{cl_ensemble} returns a list of the given clusterings or
+  dissimilarities, with additional class information (see
+  \bold{Details}).
 }
 \examples{
 d <- dist(USArrests)
@@ -58,6 +64,6 @@ hens[1 : 3]
 ## Replication.
 rep(hens, 3)
 ## And continue to analyze the ensemble, e.g.
-cl_dissimilarity(hens, method = "gamma")
+round(cl_dissimilarity(hens, method = "gamma"), 4)
 }
 \keyword{cluster}

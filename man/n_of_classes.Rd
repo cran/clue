@@ -17,17 +17,17 @@ cl_class_ids(x)
   
   For \code{cl_class_ids}, a vector of integers with the corresponding
   class ids.  For soft partitions, the class ids returned are those of
-  the \dQuote{nearest} hard partition obtained by taking the class ids
-  of the (first) maximal membership values.
+  the \emph{nearest hard partition} obtained by taking the class ids of
+  the (first) maximal membership values.
 }
 \details{
   These function are generic functions.
 
   The methods provided in package \pkg{clue} handle the partitions
   obtained from clustering functions in the base R distribution, as
-  well as packages \pkg{cba}, \pkg{cclust}, \pkg{cluster}, \pkg{e1071},
-  \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and
-  of course, \pkg{clue} itself).
+  well as packages \pkg{RWeka}, \pkg{cba}, \pkg{cclust}, \pkg{cluster},
+  \pkg{e1071}, \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and
+  \pkg{mclust} (and of course, \pkg{clue} itself).
 
   Note that the number of classes is taken as the number of distinct
   class ids actually used in the partition, and may differ from the

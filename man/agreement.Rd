@@ -8,8 +8,8 @@
 cl_agreement(x, y = NULL, method = "euclidean")
 }
 \arguments{
-  \item{x}{an ensemble of partitions or hierarchies, or something
-    coercible to that (see \code{\link{cl_ensemble}}).}
+  \item{x}{an ensemble of partitions or hierarchies and dissimilarities,
+    or something coercible to that (see \code{\link{cl_ensemble}}).}
   \item{y}{\code{NULL} (default), or as for \code{x}.}
   \item{method}{a character string specifying one of the built-in
     methods for computing agreement, or a function to be taken as
@@ -28,7 +28,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
 \details{
   If \code{y} is given, its components must be of the same kind as those
   of \code{x} (i.e., components must either all be partitions, or all be
-  hierarchies).
+  hierarchies or dissimilarities).
 
   If all components are partitions, the following built-in methods for
   measuring agreement between two partitions with respective membership
@@ -51,21 +51,21 @@ cl_agreement(x, y = NULL, method = "euclidean")
       objects both in the same class or both in different classes in
       both partitions), see Rand (1971) or Gordon (1999), page 198.
       For soft partitions, (currently) the Rand index of the
-      corresponding \dQuote{nearest} hard partitions is used.}
+      corresponding nearest hard partitions is used.}
     \item{\code{"cRand"}}{the Rand index corrected for agreement by
       chance, see Hubert and Arabie (1985) or Gordon (1999), page 198.
       Can only be used for hard partitions.}
     \item{\code{"NMI"}}{Normalized Mutual Information, see Strehl and
       Ghosh (2002).  For soft partitions, (currently) the NMI of the
-      corresponding \dQuote{nearest} hard partitions is used.} 
+      corresponding nearest hard partitions is used.} 
     \item{\code{"KP"}}{the Katz-Powell index, i.e., the product-moment
       correlation coefficient between the elements of the co-membership
       matrices \eqn{C(u) = u u'} and \eqn{C(v)}, respectively, see Katz
       and Powell (1953).  For soft partitions, (currently) the
-      Katz-Powell index of the corresponding \dQuote{nearest} hard
-      partitions is used.  (Note that for hard partitions, the
-      \eqn{(i,j)} entry of \eqn{C(u)} is one iff objects \eqn{i} and
-      \eqn{j} are in the same class.)}
+      Katz-Powell index of the corresponding nearest hard partitions is
+      used.  (Note that for hard partitions, the \eqn{(i,j)} entry of
+      \eqn{C(u)} is one iff objects \eqn{i} and \eqn{j} are in the same
+      class.)}
     \item{\code{"angle"}}{the maximal cosine of the angle between the
       elements of \eqn{u} and all column permutations of \eqn{v}.}
     \item{\code{"diag"}}{the maximal co-classification rate, i.e., the
@@ -75,7 +75,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
       numbers of distinct pairs of objects in the same class in both
       partitions and in at least one partition, respectively.
       For soft partitions, (currently) the Jaccard index of the
-      corresponding \dQuote{nearest} hard partitions is used.}
+      corresponding nearest hard partitions is used.}
     \item{\code{"FM"}}{the index of Fowlkes and Mallows (1983), i.e.,
       the ratio \eqn{N_{xy} / \sqrt{N_x N_y}}{N_xy / sqrt(N_x N_y)} of
       the number \eqn{N_{xy}}{N_xy} of distinct pairs of objects in the
@@ -84,7 +84,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
       the same class in partition \eqn{x} and partition \eqn{y},
       respectively.
       For soft partitions, (currently) the Fowlkes-Mallows index of the
-      corresponding \dQuote{nearest} hard partitions is used.}
+      corresponding nearest hard partitions is used.}
   }
 
   If all components are hierarchies, available built-in methods for
@@ -108,6 +108,10 @@ cl_agreement(x, y = NULL, method = "euclidean")
       and \eqn{v_{ij} > v_{kl}}).  (This agreement measure is a linear
       transformation of Kruskal's \eqn{\gamma}{gamma}.)}
   }
+
+  The measures based on ultrametrics also allow computing agreement with
+  \dQuote{raw} dissimilarities on the underlying objects (R objects
+  inheriting from class \code{"dist"}).
 
   If a user-defined agreement method is to be employed, it must be a
   function taking two clusterings as its arguments.
@@ -177,6 +181,15 @@ hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
 hens <- cl_ensemble(list = hclust_results)
 names(hens) <- hclust_methods 
 summary(c(cl_agreement(hens)))
+## Note that the Euclidean agreements are *very* small.
+## This is because the ultrametrics differ substantially in height:
+u <- lapply(hens, cl_ultrametric)
+round(sapply(u, max), 3)
+## Rescaling the ultrametrics to [0, 1] gives:
+u <- lapply(u, function(x) (x - min(x)) / (max(x) - min(x)))
+shens <- cl_ensemble(list = lapply(u, as.cl_hierarchy))
+summary(c(cl_agreement(shens)))
+## Au contraire ...
 summary(c(cl_agreement(hens, method = "cophenetic")))
 cl_agreement(hens[1:3], hens[4:5], method = "gamma")
 }

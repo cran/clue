@@ -35,11 +35,14 @@ function(x, k, m = 1, control = list())
         inherits(clusterings, "cl_partition_ensemble")
 
     if(is_partition_ensemble) {
-        ## Canonicalize by turning into an ensemble of membership
-        ## matrices with the same (minimal) number of columns.
-        memberships <- lapply(clusterings, cl_membership,
-                              max(sapply(clusterings, n_of_classes)))
-        clusterings <- cl_ensemble(list = memberships)
+        ## Canonicalize by turning into an ensemble of partitions
+        ## represented by membership matrices with the same (minimal)
+        ## number of columns.
+        memberships <-
+            lapply(clusterings, cl_membership,
+                   max(sapply(clusterings, n_of_classes)))
+        clusterings <-
+            cl_ensemble(list = lapply(memberships, as.cl_partition))
     }
 
     if(is.null(method)) {
@@ -154,7 +157,7 @@ function(x, k, m = 1, control = list())
                 call = match.call())
     attr(out, "converged") <- (iter <= maxiter)
     class(out) <- "cl_pclust"
-    out
+    as.cl_partition(out)
 }
 
 print.cl_pclust <-

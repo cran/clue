@@ -118,8 +118,8 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
     \item{\code{"GV3"}}{a SUMT algorithm for the \dQuote{third model} in
       Gordon and Vichi (2001) for minimizing \eqn{L} with \eqn{d} being
-      co-membership dissimilarity.  See \code{\link{ls_fit_ultrametric}}
-      for more information on the SUMT approach.  This optimization
+      co-membership dissimilarity.  (See \code{\link{ls_fit_ultrametric}}
+      for more information on the SUMT approach.)  This optimization
       problem is equivalent to finding the membership matrix \eqn{m} for
       which the sum of the squared differences between \eqn{C(m) = m m'}
       and the weighted average co-membership matrix \eqn{\sum_b w_b
@@ -150,7 +150,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   
   \describe{
     \item{\code{"cophenetic"}}{an algorithm for minimizing
-      \eqn{L(u) = \sum w_b d(x_b, u) ^ 2} over all ultrametrics, where
+      \eqn{L(x) = \sum w_b d(x_b, x) ^ 2} over all dendrograms, where
       \eqn{d} is Euclidean dissimilarity.  This is equivalent to finding
       the best least squares ultrametric approximation of the weighted
       average \eqn{d = \sum w_b u_b} of the ultrametrics \eqn{u_b} of
@@ -160,14 +160,14 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     
     \item{\code{"majority"}}{a hierarchy obtained from an extension of
       the majority consensus tree of Margush and McMorris (1981), which
-      minimizes \eqn{L(u) = \sum w_b d(x_b, u)} over all ultrametrics,
+      minimizes \eqn{L(x) = \sum w_b d(x_b, x)} over all dendrograms,
       where \eqn{d} is the symmetric difference dissimilarity.  The
       unweighted majority tree is the \eqn{n}-tree (hierarchy in the
       strict sense) consisting of all subsets of objects contained in
       more than half the \eqn{n}-trees $T_b$ induced by the dendrograms.
       In the weighted case, it consists of all subsets \eqn{A} for which
       \eqn{\sum_{b: A \in T_b} w_b > W / 2}, where \eqn{W = \sum_b w_b}.
-      The majority ultrametric returned is a representation of the
+      The majority dendrogram returned is a representation of the
       majority tree where all splits have height one.}
   }
 
@@ -225,7 +225,6 @@ cl_fuzziness(cl_ensemble(m1, m2))
 ## Do the "nearest" hard partitions fully agree?
 cl_dissimilarity(as.cl_hard_partition(m1),
                  as.cl_hard_partition(m2))
-## Hmm ...
 
 ## Consensus partition for the Gordon and Vichi (2001) macroeconomic
 ## partition data based on Euclidean dissimilarities.
@@ -244,8 +243,8 @@ sum(cl_dissimilarity(GVME, m2, "GV1") ^ 2)
 ## Seems we get a slightly  better solution ...
 ## But note that
 cl_dissimilarity(m1, m2, "GV1")
-## and that the maximal deviation is
-max(abs(m1 - m2))
+## and that the maximal deviation of the memberships is
+max(abs(cl_membership(m1) - cl_membership(m2)))
 ## so the differences seem to be due to rounding.
 ## Do the "nearest" hard partitions fully agree?
 table(cl_class_ids(m1), cl_class_ids(m2))

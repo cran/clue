@@ -116,13 +116,13 @@ set_cl_dissimilarity_method <-
 
 set_cl_dissimilarity_method("euclidean", "partition",
                             .cl_dissimilarity_partition_euclidean,
-                            "minimal euclidean membership distance")
+                            "minimal Euclidean membership distance")
 set_cl_dissimilarity_method("manhattan", "partition",
                             .cl_dissimilarity_partition_manhattan,
-                            "minimal manhattan membership distance")
+                            "minimal Manhattan membership distance")
 set_cl_dissimilarity_method("comemberships", "partition",
                             .cl_dissimilarity_partition_comemberships,
-                            "euclidean comembership distance")
+                            "Euclidean comembership distance")
 set_cl_dissimilarity_method("symdiff", "partition",
                             .cl_dissimilarity_partition_symdiff,
                             "symmetric difference distance")
@@ -147,10 +147,10 @@ set_cl_dissimilarity_method("BA/E", "partition",
 
 set_cl_dissimilarity_method("euclidean", "hierarchy",
                             .cl_dissimilarity_hierarchy_euclidean,
-                            "euclidean ultrametric distance")
+                            "Euclidean ultrametric distance")
 set_cl_dissimilarity_method("manhattan", "hierarchy",
                             .cl_dissimilarity_hierarchy_manhattan,
-                            "manhattan ultrametric distance")
+                            "Manhattan ultrametric distance")
 set_cl_dissimilarity_method("cophenetic", "hierarchy",
                             .cl_dissimilarity_hierarchy_cophenetic,
                             "cophenetic correlations")

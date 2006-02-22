@@ -47,7 +47,7 @@ cl_validity(x, ...)
   and
   \deqn{\mathrm{DEV} =
     \max\left(1 - \sum_{i,j} |d_{ij} - u_{ij}| /
-    \sum_{i,j} |d_{ij} - \mathrm{median}(d)| ^ 2, 0\right)}{
+    \sum_{i,j} |d_{ij} - \mathrm{median}(d)|, 0\right)}{
     max(1 - sum_{i,j} |d_{ij} - u_{ij}| /
     sum_{i,j} |d_{ij} - median(d)|, 0)}
   respectively.  Note that VAF and DEV are not invariant under rescaling

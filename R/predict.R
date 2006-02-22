@@ -83,6 +83,17 @@ function(object, newdata = NULL, ...)
     as.cl_membership(max.col(-d))
 }
 
+## Package RWeka: clusterers return objects inheriting from
+## "Weka_clusterer".
+cl_predict.Weka_clusterer <-
+function(object, newdata = NULL, ...)
+{
+    if(is.null(newdata))
+        return(cl_membership(object))
+    as.cl_membership(predict(object, newdata = newdata,
+                             type = "memberships", ...))
+}
+
 ## Package cba: ccfkms().
 cl_predict.ccfkms <-
 function(object, newdata = NULL, ...)
@@ -145,7 +156,6 @@ function(object, newdata = NULL, ...)
     
     d <- .rxdist(newdata, object$centers, method)
     power <- c(m, if(method == "euclidean") 2 else 1)
-
     as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
 }
 
@@ -202,35 +212,7 @@ function(object, newdata = NULL, ...)
     if(is.null(newdata))
         return(cl_membership(object))
 
-    ## Unfortunately, this is really very tricky.
-    ##
-    ## Currently, cl_plclust() is documented to partition by minimizing
-    ## \sum u_{bj}^m d(x_b, p_j)^2, where d is Euclidean dissimilarity.
-    ## But the approach more generally works for the criterion function
-    ## \sum u_{bj}^m d(x_b, p_j)^e with dissimilarity d and exponent e,
-    ## provided that there is a (weighted) consensus method for solving
-    ## \min_p \sum u_{bj}^m d(x_b, p)^e.  (Control parameters 'method'
-    ## and 'control' allow the specification of the method and control
-    ## parameters to be used for cl_consensus().)
-    ##
-    ## Hence, we should be able to infer d and e from the consensus
-    ## method used, e.g. by having consensus method family objects which
-    ## do not only provide the actual method called by cl_consensus(),
-    ## but also information on d and e (where applicable).
-    ##
-    ## Action plan:
-    ## Step 0. Short term, proceed according to the documentation.
-    ## Step 1. Have cl_pclust() at least return its call.
-    ## Step 2. Add some reflectance for the built-in consensus methods,
-    ##   e.g. by providing something like
-    ##     .builtin_consensus_method(type, name = NULL)
-    ##   (with 'type' indicating partition or hierarchy and 'name' the
-    ##   name of the method, such as "euclidean").
-    ##   See also the comments in .cl_consensus_partition_AO().
-    ## Step 3. Find a general solution ...
-    
     d <- object$d(newdata, object$prototypes)
     power <- c(object$m, object$e)
-
     as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
 }

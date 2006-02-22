@@ -1,23 +1,24 @@
 \name{lattice}
 \alias{cl_meet}
 \alias{cl_join}
-%\alias{Ops.cl_membership}
-%\alias{Summary.cl_membership}
-\title{Partition Lattice}
+\alias{Ops.cl_partition}
+\alias{Summary.cl_partition}
+\alias{Ops.cl_dendrogram}
+\alias{Summary.cl_dendrogram}
+\title{Cluster Lattices}
 \description{
-  Computations on the lattice of all (hard) partitions of a set of
-  objects: meet and join.
-  % No comparisons for the time being.
+  Computations on the lattice of all (hard) partitions, or the lattice
+  of all dendrograms, of a set of objects: meet, join, and comparisons.
 }
 \usage{
 cl_meet(x, y)
 cl_join(x, y)
 }
 \arguments{
-  \item{x}{an ensemble of partitions, or an R object representing a
-    partition.}
-  \item{y}{an R object representing a partition.  Ignored if \code{x} is
-    an ensemble of partitions.}
+  \item{x}{an ensemble of partitions or dendrograms, or an R object
+    representing a partition.}
+  \item{y}{an R object representing a partition or dendrogram.  Ignored
+    if \code{x} is an ensemble.}
 }
 \details{
   For a given finite set of objects \eqn{X}, the set \eqn{H(X)} of all
@@ -40,24 +41,36 @@ cl_join(x, y)
   and join of an arbitrary number of partitions can be defined
   recursively.
 
-% In addition to computing the meet and join, the comparison operations
-% corresponding to the above partial order as well as \code{min},
-% \code{max}, and \code{range} are available at least for R objects
-% representing partitions inheriting from
-% \code{"\link{cl_membership}"}.  The summary methods given the meet and
-% join of the given partitions (for \code{min} and \code{max}), or a
-% partition ensemble with the meet and join (for \code{range}).
+  In addition to computing the meet and join, the comparison operations
+  corresponding to the above partial order as well as \code{min},
+  \code{max}, and \code{range} are available at least for R objects
+  representing partitions inheriting from \code{"\link{cl_partition}"}.
+  The summary methods give the meet and join of the given partitions
+  (for \code{min} and \code{max}), or a partition ensemble with the meet
+  and join (for \code{range}).
 
   If the partitions specified by \code{x} and \code{y} are soft
-  partitions, the corresponding closest hard partitions are used.
+  partitions, the corresponding nearest hard partitions are used.
   Future versions may optionally provide suitable \dQuote{soft} (fuzzy)
   extensions for computing meets and joins.
+
+  The set of all dendrograms on \eqn{X} can be ordered using pointwise
+  inequality of the associated ultrametric dissimilarities: i.e., if
+  \eqn{D} and \eqn{E} are the dendrograms with ultrametrics \eqn{u} and
+  \eqn{v}, respectively, then \eqn{D \le E} if \eqn{u_{ij} \le v_{ij}}
+  for all pairs \eqn{(i, j)} of objects.  This again yields a lattice
+  (of dendrograms).  The meet of \eqn{D} and \eqn{E} are the dendrograms
+  with the maximal ultrametric dominated by \eqn{\min(u_{ij}, v_{ij})}
+  and the minimal ultrametric dominating \eqn{\max(u_{ij}, v_{ij})},
+  respectively, and can be obtained by applying single or complete
+  linkage hierarchical clustering to the minima and maxima, respectively.
+  
 }
 \value{
-  % For \code{cl_meet} and \code{cl_join},
-  An object inheriting from class
-  \code{"\link{cl_membership}"} with the memberships of the meet and
-  join, respectively.
+  For \code{cl_meet} and \code{cl_join}, an object of class
+  \code{"\link{cl_partition}"} or \code{"\link{cl_dendrogram}"} with the
+  class ids or ultrametric dissimilarities of the meet and join of the
+  partitions or dendrograms, respectively.
 }  
 \examples{
 ## Two simple partitions of 7 objects.
@@ -65,8 +78,8 @@ A <- as.cl_partition(c(1, 1, 2, 3, 3, 5, 5))
 B <- as.cl_partition(c(1, 2, 2, 3, 4, 5, 5))
 ## These disagree on objects 1-3, A splits objects 4 and 5 into
 ## separate classes.  Objects 6 and 7 are always in the same class.
-% (A <= B) || (B <= A)
-% ## (Neither partition is finer than the other.)
+(A <= B) || (B <= A)
+## (Neither partition is finer than the other.)
 cl_meet(A, B)
 cl_join(A, B)
 ## Meeting with the lumper (greatest) or joining with the splitter
@@ -75,7 +88,7 @@ C_lumper <- as.cl_partition(rep(1, n_of_objects(A)))
 cl_meet(cl_ensemble(A, B, C_lumper))
 C_splitter <- as.cl_partition(seq(length = n_of_objects(A)))
 cl_join(cl_ensemble(A, B, C_splitter))
-% ## Another way of computing the join:
-% range(A, B, C_splitter)$max
+## Another way of computing the join:
+range(A, B, C_splitter)$max
 }
 \keyword{cluster}

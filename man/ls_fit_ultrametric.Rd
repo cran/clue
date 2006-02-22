@@ -1,4 +1,5 @@
 \name{ls_fit_ultrametric}
+\encoding{UTF-8}
 \alias{ls_fit_ultrametric}
 \title{Least Squares Fit of Ultrametrics to Dissimilarities}
 \description{
@@ -6,11 +7,20 @@
   dissimilarity) to a given dissimilarity object.
 }
 \usage{
-ls_fit_ultrametric(x, control = list())
+ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
+                   control = list())
 }
 \arguments{
   \item{x}{a dissimilarity object inheriting from class
     \code{"\link{dist}"}.}
+  \item{method}{a character string indicating the fitting method to be
+    employed.  Must be one of \code{"SUMT"} (default), \code{"IP"}, or
+    \code{"IR"}, or a unique abbreviation thereof.}
+  \item{weights}{a numeric vector or matrix with non-negative weights
+    for obtaining a weighted least squares fit.  If a matrix, its
+    numbers of rows and columns must be the same as the number of
+    objects in \code{x}, and the lower diagonal part is used.
+    Otherwise, it is recycled to the number of elements in \code{x}.}
   \item{control}{a list of control parameters.  See \bold{Details}.}
 }
 \value{
@@ -18,26 +28,32 @@ ls_fit_ultrametric(x, control = list())
   optimal ultrametric distances.
 }
 \details{
-  With \eqn{L(u) = \sum (x - u)^2}, the problem to be solved is
-  minimizing \eqn{L} over all \eqn{u} satisfying the ultrametric
-  constraints (i.e., for all \eqn{i, j, k}, \eqn{u_{ij} \le \max(u_{ik},
-    u_{jk})}).  This problem is known to be NP hard (Krivanek and
-  Moravek, 1986).
+  With \eqn{L(u) = \sum w_{ij} (x_{ij} - u_{ij})^2}, the problem to be
+  solved is minimizing \eqn{L} over all \eqn{u} satisfying the
+  ultrametric constraints (i.e., for all \eqn{i, j, k}, \eqn{u_{ij} \le
+    \max(u_{ik}, u_{jk})}).  This problem is known to be NP hard
+  (Krivanek and Moravek, 1986).
 
-  We follow de Soete (1986) to use a heuristic based on an SUMT
-  (Sequential Unconstrained Minimization Technique) approach in turn
-  simplifying the suggestions in Carroll and Pruzansky (1980).  One
-  iteratively minimizes \eqn{L(u) + \rho_k P(u)}, where \eqn{P(u)} is a
-  non-negative function penalizing violations of the ultrametric 
-  constraints such that \eqn{P(u)} is zero iff \eqn{u} is an
-  ultrametric.  The \eqn{\rho} values are increased according to the
-  rule \eqn{\rho_{k+1} = q \rho_k} for some constant \eqn{q > 1}, until
-  convergence is obtained in the sense that the Euclidean distance
+  We provide three heuristics for solving this problem.
+
+  Method \code{"SUMT"} implements the SUMT (Sequential Unconstrained
+  Minimization Technique, Fiacco and McCormick, 1968) approach of de
+  Soete (1986) which in turn simplifies the suggestions in Carroll and
+  Pruzansky (1980).  One iteratively minimizes \eqn{L(u) + \rho_k P(u)},
+  where \eqn{P(u)} is a non-negative function penalizing violations of
+  the ultrametric constraints such that \eqn{P(u)} is zero iff \eqn{u}
+  is an ultrametric.  The \eqn{\rho} values are increased according to
+  the rule \eqn{\rho_{k+1} = q \rho_k} for some constant \eqn{q > 1},
+  until convergence is obtained in the sense that the Euclidean distance 
   between successive solutions \eqn{u_k} and \eqn{u_{k+1}} is small
   enough.  We then use a final rounding step to ensure that the returned
   object exactly satisfies the ultrametric constraints.  The starting
   value \eqn{u_0} is obtained by \dQuote{random shaking} of the given
-  dissimilarity object.
+  dissimilarity object.  If there are missing values in \code{x}, i.e.,
+  the given dissimilarities are \emph{incomplete}, we follow a
+  suggestion of de Soete (1984), imputing the missing values by the
+  weighted mean of the non-missing ones, and setting the corresponding
+  weights to zero.
 
   The unconstrained minimizations are carried out using either
   \code{\link[stats]{optim}} or \code{\link[stats]{nlm}}, using the
@@ -69,20 +85,96 @@ ls_fit_ultrametric(x, control = list())
   the number of objects in the dissimilarity object, suggesting to use
   the SUMT approach in favor of \code{\link[stats]{constrOptim}}.
 
-  It should be noted that the SUMT approach is a heuristic which can not
-  be guaranteed to find the global minimum.  Standard practice would
+  Method \code{"IP"} implements the Iterative Projection approach of
+  Hubert and Arabie (1995).  This iteratively projects the current
+  dissimilarities to the closed convex set given by the ultrametric
+  constraints (3-point conditions) for a single index triple \eqn{(i, j,
+    k)}, in fact replacing the two largest values among \eqn{d_{ij},
+    d_{ik}, d_{jk}} by their mean.  The following control parameters can
+  be provided via the \code{control} argument.
+
+  \describe{
+    \item{\code{maxiter}}{an integer giving the maximal number of
+      iterations to be employed.}
+    \item{\code{order}}{a permutation of the numbers from 1 to the
+      number of objects in \code{x}, specifying the order in which the
+      ultrametric constraints are considered.}
+    \item{\code{tol}}{a double indicating the maximal convergence
+      tolerance.  The algorithm stops if the total absolute change in
+      the dissimilarities in an iteration is less than \code{tol}.}
+    \item{\code{verbose}}{a logical indicating whether to provide some
+      output on minimization progress.  Defaults to
+      \code{getOption("verbose")}.}
+  }
+
+  Non-identical weights and incomplete dissimilarities are currently not
+  supported.
+
+  Method \code{"IR"} implements the Iterative Reduction approach
+  suggested by Roux (1988), see also Barthélémy and Guénoche (1991).
+  This is similar to the Iterative Projection method, but modifies the
+  dissimilarities between objects proportionally to the aggregated
+  change incurred from the ultrametric projections.  The following
+  control parameters can be provided via the \code{control} argument.
+
+  \describe{
+    \item{\code{maxiter}}{an integer giving the maximal number of
+      iterations to be employed.}
+    \item{\code{order}}{a permutation of the numbers from 1 to the
+      number of objects in \code{x}, specifying the order in which the
+      ultrametric constraints are considered.}
+    \item{\code{tol}}{a double indicating the maximal convergence
+      tolerance.  The algorithm stops if the total absolute change in
+      the dissimilarities in an iteration is less than \code{tol}.}
+    \item{\code{verbose}}{a logical indicating whether to provide some
+      output on minimization progress.  Defaults to
+      \code{getOption("verbose")}.}
+  }
+
+  Non-identical weights and incomplete dissimilarities are currently not
+  supported.
+
+  It should be noted that all methods are heuristics which can not be
+  guaranteed to find the global minimum.  Standard practice would
   recommend to use the best solution found in \dQuote{sufficiently many}
   replications of the base algorithm.
 }
 \references{
+  J.-P. Barthélémy and A. Guénoche (1991).
+  \emph{Trees and proximity representations}.
+  Chichester: John Wiley \& Sons.
+  ISBN 0-471-92263-3.
+  
   J. D. Carroll and S. Pruzansky (1980).
   Discrete and hybrid scaling models.
   In E. D. Lantermann and H. Feger (eds.), \emph{Similarity and Choice}.
   Bern (Switzerland): Huber.
+
+  A. V. Fiacco and G. P. McCormick (1968).
+  \emph{Nonlinear programming: Sequential unconstrained minimization
+    techniques}.
+  New York: John Wiley & Sons.
+
+  L. Hubert and P. Arabie (1995).
+  Iterative projection strategies for the least squares fitting of tree
+  structures to proximity data.
+  \emph{British Journal of Mathematical and Statistical Psychology},
+  \bold{48}, 281--317.
   
   M. Krivanek and J. Moravek (1986).
   NP-hard problems in hierarchical tree clustering.
   \emph{Acta Informatica}, \bold{23}, 311--323.
+  
+  M. Roux (1988).
+  Techniques of approximation for building two tree structures.
+  In C. Hayashi and E. Diday and M. Jambu and N. Ohsumi (Eds.),
+  \emph{Recent Developments in Clustering and Data Analysis}, pages
+  151--170.
+  New York: Academic Press.
+
+  G. de Soete (1984).
+  Ultrametric tree representations of incomplete dissimilarity data.
+  \emph{Journal of Classification}, \bold{1}, 235--242.
 
   G. de Soete (1986).
   A least squares algorithm for fitting an ultrametric tree to a
@@ -104,7 +196,7 @@ d <- 1 - as.dist(Phonemes)
 u <- ls_fit_ultrametric(d, control = list(verbose = TRUE))
 ## Cophenetic correlation:
 cor(d, u)
-## Dendrogram:
+## Plot:
 plot(u)
 ## ("Basically" the same as Figure 1 in de Soete (1986).)
 }

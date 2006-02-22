@@ -7,8 +7,8 @@
 cl_dissimilarity(x, y = NULL, method = "euclidean")
 }
 \arguments{
-  \item{x}{an ensemble of partitions or hierarchies, or something
-    coercible to that (see \code{\link{cl_ensemble}}).}
+  \item{x}{an ensemble of partitions or hierarchies and dissimilarities,
+    or something coercible to that (see \code{\link{cl_ensemble}}).}
   \item{y}{\code{NULL} (default), or as for \code{x}.}
   \item{method}{a character string specifying one of the built-in
     methods for computing dissimilarity, or a function to be taken as
@@ -27,7 +27,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
 \details{
   If \code{y} is given, its components must be of the same kind as those
   of \code{x} (i.e., components must either all be partitions, or all be
-  hierarchies).
+  hierarchies or dissimilarities).
 
   If all components are partitions, the following built-in methods for
   measuring dissimilarity between two partitions with respective
@@ -53,12 +53,11 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
       (Alternatively, the cardinality of the symmetric set difference
       between the (binary) equivalence relations corresponding to the
       partitions.)  For soft partitions, (currently) the symmetric set
-      difference of the corresponding \dQuote{nearest} hard partitions
-      is used.}
+      difference of the corresponding nearest hard partitions is used.}
     \item{\code{"Rand"}}{the Rand distance, i.e., the rate of distinct
       pairs of objects in the same class in exactly one of the
       partitions.  For soft partitions, (currectly) the Rand distance of
-      the corresponding \dQuote{nearest} hard partitions is used.}
+      the corresponding nearest hard partitions is used.}
     \item{\code{"GV1"}}{the square root of the dissimilarity
       \eqn{\Delta_1}{Delta_1} used for the first model in Gordon and
       Vichi (2001), i.e., the square root of the minimal sum of the
@@ -67,7 +66,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
     \item{\code{"BA/\var{d}"}}{distance measures for hard partitions
       discussed in Boorman and Arabie (1972), with \var{d} one of
       \samp{A}, \samp{C}, \samp{D}, or \samp{E}.  For soft partitions,
-      the distances of the corresponding closest hard partitions are
+      the distances of the corresponding nearest hard partitions are
       used.
 
       \code{"BA/A"} is the minimum number of single element moves (move
@@ -119,7 +118,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   number of single element moves distance of Boorman and Arabie.
 
   If all components are hierarchies, available built-in methods for
-  measuring agreement between two hierarchies with respective
+  measuring dissimilarity between two hierarchies with respective
   ultrametrics \eqn{u} and \eqn{v} are as follows.
 
   \describe{
@@ -141,6 +140,10 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
       objects obtained by a split in exactly one of the hierarchies.}
   }
 
+  The measures based on ultrametrics also allow computing dissimilarity
+  with \dQuote{raw} dissimilarities on the underlying objects (R objects
+  inheriting from class \code{"dist"}).
+
   If a user-defined agreement method is to be employed, it must be a
   function taking two clusterings as its arguments.
 
@@ -158,8 +161,6 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   extend this class), thus making it possible to use them directly for
   clustering algorithms based on dissimilarity matrices of this class,
   see the examples.
-
-  
 }
 \references{
   S. A. Boorman and P. Arabie (1972).
@@ -224,5 +225,11 @@ P1 <- as.cl_partition(c(1, 2, 2, 2, 3, 3, 2, 2))
 P2 <- as.cl_partition(c(1, 1, 2, 2, 3, 3, 4, 4))
 cl_dissimilarity(P1, P2, "BA/A")
 cl_dissimilarity(P1, P2, "BA/C")
+
+## Hierarchical clustering.
+d <- dist(USArrests)
+x <- hclust(d)
+cl_dissimilarity(x, d, "cophenetic")
+cl_dissimilarity(x, d, "gamma")
 }
 \keyword{cluster}
