@@ -92,8 +92,8 @@ function(x, y)
 function(x, y)
 {
     ## We used to have the straightforward
-    ##   C_x <- crossprod(t(cl_membership(x))) # M_x M_x'
-    ##   C_y <- crossprod(t(cl_membership(y))) # M_y M_y'
+    ##   C_x <- tcrossprod(cl_membership(x)) # M_x M_x'
+    ##   C_y <- tcrossprod(cl_membership(y)) # M_y M_y'
     ##   sum((C_x - C_y) ^ 2) / n_of_objects(x) ^ 2
     ## But note that
     ##   \| AA' - BB' \|^2
@@ -281,6 +281,32 @@ function(x, y)
         s <- s + sum(is.na(match(sx, sy))) + sum(is.na(match(sy, sx)))
     }
     s
+}
+
+### ** .cl_dissimilarity_hierarchy_Chebyshev
+
+.cl_dissimilarity_hierarchy_Chebyshev <-
+function(x, y)
+{
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u <- cl_object_dissimilarities(x)
+    v <- cl_object_dissimilarities(y)
+    max(abs(u - v))
+}
+
+### ** .cl_dissimilarity_hierarchy_Lyapunov
+
+.cl_dissimilarity_hierarchy_Lyapunov <-
+function(x, y)
+{
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    q <- cl_object_dissimilarities(x) / cl_object_dissimilarities(y)
+    if(is.matrix(q)) q <- q[lower.tri(q)]
+    log(max(q) / min(q))
 }
 
 ### * as.dist.cl_dissimilarity

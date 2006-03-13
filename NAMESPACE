@@ -7,39 +7,32 @@ export("cl_agreement",
        "cl_boot",
        "cl_consensus",
        "cl_dissimilarity",
-       "cl_ensemble",
-       "as.cl_ensemble",
-       "is.cl_ensemble",
+       "cl_ensemble", "as.cl_ensemble", "is.cl_ensemble",
        "cl_fuzziness",
        "cl_join",
        "cl_margin",
        "cl_meet",
        "cl_medoid",
-       "cl_membership",
-       "as.cl_membership",
+       "cl_membership", "as.cl_membership",
+       "cl_object_names",
        "cl_pclust",
        "cl_predict",
        "cl_prototypes",
        "cl_tabulate",
-       "cl_ultrametric",
-       "as.cl_ultrametric",
+       "cl_ultrametric", "as.cl_ultrametric",
        "ls_fit_ultrametric",
        "ls_fit_ultrametric_target",
        "l1_fit_ultrametric_target",
        "cl_validity",
        "n_of_objects",
        "n_of_classes",
-       "cl_class_ids",
+       "cl_class_ids", "as.cl_class_ids",
        "cl_classes",
-       "is.cl_partition",
-       "as.cl_partition",
-       "is.cl_hard_partition",
-       "as.cl_hard_partition",
-       "is.cl_soft_partition",
-       "is.cl_dendrogram",
+       "is.cl_partition", "as.cl_partition",
+       "is.cl_hard_partition", "as.cl_hard_partition",
+       "is.cl_soft_partition", "is.cl_dendrogram",
        "as.cl_dendrogram",
-       "is.cl_hierarchy",
-       "as.cl_hierarchy",
+       "is.cl_hierarchy", "as.cl_hierarchy",
        "solve_LSAP")
 
 ## S3 methods, sorted alphabetically.
@@ -82,7 +75,9 @@ S3method("cl_class_ids", "Weka_clusterer")
 S3method("cl_class_ids", "bclust")
 S3method("cl_class_ids", "ccfkms")
 S3method("cl_class_ids", "cclust")
+S3method("cl_class_ids", "cl_class_ids")
 S3method("cl_class_ids", "cl_membership")
+S3method("cl_class_ids", "cl_partition")
 S3method("cl_class_ids", "cl_partition_by_class_ids")
 S3method("cl_class_ids", "cl_pclust")
 S3method("cl_class_ids", "cshell")
@@ -104,6 +99,7 @@ S3method("cl_membership", "Mclust")
 S3method("cl_membership", "bclust")
 S3method("cl_membership", "cclust")
 S3method("cl_membership", "cl_membership")
+S3method("cl_membership", "cl_partition")
 S3method("cl_membership", "cl_pclust")
 S3method("cl_membership", "cshell")
 S3method("cl_membership", "default")
@@ -113,7 +109,9 @@ S3method("cl_membership", "flexmix")
 S3method("cl_membership", "kmeans")
 S3method("cl_membership", "partition")
 
+S3method("cl_object_names", "cl_hierarchy")
 S3method("cl_object_names", "cl_membership")
+S3method("cl_object_names", "cl_partition")
 S3method("cl_object_names", "cl_ultrametric")
 S3method("cl_object_names", "default")
 S3method("cl_object_names", "hclust")
@@ -123,6 +121,7 @@ S3method("cl_object_names", "twins")
 S3method("cl_predict", "Weka_clusterer")
 S3method("cl_predict", "bclust")
 S3method("cl_predict", "cclust")
+S3method("cl_predict", "cl_partition")
 S3method("cl_predict", "cl_pclust")
 S3method("cl_predict", "ccfkms")
 S3method("cl_predict", "clara")
@@ -139,6 +138,7 @@ S3method("cl_prototypes", "bclust")
 S3method("cl_prototypes", "ccfkms")
 S3method("cl_prototypes", "cclust")
 S3method("cl_prototypes", "cl_pclust")
+S3method("cl_prototypes", "cl_partition")
 S3method("cl_prototypes", "clara")
 S3method("cl_prototypes", "cshell")
 S3method("cl_prototypes", "fclust")
@@ -206,6 +206,7 @@ S3method("n_of_classes", "Mclust")
 S3method("n_of_classes", "bclust")
 S3method("n_of_classes", "cclust")
 S3method("n_of_classes", "cl_membership")
+S3method("n_of_classes", "cl_partition")
 S3method("n_of_classes", "cl_pclust")
 S3method("n_of_classes", "cshell")
 S3method("n_of_classes", "default")
@@ -218,7 +219,9 @@ S3method("n_of_objects", "Mclust")
 S3method("n_of_objects", "bclust")
 S3method("n_of_objects", "cclust")
 S3method("n_of_objects", "cl_ensemble")
+S3method("n_of_objects", "cl_hierarchy")
 S3method("n_of_objects", "cl_membership")
+S3method("n_of_objects", "cl_partition")
 S3method("n_of_objects", "cl_pclust")
 S3method("n_of_objects", "cl_ultrametric")
 S3method("n_of_objects", "cshell")
@@ -233,8 +236,10 @@ S3method("n_of_objects", "twins")
 
 S3method("names", "cl_proximity")
 
+S3method("plot", "cl_dendrogram")
 S3method("plot", "cl_ultrametric")
 
+S3method("print", "cl_class_ids")
 S3method("print", "cl_cross_proximity")
 S3method("print", "cl_dendrogram")
 S3method("print", "cl_dendrogram_ensemble")

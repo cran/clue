@@ -160,6 +160,12 @@ set_cl_dissimilarity_method("gamma", "hierarchy",
 set_cl_dissimilarity_method("symdiff", "hierarchy",
                             .cl_dissimilarity_hierarchy_symdiff,
                             "symmetric difference distance")
+set_cl_dissimilarity_method("Chebyshev", "hierarchy",
+                            .cl_dissimilarity_hierarchy_Chebyshev,
+                            "Chebyshev distance")
+set_cl_dissimilarity_method("Lyapunov", "hierarchy",
+                            .cl_dissimilarity_hierarchy_Lyapunov,
+                            "Lyapunov distance")
 
 ### * Agreement Method Registration.
 

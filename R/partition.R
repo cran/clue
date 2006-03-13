@@ -47,6 +47,10 @@ function(x)
     attr(x, "n_of_classes")
 ## Package clue: cl_pclust().
 n_of_classes.cl_pclust <- n_of_classes.fanny
+## Package clue: (virtual) class "cl_partition".
+n_of_classes.cl_partition <-
+function(x)
+    n_of_classes(.get_representation(x))
 
 ### * cl_class_ids
 
@@ -65,7 +69,11 @@ cl_class_ids.default <-
 function(x)
 {
     ## Assume data structure returned by kmeans.
-    x$cluster
+    ## But only if this gives "something" ...
+    ids <- x$cluster
+    if(!length(ids))
+        stop("Cannot infer class ids from given object.")
+    as.cl_class_ids(ids)
 }
 
 ## Package stats: kmeans() (R 2.1.0 or better).
@@ -75,22 +83,22 @@ cl_class_ids.kmeans <- cl_class_ids.default
 ## respective class inheriting from class "partition".
 cl_class_ids.partition <-
 function(x)
-    x$clustering
+    as.cl_class_ids(x$clustering)
 
 ## Package RWeka: clusterers return objects inheriting from
 ## "Weka_clusterer".
 cl_class_ids.Weka_clusterer <-
 function(x)
-    x$class_ids
+    as.cl_class_ids(x$class_ids)
 
 ## Package cba: ccfkms().
 cl_class_ids.ccfkms <-
 function(x)
-    as.vector(x$cl)
+    as.cl_class_ids(as.vector(x$cl))
 ## Package cba: rockCluster() returns objects of class "rock".
 cl_class_ids.rock <-
 function(x)
-    as.vector(x$cl)
+    as.cl_class_ids(as.vector(x$cl))
 
 ## Package cclust: cclust().
 cl_class_ids.cclust <- cl_class_ids.default
@@ -106,36 +114,71 @@ cl_class_ids.bclust <- cl_class_ids.default
 ## extends S4 class "flexclust".
 cl_class_ids.kcca <-
 function(x)
-    flexclust::cluster(x)
+    as.cl_class_ids(flexclust::cluster(x))
 
 ## Package flexmix: class "flexmix".
 cl_class_ids.flexmix <-
 function(x)
-    flexmix::cluster(x)
+    as.cl_class_ids(flexmix::cluster(x))
 
 ## Package kernlab: specc() and kkmeans() return objects of S4 class
 ## "specc".
 cl_class_ids.specc <-
 function(x)
-    as.vector(unclass(x))
+{
+    tmp <- unclass(x)
+    as.cl_class_ids(structure(as.vector(tmp), names = names(tmp)))
+}
 
 ## Package mclust: Mclust().
 cl_class_ids.Mclust <-
 function(x)
-    x$classification
+    as.cl_class_ids(x$classification)
 
+## Package clue: Class ids.
+cl_class_ids.cl_class_ids <- .identity
 ## Package clue: Memberships.
 cl_class_ids.cl_membership <-
 function(x)
-    max.col(x)
+    as.cl_class_ids(structure(max.col(x), names = rownames(x)))
 ## (Cannot do cl_class_ids.cl_membership <- max.col for generic/method
 ## consistency.)
 ## Package clue: cl_partition_by_class_ids().
 cl_class_ids.cl_partition_by_class_ids <-
 function(x)
-    unclass(x)
+    .get_representation(x)
 ## Package clue: cl_pclust().
 cl_class_ids.cl_pclust <- cl_class_ids.default
+## Package clue: (virtual) class "cl_partition".
+cl_class_ids.cl_partition <-
+function(x)
+    cl_class_ids(.get_representation(x))
+
+### * as.cl_class_ids
+
+as.cl_class_ids <-
+function(x)
+{
+    ## For the time being, handle only "raw" class ids.
+    ## Maybe add methods handling factors lateron (if necessary).
+    ## <NOTE>
+    ## This could also be used to canonicalize returned class ids
+    ## according to the docs (vector of integers with the class ids),
+    ## using someting like
+    ##   match(ids, unique(ids))
+    ## </NOTE>
+    structure(unclass(x), class = "cl_class_ids")
+}
+
+### * print.cl_class_ids
+
+print.cl_class_ids <-
+function(x, ...)
+{
+    writeLines("Class ids:")
+    print(unclass(x), ...)
+    invisible(x)
+}
 
 ### * cl_class_labels
 
@@ -242,19 +285,16 @@ function(x)
 
 print.cl_partition <-
 function(x, ...)
-{
-    writeLines(gettext("An object from virtual class 'cl_partition', with representation:\n"))
-    NextMethod("print")
-}
+    .print_container(x, "cl_partition", ...)
 
 ### * print.cl_partition_by_class_ids
 
 print.cl_partition_by_class_ids <-
 function(x, ...)
 {
-    writeLines(gettextf("A hard partition of %d objects, with class ids:",
+    writeLines(gettextf("A hard partition of %d objects.",
                         n_of_objects(x)))
-    print(cl_class_ids(x))
+    print(cl_class_ids(x), ...)
     invisible(x)
 }
 
@@ -263,8 +303,9 @@ function(x, ...)
 print.cl_partition_by_memberships <-
 function(x, ...)
 {
-    writeLines(gettextf("A partition of %d objects.", n_of_objects(x)))
-    print(cl_membership(x))
+    writeLines(gettextf("A partition of %d objects.",
+                        n_of_objects(x)))
+    print(cl_membership(x), ...)
     invisible(x)
 }
 
@@ -344,9 +385,25 @@ function(x, labels = NULL)
     ## Play with labels vs names later ...
     attr(x, "Labels") <- labels
     ## </FIXME>
-    .make_container(x,
+    ## <FIXME>
+    ## Perhaps give the raw class ids more structure?
+    ## E.g, class "cl_class_ids"?
+    ## Problem is that we used to say about extensibility that all there
+    ## is to do for a hard partitioner is to add a cl_class_ids() method
+    ## and two predicates, but *not* to have the former give a suitably
+    ## classed object.  On the other hand, the recipe would need to be
+    ## extended for soft partitioners, for which it would be necessary
+    ## to provide a cl_membership() method which really returns an
+    ## object of class cl_membership.  Note that we can do this using
+    ## as.cl_membership(m), where m is the raw membership matrix.  So
+    ## maybe we should ask for using as.cl_class_ids() to coerce raw
+    ## class ids ...
+    .make_container(as.cl_class_ids(x),
                     c("cl_partition_by_class_ids",
-                      .cl_hard_partition_classes))
+                      .cl_hard_partition_classes),
+                    list(n_of_objects = length(x),
+                         n_of_classes = length(unique(x))))
+    ## </FIXME>
 }
 
 ### * cl_partition_by_memberships
@@ -369,7 +426,8 @@ function(x, labels = NULL)
     ## </FIXME>
     .make_container(as.cl_membership(x),
                     c("cl_partition_by_memberships",
-                      .cl_partition_classes))
+                      .cl_partition_classes),
+                    list(n_of_objects = nrow(x)))
 }
 
 ### * is.cl_hard_partition
@@ -452,8 +510,9 @@ is.cl_hard_partition.cl_partition <-
 function(x)
 {
     ## If the object has a cl_membership representation ...
-    if(inherits(x, "cl_membership"))
-        attr(x, "is_cl_hard_partition")
+    y <- .get_representation(x)
+    if(inherits(y, "cl_membership"))
+        attr(y, "is_cl_hard_partition")
     ## Other representations, e.g. for "definitely" hard partitions via
     ## vectors of class ids or class labels, or a list of classes, may
     ## be added in future versions.
@@ -461,7 +520,7 @@ function(x)
     ## as.cl_partition() [which currently runs as.cl_membership() in
     ## case is.cl_partition() gives false].
     else
-        NextMethod("is.cl_hard_partition")
+        is.cl_hard_partition(y)
 }
 ## Package clue: cl_pclust().
 is.cl_hard_partition.cl_pclust <- is.cl_hard_partition.fanny
@@ -529,10 +588,11 @@ function(x)
 .maybe_is_proper_soft_partition.cl_partition <-
 function(x)
 {
-    if(inherits(x, "cl_membership"))
-        !attr(x, "is_cl_hard_partition")
+    y <- .get_representation(x)
+    if(inherits(y, "cl_membership"))
+        !attr(y, "is_cl_hard_partition")
     else
-        NextMethod(".maybe_is_proper_soft_partition")
+        .maybe_is_proper_soft_partition(y)
 }
 .maybe_is_proper_soft_partition.cl_pclust <-
 function(x)

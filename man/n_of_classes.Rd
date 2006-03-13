@@ -1,15 +1,19 @@
 \name{n_of_classes}
 \alias{n_of_classes}
 \alias{cl_class_ids}
+\alias{as.cl_class_ids}
 \title{Classes in a Partition}
 \description{Determine the number of classes and the class ids in a
   partition of objects.}
 \usage{
 n_of_classes(x)
 cl_class_ids(x)
+as.cl_class_ids(x)
 }
 \arguments{
-  \item{x}{an object representing a (hard or soft) partition.}
+  \item{x}{an object representing a (hard or soft) partition (for
+    \code{n_of_classes} and \code{cl_class_ids}), or raw class ids (for
+    \code{as.cl_class_ids}).}
 }
 \value{
   For \code{n_of_classes}, an integer giving the number of classes in
@@ -32,6 +36,9 @@ cl_class_ids(x)
   Note that the number of classes is taken as the number of distinct
   class ids actually used in the partition, and may differ from the
   number of columns in a membership matrix representing the partition.
+
+  \code{as.cl_class_ids} can be used for coercing \dQuote{raw} class
+  ids (given as atomic vectors) to class id objects.
 }
 \seealso{
   \code{\link{is.cl_partition}}

@@ -10,7 +10,9 @@ cl_membership(x, k = n_of_classes(x))
 as.cl_membership(x)
 }
 \arguments{
-  \item{x}{an R object representing a partition of objects.}
+  \item{x}{an R object representing a partition of objects (for
+    \code{cl_membership}) or raw memberships or class ids (for
+    \code{as.cl_membership}).}
   \item{k}{an integer giving the number of columns (corresponding to
     class ids) to be used in the membership matrix.  Must not be less,
     and default to, the number of classes in the partition.}

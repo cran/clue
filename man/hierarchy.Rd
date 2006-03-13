@@ -5,6 +5,7 @@
 \alias{cl_dendrogram}		% class ...
 \alias{is.cl_dendrogram}
 \alias{as.cl_dendrogram}
+\alias{plot.cl_dendrogram}
 \title{Hierarchies}
 \description{
   Determine whether an R object represents a hierarchy of objects, or
@@ -81,7 +82,7 @@ as.cl_dendrogram(x)
 
   There are group methods for comparing dendrograms and computing their
   minimum, maximum, and range based on the meet and join operations, see
-  \code{\link{cl_meet}}.
+  \code{\link{cl_meet}}.  There is also a plot method.
 }
 \examples{
 hcl <- hclust(dist(USArrests))

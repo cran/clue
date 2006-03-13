@@ -1,3 +1,5 @@
+## * Matrix utilities
+
 .one_entry_per_column <-
 function(x, j)
 {
@@ -17,9 +19,64 @@ function(x, j, value)
     x
 }
 
+## <FIXME>
+## Transition function.
+## Remove once R 2.3.0 is out and required.
+.tcrossprod <- if(exists("tcrossprod", envir = baseenv())) {
+    tcrossprod
+} else {
+    function(x, y = NULL) {
+        if(is.null(y))
+            x %*% t(x)
+        else
+            x %*% t(y)
+    }
+}
+## </FIXME>
+
+## * Containers
+
+## Creator.
 .make_container <-
-function(x, classes)
-    structure(x, class = unique(c(classes, class(x))))
+function(x, classes, properties = NULL)
+    structure(list(.Data = x, .Meta = properties),
+              class = unique(classes))
+
+## Getters.
+.get_representation <-
+function(x)
+    x$.Data
+.get_properties <-
+function(x)
+    x$.Meta
+.get_property <-
+function(x, which)
+    x$.Meta[[which]]
+.has_property <-
+function(x, which)
+    which %in% names(x$.Meta)
+.get_property_from_object_or_representation <-
+function(x, which, getter)
+{
+    if(.has_property(x, which))
+        .get_property(x, which)
+    else {
+        if(missing(getter)) getter <- get(which)
+        getter(.get_representation(x))
+    }
+}
+
+## Methods (sort of).
+.print_container <-
+function(x, cls, ...)
+{
+    writeLines(gettextf("An object of virtual class '%s', with representation:\n",
+                        cls))
+    print(.get_representation(x), ...)
+    invisible(x)
+}
+    
+## * Others
 
 weighted_median <-
 function(x, w = 1, na.rm = FALSE)

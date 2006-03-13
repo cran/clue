@@ -138,6 +138,15 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
       difference of the sets of classes (hierarchies in the strict
       sense) induced by the dendrograms.  I.e., the number of sets of
       objects obtained by a split in exactly one of the hierarchies.}
+    \item{\code{"Chebyshev"}}{the Chebyshev (maximal) dissimilarity of
+      the ultrametrics (i.e., the maximum of the absolute differences of
+      \eqn{u} and \eqn{v}).}
+    \item{\code{"Lyapunov"}}{the logarithm of the product of the
+      maximal and minimal ratios of the ultrametrics.  This is also
+      known as the \dQuote{Hilbert projective metric} on the cone
+      represented by the ultrametrics (e.g., Jardine & Sibson (1971),
+      page 107), and only defined for \emph{strict} ultrametrics (which
+      are strictly positive for distinct objects).}
   }
 
   The measures based on ultrametrics also allow computing dissimilarity
@@ -193,6 +202,10 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   Partition-distance: A problem and class of perfect graphs arising in
   clustering.
   \emph{Information Processing Letters}, \bold{82}, 159--164.
+
+  N. Jardine and E. Sibson (1971).
+  \emph{Mathematical Taxonomy}.
+  London: Wiley.
 
   C. Rajski (1961).
   A metric space of discrete probability distributions,

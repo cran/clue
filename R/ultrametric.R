@@ -3,7 +3,14 @@
 cl_ultrametric <-
 function(x, size = NULL, labels = NULL) 
 {
-    if(!inherits(x, "cl_ultrametric")) {
+    if(inherits(x, "cl_hierarchy")) {
+        ## <FIXME>
+        ## Strictly, not every hierarchy corresponds to an ultrametric.
+        ## </FIXME>
+        return(cl_ultrametric(.get_representation(x),
+                              size = size, labels = labels))
+    }
+    else if(!inherits(x, "cl_ultrametric")) {
         ## Try using cophenetic().
         ## This starts by coercing to hclust, which has methods for all
         ## currently supported hierarchical classification methods.
@@ -141,6 +148,8 @@ function(x, weights = 1, control = list())
     w <- weights / sum(weights)
 
     ## Control parameters.
+    ## <FIXME>
+    ## Note that the same defaults are used by SUMT() ...
     eps <- control$eps
     ## <TODO>
     ## Maybe divide by length(x) to force maximal non-ultrametricity
@@ -159,6 +168,7 @@ function(x, weights = 1, control = list())
     verbose <- control$verbose
     if(is.null(verbose))
         verbose <- getOption("verbose")
+    ## </FIXME>
     ## Do this at last ...
     control <- as.list(control$control)
 
@@ -193,6 +203,7 @@ function(x, weights = 1, control = list())
         ## the ultrametricity constraint.
         .non_ultrametricity(.symmetric_matrix_from_veclh(d, n))
     }
+    grad_L <- function(d) 2 * w * (d - x)
     grad_P <- function(d) {
         d <- .symmetric_matrix_from_veclh(d, n)
         n <- nrow(d)
@@ -201,74 +212,13 @@ function(x, weights = 1, control = list())
                         PACKAGE = "clue")$gr, n, n)
         gr[row(gr) > col(gr)]
     }
-    Phi <- function(rho, d) L(d) + rho * P(d)
-    grad_Phi <- function(rho, d) {
-        2 * w * (d - x) + rho * grad_P(d)
-    }
 
-    make_Phi <- if(method == "nlm") {
-        function(rho) {
-            function(d) {
-                y <- Phi(rho, d)
-                attr(y, "gradient") <- grad_Phi(rho, d)
-                y
-            }
-        }
-    }
-    else
-        function(rho) {
-            function(d)
-                Phi(rho, d)
-        }
-    make_grad_Phi <- function(rho) { function(d) grad_Phi(rho, d) }
-
-    ## <NOTE>
-    ## For the penalized minimization, the Newton-type nlm() may be
-    ## computationally infeasible (although it works much faster on the
-    ## Phonemes data).
-    ## De Soete recommends using Conjugate Gradients.
-    ## We provide a simple choice: by default, optim(method = "CG") is
-    ## used.  If control$method is non-null and not "nlm", we use
-    ## optim() with this method.  In both cases, control$control gives
-    ## the control parameters for optim().
-    ## If control$method is "nlm", nlm() is used, in which case
-    ## control$control is ignored.  Note that we *must* call nlm() which
-    ## checking analyticals turned off, as in fact the penalty function
-    ## is not even continuous ...
-    optimize_with_penalty <- if(method == "nlm")
-        function(rho, d)
-            nlm(make_Phi(rho), d, check.analyticals = FALSE) $ estimate
-    else {
-        function(rho, d)
-            optim(d, make_Phi(rho), gr = make_grad_Phi(rho),
-                  method = method, control = control) $ par
-    }
-    ## </NOTE>
-    
     ## Initialize by "random shaking".  Use sd() for simplicity.
-    d_old <- x
     d <- x + rnorm(length(x), sd = sd(x) / 3)
-    ## <TODO>
-    ## Better upper/lower bounds for rho?
-    rho <- L(d) / max(P(d), 0.00001)
-    ## </TODO>
-
-    iter <- 1
-    ## <TODO>
-    ## Shouldnt't we also have maxiter, just in case ...?
-    ## </TODO>
-    while(sum((d_old - d) ^ 2) >= eps) {
-        if(verbose)
-            cat("Iteration:", iter,
-                "Rho:", rho,
-                "P:", P(d),
-                "\n")
-        d_old <- d
-        d <- optimize_with_penalty(rho, d)
-        iter <- iter + 1        
-        rho <- q * rho
-    }
-
+    ## And now ...
+    d <- SUMT(d, L, P, grad_L, grad_P, method = method, eps = eps,
+              q = q, verbose = verbose, control = control)
+    
     ## Round to enforce ultrametricity, and hope for the best ...
     ## Alternatively, we could try running one more optimization step
     ## with just the penalty function.
@@ -393,10 +343,10 @@ function(x, weights = 1, control = list())
 ls_fit_ultrametric_target <-
 function(x, y, weights = 1)
 {
-    if(identical(weights, 1))           # Default.
-        fitter <- function(x, w) mean(x)
+    fitter <- if(identical(weights, 1)) # Default.
+        function(x, w) mean(x)
     else
-        fitter <- function(x, w) weighted.mean(x, w)
+        function(x, w) weighted.mean(x, w)
     .fit_ultrametric_target(x, y, weights, fitter)
 }
 
@@ -405,10 +355,10 @@ function(x, y, weights = 1)
 l1_fit_ultrametric_target <-
 function(x, y, weights = 1)
 {
-    if(identical(weights, 1))           # Default.
-        fitter <- function(x, w) median(x)
+    fitter <- if(identical(weights, 1)) # Default.
+        function(x, w) median(x)
     else
-        fitter <- function(x, w) weighted_median(x, w)
+        function(x, w) weighted_median(x, w)
     .fit_ultrametric_target(x, y, weights, fitter)
 }
 

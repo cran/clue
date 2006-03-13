@@ -216,3 +216,8 @@ function(object, newdata = NULL, ...)
     power <- c(object$m, object$e)
     as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
 }
+
+## Package clue: (virtual) class "cl_partition".
+cl_predict.cl_partition <-
+function(object, newdata = NULL, ...)
+    cl_predict(.get_representation(object), newdata = newdata, ...)
