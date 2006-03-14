@@ -59,11 +59,12 @@ cl_join(x, y)
   \eqn{D} and \eqn{E} are the dendrograms with ultrametrics \eqn{u} and
   \eqn{v}, respectively, then \eqn{D \le E} if \eqn{u_{ij} \le v_{ij}}
   for all pairs \eqn{(i, j)} of objects.  This again yields a lattice
-  (of dendrograms).  The meet of \eqn{D} and \eqn{E} are the dendrograms
-  with the maximal ultrametric dominated by \eqn{\min(u_{ij}, v_{ij})}
-  and the minimal ultrametric dominating \eqn{\max(u_{ij}, v_{ij})},
-  respectively, and can be obtained by applying single or complete
-  linkage hierarchical clustering to the minima and maxima, respectively.
+  (of dendrograms).  The join of \eqn{D} and \eqn{E} is the dendrogram
+  with ultrametrics given by \eqn{\max(u_{ij}, v_{ij})} (as this gives
+  an ultrametric); the meet is the dendrogram with the maximal
+  ultrametric dominated by \eqn{\min(u_{ij}, v_{ij})}, and can be
+  obtained by applying single linkage hierarchical clustering to the
+  minima.
   
 }
 \value{

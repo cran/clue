@@ -67,3 +67,8 @@ function(x)
 cl_prototypes.cl_pclust <-
 function(x)
     x$prototypes
+
+## Package clue: (virtual) class "cl_partition".
+cl_prototypes.cl_partition <-
+function(x)
+    cl_prototypes(.get_representation(x))

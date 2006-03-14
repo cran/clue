@@ -567,7 +567,7 @@ function(clusterings, weights, control)
 .cl_consensus_partition_GV3 <-
 function(clusterings, weights, control)
 {
-    ## Use a SUMT similar to the one in ls_fit_ultrametric() to solve
+    ## Use a SUMT to solve
     ##   \| Y - M M' \|_F^2 => min
     ## where M is a membership matrix and Y = \sum_b w_b M_b M_b'.
 
@@ -576,6 +576,8 @@ function(clusterings, weights, control)
     max_n_of_classes <- max(sapply(clusterings, n_of_classes))
 
     ## Control parameters.
+    ## <FIXME>
+    ## Note that the same defaults are used by SUMT() ...
     eps <- control$eps
     if(is.null(eps))
         eps <- .Machine$double.eps
@@ -594,6 +596,7 @@ function(clusterings, weights, control)
     verbose <- control$verbose
     if(is.null(verbose))
         verbose <- getOption("verbose")
+    ## </FIXME>
     ## Do this at last ...
     control <- as.list(control$control)
 
@@ -603,7 +606,7 @@ function(clusterings, weights, control)
         lapply(clusterings, function(x) {
             ## No need to force a common k here.
             M <- cl_membership(x)
-            M %*% t(M)
+            .tcrossprod(M)
         })
 
     Y <- matrix(rowSums(mapply("*", comemberships, w)), n)
@@ -616,60 +619,21 @@ function(clusterings, weights, control)
         start
     y <- c(Y)
 
-    L <- function(m) sum((y - crossprod(t(matrix(m, n)))) ^ 2)
+    L <- function(m) sum((y - .tcrossprod(matrix(m, n))) ^ 2)
     P <- function(m) {
         sum(pmin(m, 0) ^ 2) + sum((rowSums(matrix(m, n)) - 1) ^ 2)
     }
-    Phi <- function(rho, m) L(m) + rho * P(m)
-    grad_Phi <- function(rho, m) {
+    grad_L <- function(m) {
         M <- matrix(m, n)
-        4 * c((crossprod(t(M)) - Y) %*% M) +
-            2 * rho * (pmin(m, 0) + rep.int(rowSums(M) - 1, k))
+        4 * c((.tcrossprod(M) - Y) %*% M)
     }
-    
-    make_Phi <- if(method == "nlm") {
-        function(rho) {
-            function(m) {
-                y <- Phi(rho, m)
-                attr(y, "gradient") <- grad_Phi(rho, m)
-                y
-            }
-        }
+    grad_P <- function(m) {
+        M <- matrix(m, n)
+        2 * (pmin(m, 0) + rep.int(rowSums(M) - 1, k))
     }
-    else
-        function(rho) {
-            function(m)
-                Phi(rho, m)
-        }
-    make_grad_Phi <- function(rho) { function(m) grad_Phi(rho, m) }
 
-    optimize_with_penalty <- if(method == "nlm")
-        function(rho, m)
-            nlm(make_Phi(rho), m, check.analyticals = FALSE) $ estimate
-    else
-        function(rho, m)
-            optim(m, make_Phi(rho), gr = make_grad_Phi(rho),
-                  method = method, control = control) $ par
-
-    m <- c(M)
-    ## <TODO>
-    ## Better upper/lower bounds for rho?
-    rho <- max(L(m), 0.00001) / max(P(m), 0.00001)
-    ## </TODO>
-    iter <- 1
-    repeat {
-        if(verbose)
-            cat("Iteration:", iter,
-                "Rho:", rho,
-                "P:", P(m),
-                "\n")
-        m_old <- m
-        m <- optimize_with_penalty(rho, m)
-        if(sum((m_old - m) ^ 2) < eps)
-            break
-        iter <- iter + 1        
-        rho <- q * rho
-    }
+    m <- SUMT(c(M), L, P, grad_L, grad_P, method = method, eps = eps,
+              q = q, verbose = verbose, control = control)
 
     ## Ensure that a stochastic matrix is returned.
     M <- matrix(pmax(m, 0), n)
@@ -698,7 +662,7 @@ function(clusterings, weights, control)
     labels <- attr(ultrametrics[[1]], "Labels")
     d <- .dist_from_vector(dissimilarities, labels = labels)
     ## </FIXME>
-    as.cl_hierarchy(ls_fit_ultrametric(d, control))
+    as.cl_hierarchy(ls_fit_ultrametric(d, control = control))
 }
 
 ### * .cl_consensus_hierarchy_majority
@@ -706,9 +670,14 @@ function(clusterings, weights, control)
 .cl_consensus_hierarchy_majority <-
 function(clusterings, weights, control)
 {
-    ## Have no use for control arguments.
-
     w <- weights / sum(weights)
+
+    p <- control$p
+    if(is.null(p))
+        p <- 1 / 2
+    ## <FIXME>
+    ## Add bounds checking for [1/2, 1] eventually.
+    ## </FIXME>
 
     classes <- lapply(clusterings, cl_classes)
     all_classes <- unique(unlist(classes, recursive = FALSE))
@@ -716,10 +685,19 @@ function(clusterings, weights, control)
     for(i in seq(along = classes))
         gamma <- gamma + w[i] * !is.na(match(all_classes, classes[[i]]))
 
-    maj_classes <- all_classes[gamma > 1 / 2]
+    maj_classes <- if(p == 1) {
+        ## Strict consensus tree.
+        all_classes[gamma == 1]
+    }
+    else
+        all_classes[gamma > p]
     attr(maj_classes, "labels") <- attr(classes[[1]], "labels")
 
+    ## <FIXME>
+    ## Stop auto-coercing that to dendrograms once we have suitable ways
+    ## of representing n-trees.
     as.cl_hierarchy(.cl_ultrametric_from_classes(maj_classes))
+    ## </FIXME>
 }
 
 ### * Utilities

@@ -73,6 +73,10 @@ function(x, k = n_of_classes(x))
 
 ## Package clue: cl_pclust().
 cl_membership.cl_pclust <- cl_membership.fanny
+## Package clue: (virtual) class "cl_partition".
+cl_membership.cl_partition <-
+function(x, k = n_of_classes(x))
+    cl_membership(.get_representation(x), k)
 
 ### * .cl_membership_from_class_ids
 
@@ -181,7 +185,7 @@ function(d, power = 2)
 print.cl_membership <-
 function(x, ...)
 {
-    cat("Memberships:\n")
+    writeLines("Memberships:")
     print(matrix(as.vector(x), nr = nrow(x), dimnames = dimnames(x)),
           ...)
     invisible(x)

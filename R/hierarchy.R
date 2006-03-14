@@ -42,17 +42,15 @@ function(x)
             x
     }
     else
-        .make_container(as.cl_ultrametric(x), .cl_hierarchy_classes)
+        .make_container(as.cl_ultrametric(x),
+                        .cl_hierarchy_classes)
 }
 
 ### * print.cl_hierarchy
 
 print.cl_hierarchy <-
 function(x, ...)
-{
-    writeLines(gettext("An object from virtual class 'cl_hierarchy', with representation:\n"))
-    NextMethod("print")
-}
+    .print_container(x, "cl_hierarchy", ...)
 
 ### * Complex.cl_hierarchy
 
@@ -109,21 +107,23 @@ function(x)
             x
     }
     else
-        .make_container(as.cl_ultrametric(x), .cl_dendrogram_classes)
+        .make_container(as.cl_ultrametric(x),
+                        .cl_dendrogram_classes)
 }
 
 ### * print.cl_dendrogram
 
 print.cl_dendrogram <-
 function(x, ...)
-{
-    writeLines(gettext("An object from virtual class 'cl_dendrogram', with representation:\n"))
-    ## Ugly ... but how can we do this using NextMethod()?
-    y <- x
-    class(y) <- class(x)[ - match(.cl_dendrogram_classes, class(x)) ]
-    print(y)
-    x
-}
+    .print_container(x, "cl_dendrogram", ...)
+
+### * plot.cl_dendrogram
+
+plot.cl_dendrogram <-
+function(x, ...)
+    plot(cl_ultrametric(.get_representation(x)), ...)
+
+### * Group methods for cl_dendrogram objects.
 
 Ops.cl_dendrogram <-
 function(e1, e2)

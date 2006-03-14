@@ -44,8 +44,9 @@ function(x)
     ## We need the maximal ultrametric dominated by the given ones,
     ## which can be obtained by hierarchical clustering with single
     ## linkage on the pointwise minima of the ultrametrics.
-    hclust(as.dist(do.call(pmin, lapply(x, cl_ultrametric))),
-           "single")
+    as.cl_dendrogram(hclust(as.dist(do.call(pmin,
+                                            lapply(x, cl_ultrametric))),
+                            "single"))
 }
 
 cl_join <-
@@ -92,7 +93,7 @@ function(x)
         z <- table(jcids, ids[[b]])
         ## It is faster to work on the smaller partition, but this
         ## should be ensured by the reordering ...
-        C_new <- C_old <- C <- (z %*% t(z)) > 0
+        C_new <- C_old <- C <- (.tcrossprod(z) > 0)
         repeat {
             C_new <- (C_old %*% C) > 0
             if(all(C_new == C_old)) break
@@ -120,9 +121,5 @@ function(x)
 function(x)
 {
     ## Join of an ensemble of dendrograms.
-    ## We need the minimal ultrametric dominating the given ones,
-    ## which can be obtained by hierarchical clustering with complete
-    ## linkage on the pointwise maxima of the ultrametrics.
-    hclust(as.dist(do.call(pmax, lapply(x, cl_ultrametric))),
-           "complete")
+    as.cl_dendrogram(do.call(pmax, lapply(x, cl_ultrametric)))
 }

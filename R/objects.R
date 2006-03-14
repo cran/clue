@@ -70,6 +70,14 @@ n_of_objects.cl_membership <- nrow
 n_of_objects.cl_pclust <- n_of_objects.fclust
 ## Package clue: Ultrametrics.
 n_of_objects.cl_ultrametric <- n_of_objects.dist
+## Package clue: (virtual) class "cl_partition".
+n_of_objects.cl_partition <-
+function(x)
+    .get_property_from_object_or_representation(x, "n_of_objects")
+## Package clue: (virtual) class "cl_hierarchy".
+n_of_objects.cl_hierarchy <-
+function(x)
+    .get_property_from_object_or_representation(x, "n_of_objects")
 
 ### * cl_object_names
 
@@ -92,7 +100,6 @@ cl_object_names.default <- function(x) names(cl_class_ids(x))
 ## Most partitioning functions return no information on object names.
 ## This includes classes
 ##   stats:      kmeans
-##   RWeka:      Weka_clusterer
 ##   cba:        ccfkms, rock
 ##   cclust:     cclust
 ##   e1071:      bclust
@@ -100,6 +107,7 @@ cl_object_names.default <- function(x) names(cl_class_ids(x))
 ##   kernlab:    specc
 ##   mclust:     Mclust
 ## The algorithms for which things "work" all give named class ids.
+##   RWeka:      Weka_clusterer
 ##   cluster:    clara fanny pam
 ##   e1071:      cclust cshell
 
@@ -129,9 +137,21 @@ cl_object_names.mona <- cl_object_names.twins
 ## ** Others.
 
 ## Package clue: memberships.
-cl_object_names.cl_membership <- function(x) rownames(x)
+cl_object_names.cl_membership <-
+function(x)
+    rownames(x)
 ## Package clue: ultrametrics.
-cl_object_names.cl_ultrametric <- function(x) attr(x, "Labels")
+cl_object_names.cl_ultrametric <-
+function(x)
+    attr(x, "Labels")
+## Package clue: (virtual) class "cl_partition".
+cl_object_names.cl_partition <-
+function(x)
+    cl_object_names(.get_representation(x))
+## Package clue: (virtual) class "cl_hierarchy".
+cl_object_names.cl_hierarchy <-
+function(x)
+    cl_object_names(.get_representation(x))
 
 ### * cl_object_labels
 

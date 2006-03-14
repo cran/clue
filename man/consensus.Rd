@@ -162,13 +162,21 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       the majority consensus tree of Margush and McMorris (1981), which
       minimizes \eqn{L(x) = \sum w_b d(x_b, x)} over all dendrograms,
       where \eqn{d} is the symmetric difference dissimilarity.  The
-      unweighted majority tree is the \eqn{n}-tree (hierarchy in the
-      strict sense) consisting of all subsets of objects contained in
-      more than half the \eqn{n}-trees $T_b$ induced by the dendrograms.
-      In the weighted case, it consists of all subsets \eqn{A} for which
-      \eqn{\sum_{b: A \in T_b} w_b > W / 2}, where \eqn{W = \sum_b w_b}.
+      unweighted \eqn{p}-majority tree is the \eqn{n}-tree (hierarchy in
+      the strict sense) consisting of all subsets of objects contained
+      in more than \eqn{p} of the \eqn{n}-trees $T_b$ induced by the
+      dendrograms, where \eqn{1/2 < p < 1} and \eqn{p = 1/2} (default)
+      corresponds to the standard majority tree.  In the weighted case,
+      it consists of all subsets \eqn{A} for which \eqn{\sum_{b: A \in
+      T_b} w_b > W p}, where \eqn{W = \sum_b w_b}.  We also allow for
+      \eqn{p = 1}, which gives the \emph{strict consensus tree}
+      consisting of all subsets contained in each of the \eqn{n}-trees.
       The majority dendrogram returned is a representation of the
-      majority tree where all splits have height one.}
+      majority tree where all splits have height one.
+
+      The fraction \eqn{p} can be specified via the control parameter
+      \code{p}.
+    }
   }
 
   By default, method \code{"cophenetic"} is used for ensembles of

@@ -310,7 +310,7 @@ methods.
 <<>>=
 cl_class_ids.glvq <-
 function(x)
-    x$class_ids
+    as.cl_class_ids(x$class_ids)
 is.cl_partition.glvq <-
 function(x)
     TRUE
@@ -1149,7 +1149,7 @@ which all exhibit greater Euclidean dissimilarity to $d$ than $u$.  We
 can also compare the ``structure'' of the different hierarchies, e.g.\
 by looking at the rate of inversions between them:
 <<>>=
-ahens <- c(L2opt = cl_ensemble(as.cl_hierarchy(u)), hens)
+ahens <- c(L2opt = cl_ensemble(u), hens)
 round(cl_dissimilarity(ahens, method = "gamma"), 2)
 @ %
 
