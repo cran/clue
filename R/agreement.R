@@ -137,18 +137,19 @@ function(x, y)
     ##   E = Sx. * S.y / choose(n, 2)
     ## We replace the bincoefs by the corresponding sums of squares,
     ## getting
-    ##   (Txy - E) / ((Tx. + T.y) / 2 - E)
+    ##   (Txy - F) / ((Tx. + T.y) / 2 - F)
     ## where
     ##   Txy = \sum_{i,j} x_{ij}^2 - n
     ##   Tx. = \sum_i     x_{i.}^2 - n
     ##   T.y = \sum_j     x_{.j}^2 - n
     ## and
-    ##   E = Tx. * T.y / (n^2 - n)
+    ##   F = Tx. * T.y / (n^2 - n)
     ## </NOTE>
-    Tx. <- sum(rowSums(x)^2)
-    T.y <- sum(colSums(x)^2)
-    E <- Tx. * T.y / (n^2 - n)
-    (sum(x^2) - E) / ((Tx. + T.y) / 2 - E)
+    Txy <- sum(x ^ 2) - n
+    Tx. <- sum(rowSums(x) ^ 2) - n
+    T.y <- sum(colSums(x) ^ 2) - n
+    F <- Tx. * T.y / (n ^ 2 - n)
+    (Txy - F) / ((Tx. + T.y) / 2 - F)
 }
 
 
