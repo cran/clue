@@ -5,7 +5,7 @@
   hierarchies.
 }
 \usage{
-cl_agreement(x, y = NULL, method = "euclidean")
+cl_agreement(x, y = NULL, method = "euclidean", \dots)
 }
 \arguments{
   \item{x}{an ensemble of partitions or hierarchies and dissimilarities,
@@ -17,6 +17,7 @@ cl_agreement(x, y = NULL, method = "euclidean")
     version is matched against the lower-cased names of the available
     built-in methods using \code{\link{pmatch}}.  See \bold{Details} for
     available built-in methods.}
+  \item{\dots}{further arguments to be passed to methods.}
 }
 \value{
   If \code{y} is \code{NULL}, an object of class \code{"cl_agreement"}

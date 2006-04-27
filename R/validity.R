@@ -11,13 +11,13 @@ function(x, d, ...)
     ## Note that providing methods for classes "cl_partition" and
     ## "cl_hierarchy" is not good enough ...
     out <- list()
-    if(is.cl_partition(x)) {
+    if(.has_object_memberships(x)) {
         v <- .cl_validity_partition_d_a_f(cl_membership(x),
                                           as.matrix(d))
         out <- list("Dissimilarity accounted for" = v)
     }
-    else if(is.cl_hierarchy(x)) {
-        x <- cl_ultrametric(x)
+    else if(.has_object_dissimilarities(x)) {
+        x <- cl_object_dissimilarities(x)
         d <- as.dist(d)
         out <- list("Variance accounted for" =
                     .cl_validity_hierarchy_variance_a_f(x, d),

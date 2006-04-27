@@ -93,7 +93,7 @@ function(x)
         z <- table(jcids, ids[[b]])
         ## It is faster to work on the smaller partition, but this
         ## should be ensured by the reordering ...
-        C_new <- C_old <- C <- (.tcrossprod(z) > 0)
+        C_new <- C_old <- C <- (tcrossprod(z) > 0)
         repeat {
             C_new <- (C_old %*% C) > 0
             if(all(C_new == C_old)) break

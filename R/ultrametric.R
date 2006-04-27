@@ -129,6 +129,8 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
                                                           control)
            })
 }
+
+### ** .ls_fit_ultrametric_by_SUMT
            
 .ls_fit_ultrametric_by_SUMT <-
 function(x, weights = 1, control = list())
@@ -147,30 +149,22 @@ function(x, weights = 1, control = list())
 
     w <- weights / sum(weights)
 
-    ## Control parameters.
-    ## <FIXME>
-    ## Note that the same defaults are used by SUMT() ...
-    eps <- control$eps
-    ## <TODO>
-    ## Maybe divide by length(x) to force maximal non-ultrametricity
-    ## down even more.
-    if(is.null(eps))
-        eps <- .Machine$double.eps
-    ## </TODO>
-    method <- control$method
-    ## We use optim(method = "CG") as default, as nlm() may be
-    ## computationally infeasible.
-    if(is.null(method))
-        method <- "CG"
-    q <- control$q
-    if(is.null(q))
-        q <- 10
-    verbose <- control$verbose
-    if(is.null(verbose))
-        verbose <- getOption("verbose")
-    ## </FIXME>
-    ## Do this at last ...
-    control <- as.list(control$control)
+    ## Control parameters:
+    ## nruns,
+    nruns <- control$nruns
+    ## start.
+    start <- control$start
+
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else if(is.null(nruns)) {
+        ## Use nruns only if start is not given.
+        nruns <- 1
+    }
 
     ## If x is an ultrametric, or satisfies the ultrametricity
     ## constraints, return it.
@@ -198,26 +192,22 @@ function(x, weights = 1, control = list())
     ## proximity objects.
 
     L <- function(d) sum(w * (x - d) ^ 2)
-    P <- function(d) {
-        ## Smooth penalty function measuring the extent of violation of
-        ## the ultrametricity constraint.
-        .non_ultrametricity(.symmetric_matrix_from_veclh(d, n))
-    }
+    P <- .make_penalty_function_ultrametric(n)
     grad_L <- function(d) 2 * w * (d - x)
-    grad_P <- function(d) {
-        d <- .symmetric_matrix_from_veclh(d, n)
-        n <- nrow(d)
-        gr <- matrix(.C("deviation_from_ultrametricity_gradient",
-                        as.double(d), n, gr = double(n * n),
-                        PACKAGE = "clue")$gr, n, n)
-        gr[row(gr) > col(gr)]
-    }
+    grad_P <- .make_penalty_gradient_ultrametric(n)
 
-    ## Initialize by "random shaking".  Use sd() for simplicity.
-    d <- x + rnorm(length(x), sd = sd(x) / 3)
+    if(is.null(start)) {
+        ## Initialize by "random shaking".  Use sd() for simplicity.
+        start <- replicate(nruns,  
+                           x + rnorm(length(x), sd = sd(x) / sqrt(3)),
+                           simplify = FALSE)
+    }
+    
     ## And now ...
-    d <- SUMT(d, L, P, grad_L, grad_P, method = method, eps = eps,
-              q = q, verbose = verbose, control = control)
+    d <- SUMT(start, L, P, grad_L, grad_P,
+              method = control$method, eps = control$eps,
+              q = control$q, verbose = control$verbose,
+              control = as.list(control$control))
     
     ## Round to enforce ultrametricity, and hope for the best ...
     ## Alternatively, we could try running one more optimization step
@@ -226,7 +216,28 @@ function(x, weights = 1, control = list())
                                                    labels = labels)
 }
 
-### * .ls_fit_ultrametric_by_iterative_projection
+.make_penalty_function_ultrametric <-
+function(n)
+    function(d) {
+        ## Smooth penalty function measuring the extent of violation of
+        ## the ultrametricity constraint.  Also ensure nonnegativity ...
+        (.non_ultrametricity(.symmetric_matrix_from_veclh(d, n))
+         + sum(pmin(d, 0) ^ 2))
+    }
+
+.make_penalty_gradient_ultrametric <-
+function(n)
+    function(d) {
+        gr <- matrix(.C("deviation_from_ultrametricity_gradient",
+                        as.double(.symmetric_matrix_from_veclh(d, n)),
+                        n,
+                        gr = double(n * n),
+                        PACKAGE = "clue")$gr,
+                     n, n)
+        gr[row(gr) > col(gr)] + 2 * sum(pmin(d, 0))
+    }
+
+### ** .ls_fit_ultrametric_by_iterative_projection
 
 ## <NOTE>
 ## Functions
@@ -254,14 +265,10 @@ function(x, weights = 1, control = list())
     maxiter <- control$maxiter
     if(is.null(maxiter))
         maxiter <- 10000
+    ## nruns,
+    nruns <- control$nruns
     ## order,
     order <- control$order
-    if(is.null(order))
-        order <- 1 : n
-    else {
-        if(!all(sort(order) == 1 : n))
-            stop("Given order is not a valid permutation.")
-    }
     ## tol,
     tol <- control$tol
     if(is.null(tol))
@@ -270,20 +277,48 @@ function(x, weights = 1, control = list())
     verbose <- control$verbose
     if(is.null(verbose))
         verbose <- getOption("verbose")
-    
-    out <- .C("ls_fit_ultrametric_by_iterative_projection",
-              as.double(as.matrix(x)),
-              as.integer(n),
-              as.integer(order - 1),
-              as.integer(maxiter),
-              iter = integer(1),
-              as.double(tol),
-              as.logical(verbose))
-    d <- as.dist(matrix(out[[1]], n))
+
+    ## Handle order and nruns.
+    if(!is.null(order)) {
+        if(!is.list(order))
+            order <- as.list(order)
+        if(!all(sapply(order,
+                       function(o) all(sort(o) == 1 : n))))
+            stop("All given orders must be valid permutations.")
+    }
+    else {
+        if(is.null(nruns))
+            nruns <- 1
+        order <- replicate(nruns, sample(n), simplify = FALSE)
+    }
+
+    L <- function(d) sum(weights * (x - d) ^ 2)
+
+    d_opt <- NULL
+    v_opt <- Inf
+    for(run in seq(along = order)) {
+        if(verbose)
+            cat("Iterative projection run:", run, "\n")
+        d <- .C("ls_fit_ultrametric_by_iterative_projection",
+                as.double(as.matrix(x)),
+                as.integer(n),
+                as.integer(order[[run]] - 1),
+                as.integer(maxiter),
+                iter = integer(1),
+                as.double(tol),
+                as.logical(verbose))[[1]]
+        v <- L(d)
+        if(v < v_opt) {
+            v_opt <- v
+            d_opt <- d
+        }
+    }
+        
+    d <- as.dist(matrix(d_opt, n))
     .cl_ultrametric_from_ultrametric_approximation(d, n, labels)
 }
 
-### * .ls_fit_ultrametric_by_iterative_reduction
+### ** .ls_fit_ultrametric_by_iterative_reduction
 
 .ls_fit_ultrametric_by_iterative_reduction <-
 function(x, weights = 1, control = list())
@@ -302,14 +337,10 @@ function(x, weights = 1, control = list())
     maxiter <- control$maxiter
     if(is.null(maxiter))
         maxiter <- 10000
+    ## nruns,
+    nruns <- control$nruns
     ## order,
     order <- control$order
-    if(is.null(order))
-        order <- 1 : n
-    else {
-        if(!all(sort(order) == 1 : n))
-            stop("Given order is not a valid permutation.")
-    }
     ## tol,
     tol <- control$tol
     if(is.null(tol))
@@ -319,16 +350,44 @@ function(x, weights = 1, control = list())
     if(is.null(verbose))
         verbose <- getOption("verbose")
 
-    out <- .C("ls_fit_ultrametric_by_iterative_reduction",
-              as.double(x),
-              as.integer(n),
-              as.integer(order - 1),
-              as.integer(maxiter),
-              iter = integer(1),
-              as.double(tol),
-              as.logical(verbose),
-              PACKAGE = "clue")
-    d <- as.dist(matrix(out[[1]], n))
+    ## Handle order and nruns.
+    if(!is.null(order)) {
+        if(!is.list(order))
+            order <- as.list(order)
+        if(!all(sapply(order,
+                       function(o) all(sort(o) == 1 : n))))
+            stop("All given orders must be valid permutations.")
+    }
+    else {
+        if(is.null(nruns))
+            nruns <- 1
+        order <- replicate(nruns, sample(n), simplify = FALSE)
+    }
+
+    L <- function(d) sum(weights * (x - d) ^ 2)
+
+    d_opt <- NULL
+    v_opt <- Inf
+    for(run in seq(along = order)) {
+        if(verbose)
+            cat("Iterative reduction run:", run, "\n")
+        d <- .C("ls_fit_ultrametric_by_iterative_reduction",
+                as.double(x),
+                as.integer(n),
+                as.integer(order[[run]] - 1),
+                as.integer(maxiter),
+                iter = integer(1),
+                as.double(tol),
+                as.logical(verbose),
+                PACKAGE = "clue")[[1]]
+        v <- L(d)
+        if(v < v_opt) {
+            v_opt <- v
+            d_opt <- d
+        }
+    }
+        
+    d <- as.dist(matrix(d_opt, n))
     ## <NOTE>
     ## If we want to add an attribute with the convergence info, we need
     ## to do this after using as.cl_ultrametric().
@@ -405,37 +464,201 @@ function(weights, x)
     weights
 }
 
-### * .dist_from_vector
-        
-.dist_from_vector <-
-function(x, n = NULL, labels = NULL)
+### l1_fit_ultrametric
+
+l1_fit_ultrametric <-
+function(x, method = c("SUMT", "IRIP"), weights = 1,
+         control = list())
 {
-    ## This might be useful as as.dist.vector, perhaps without the extra
-    ## argument n then which we only have for minimal performance gains.
-    if(is.null(n))
-        n <- as.integer((sqrt(1 + 8 * length(x)) + 1) / 2)
-    attr(x, "Size") <- n
-    if(!is.null(labels))
-        attr(x, "Labels") <- labels
-    class(x) <- "dist"
-    x
+    if(inherits(x, "cl_ultrametric"))
+        return(x)
+
+    ## Handle weights.
+    ## This is somewhat tricky ...
+    if(is.matrix(weights)) {
+        weights <- as.dist(weights)
+        if(length(weights) != length(x))
+            stop("Arguments 'weights' must be compatible with 'x'.")
+    }
+    else
+        weights <- rep(weights, length = length(x))
+    if(any(weights < 0))
+        stop("Argument 'weights' has negative elements.")
+    if(!any(weights > 0))
+        stop("Argument 'weights' has no positive elements.")
+
+    method <- match.arg(method)
+    switch(method,
+           SUMT = .l1_fit_ultrametric_by_SUMT(x, weights, control),
+           IRIP = .l1_fit_ultrametric_by_IRIP(x, weights, control))
 }
 
-### * .symmetric_matrix_from_veclh
+### ** .l1_fit_ultrametric_by_SUMT
 
-.symmetric_matrix_from_veclh <-
-function(x, n = NULL)
+.l1_fit_ultrametric_by_SUMT <-
+function(x, weights = 1, control = list())
 {
-    ## In essence the same as as.matrix.dist, but without handling the
-    ## additional attributes that dist objects might have.
-    if(is.null(n))
-        n <- as.integer((sqrt(1 + 8 * length(x)) + 1) / 2)
-    M <- matrix(0, n, n)
-    M[row(M) > col(M)] <- x
-    M + t(M)
+    ## Try a SUMT with "pseudo-gradients".
+
+    w <- weights / sum(weights)
+
+    ## Control parameters:
+    ## gradient,
+    gradient <- control$gradient
+    if(is.null(gradient))
+        gradient <- TRUE
+    ## nruns,
+    nruns <- control$nruns
+    ## start.
+    start <- control$start
+
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else if(is.null(nruns)) {
+        ## Use nruns only if start is not given.
+        nruns <- 1
+    }
+
+    ## If x is an ultrametric, or satisfies the ultrametricity
+    ## constraints, return it.
+    if(inherits(x, "cl_ultrametric")
+       || (.non_ultrametricity(x, max = TRUE) == 0))
+        return(as.cl_ultrametric(x))
+
+    ## For the time being, use a simple minimizer.
+
+    n <- attr(x, "Size")
+    if(n <= 2) return(as.cl_ultrametric(x))
+    labels <- attr(x, "Labels")
+
+    L <- function(d) sum(w * abs(d - x))
+    P <- .make_penalty_function_ultrametric(n)
+    if(gradient) {
+        grad_L <- function(d) w * sign(d - x)
+        grad_P <- .make_penalty_gradient_ultrametric(n)
+    } else
+        grad_L <- grad_P <- NULL
+
+    if(is.null(start)) {
+        ## Initialize by "random shaking".  Use sd() for simplicity.
+        start <- replicate(nruns,  
+                           x + rnorm(length(x), sd = sd(x) / sqrt(3)),
+                           simplify = FALSE)
+    }
+
+    ## And now ...
+    d <- SUMT(start, L, P, grad_L, grad_P,
+              method = control$method, eps = control$eps,
+              q = control$q, verbose = control$verbose,
+              control = as.list(control$control))
+    
+    as.cl_ultrametric(d)
 }
 
-### .non_ultrametricity
+### ** .l1_fit_ultrametric_by_IRIP
+
+.l1_fit_ultrametric_by_IRIP <-
+function(x, weights = 1, control = list())
+{
+    verbose <- control$verbose
+    if(is.null(verbose))
+        verbose <- getOption("verbose")
+    
+    eps <- 1e-6                         # Make settable later.
+
+    ## Initialize by "random shaking" as for the L2 SUMT, but perhaps we
+    ## should not do this?  [Or do it differently?]
+    u <- x + rnorm(length(x), sd = sd(x) / 3)
+    ## u <- x
+
+    iter <- 1
+
+    repeat {
+        if(verbose)
+            cat("Outer iteration:", iter)
+        u_old <- u
+        w <- weights / pmax(abs(u - x), 0.000001)
+        ## u <- ls_fit_ultrametric(x, weights = w)
+        u <- .ls_fit_ultrametric_by_SUMT(x, weights = w,
+                                         control = as.list(control$control))
+        ## Use some control arguments lateron ...
+        D <- sum(abs(u - u_old))
+        if(verbose)
+            cat(", Change:", D, "\n")
+        if(D < eps) break
+        iter <- iter + 1
+    }
+
+    ## <FIXME>
+    ## Use
+    ##   .cl_ultrametric_from_ultrametric_approximation(u)
+    ## eventually ...
+    as.cl_ultrametric(u)
+    ## </FIXME>
+}
+
+## * ls_fit_sum_of_ultrametrics
+
+ls_fit_sum_of_ultrametrics <-
+function(x, nterms = 1, weights = 1, control = list())
+{
+    ## Control parameters:
+    ## eps,
+    eps <- control$eps
+    if(is.null(eps))
+        eps <- 1e-8
+    ## method,
+    method <- control$method
+    if(is.null(method))
+        method <- "SUMT"
+    ## verbose.
+    verbose <- control$verbose
+    if(is.null(verbose))
+        verbose <- getOption("verbose")
+    ## Do this at last.
+    control <- as.list(control$control)
+    ## And be nice ...
+    if(identical(method, "SUMT") && is.null(control$nruns))
+        control$nruns <- 10
+    
+    ## Init.
+    u <- rep.int(list(as.cl_ultrametric(0 * x)), nterms)
+
+    ## Loop.
+    iter <- 1
+    repeat {
+        if(verbose)
+            cat("Iteration:", iter, "\n")
+        delta <- 0
+        for(i in seq(length = nterms)) {
+            if(verbose)
+                cat("Term:", i)
+            u_old <- u[[i]]
+            ## Compute residual r = x - \sum_{j: j \ne i} u(j)
+            r <- x - rowSums(matrix(unlist(u[-i]), nc = nterms - 1))
+            ## Fit residual.
+            u[[i]] <- ls_fit_ultrametric(r, method, weights, control)
+            ## Accumulate change.
+            change <- sum((u[[i]] - u_old) ^ 2)
+            if(verbose)
+                cat(" Change:", change, "\n")
+            delta <- delta + change
+        }
+        if(verbose)
+            cat("Total change:", delta, "\n\n")
+        if(delta < eps)
+            break
+        iter <- iter + 1
+    }
+
+    u
+}
+
+### * .non_ultrametricity
 
 .non_ultrametricity <-
 function(x, max = FALSE)
@@ -450,7 +673,7 @@ function(x, max = FALSE)
        PACKAGE = "clue")$fn
 }
 
-### .cl_ultrametric_from_ultrametric_approximation
+### * .cl_ultrametric_from_ultrametric_approximation
 
 .cl_ultrametric_from_ultrametric_approximation <-
 function(x, size = NULL, labels = NULL)
@@ -462,7 +685,7 @@ function(x, size = NULL, labels = NULL)
                    size = size, labels = labels)
 }
 
-### .cl_ultrametric_from_classes
+### * .cl_ultrametric_from_classes
 
 .cl_ultrametric_from_classes <-
 function(x)

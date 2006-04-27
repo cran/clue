@@ -11,9 +11,9 @@
 \format{
   A classed list with components
   \describe{
-    \item{\code{x}:}{a matrix with 1000 rows and 2 columns giving the
+    \item{\code{x}}{a matrix with 1000 rows and 2 columns giving the
       coordinates of the points.}
-    \item{\code{classes}:}{a factor indicating which structure the
+    \item{\code{classes}}{a factor indicating which structure the
       respective points belong to.}
   }
 }

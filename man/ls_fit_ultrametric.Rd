@@ -49,11 +49,11 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   enough.  We then use a final rounding step to ensure that the returned
   object exactly satisfies the ultrametric constraints.  The starting
   value \eqn{u_0} is obtained by \dQuote{random shaking} of the given
-  dissimilarity object.  If there are missing values in \code{x}, i.e.,
-  the given dissimilarities are \emph{incomplete}, we follow a
-  suggestion of de Soete (1984), imputing the missing values by the
-  weighted mean of the non-missing ones, and setting the corresponding
-  weights to zero.
+  dissimilarity object (if not given).  If there are missing values in
+  \code{x}, i.e., the given dissimilarities are \emph{incomplete}, we
+  follow a suggestion of de Soete (1984), imputing the missing values by
+  the weighted mean of the non-missing ones, and setting the
+  corresponding weights to zero.
 
   The unconstrained minimizations are carried out using either
   \code{\link[stats]{optim}} or \code{\link[stats]{nlm}}, using the
@@ -62,6 +62,10 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   argument.
 
   \describe{
+    \item{\code{nruns}}{an integer giving the number of runs to be
+      performed.  Defaults to 1.}
+    \item{\code{start}}{a single dissimilarity, or a list of
+      dissimilarities to be employed as starting values.}
     \item{\code{method}}{a character string, or \code{NULL}.  If not
       given, \code{"CG"} is used.  If equal to \code{"nlm"},
       minimization is carried out using \code{\link[stats]{nlm}}.
@@ -85,6 +89,13 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   the number of objects in the dissimilarity object, suggesting to use
   the SUMT approach in favor of \code{\link[stats]{constrOptim}}.
 
+  If starting values for the SUMT are provided via \code{start}, the
+  number of starting values gives the number of runs to be performed,
+  and control option \code{nruns} is ignored.  Otherwise, \code{nruns}
+  starting values are obtained by random shaking of the dissimilarity to
+  be fitted.  In the case of multiple SUMT runs, the (first) best
+  solution found is returned.
+
   Method \code{"IP"} implements the Iterative Projection approach of
   Hubert and Arabie (1995).  This iteratively projects the current
   dissimilarities to the closed convex set given by the ultrametric
@@ -94,11 +105,14 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   be provided via the \code{control} argument.
 
   \describe{
-    \item{\code{maxiter}}{an integer giving the maximal number of
-      iterations to be employed.}
+    \item{\code{nruns}}{an integer giving the number of runs to be
+      performed.  Defaults to 1.}
     \item{\code{order}}{a permutation of the numbers from 1 to the
       number of objects in \code{x}, specifying the order in which the
-      ultrametric constraints are considered.}
+      ultrametric constraints are considered, or a list of such
+      permutations.}
+    \item{\code{maxiter}}{an integer giving the maximal number of
+      iterations to be employed.}
     \item{\code{tol}}{a double indicating the maximal convergence
       tolerance.  The algorithm stops if the total absolute change in
       the dissimilarities in an iteration is less than \code{tol}.}
@@ -106,6 +120,12 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
       output on minimization progress.  Defaults to
       \code{getOption("verbose")}.}
   }
+
+  If permutations are provided via \code{order}, the number of these
+  gives the number of runs to be performed, and control option
+  \code{nruns} is ignored.  Otherwise, \code{nruns} randomly generated
+  orders are tried.  In the case of multiple runs, the (first) best
+  solution found is returned.
 
   Non-identical weights and incomplete dissimilarities are currently not
   supported.
@@ -114,22 +134,8 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   suggested by Roux (1988), see also Barthélémy and Guénoche (1991).
   This is similar to the Iterative Projection method, but modifies the
   dissimilarities between objects proportionally to the aggregated
-  change incurred from the ultrametric projections.  The following
-  control parameters can be provided via the \code{control} argument.
-
-  \describe{
-    \item{\code{maxiter}}{an integer giving the maximal number of
-      iterations to be employed.}
-    \item{\code{order}}{a permutation of the numbers from 1 to the
-      number of objects in \code{x}, specifying the order in which the
-      ultrametric constraints are considered.}
-    \item{\code{tol}}{a double indicating the maximal convergence
-      tolerance.  The algorithm stops if the total absolute change in
-      the dissimilarities in an iteration is less than \code{tol}.}
-    \item{\code{verbose}}{a logical indicating whether to provide some
-      output on minimization progress.  Defaults to
-      \code{getOption("verbose")}.}
-  }
+  change incurred from the ultrametric projections.  Available control
+  parameters are identical to those of method \code{"IP"}.
 
   Non-identical weights and incomplete dissimilarities are currently not
   supported.

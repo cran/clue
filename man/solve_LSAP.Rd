@@ -9,17 +9,20 @@
 solve_LSAP(x, maximum = FALSE)
 }
 \arguments{
-  \item{x}{a square matrix with nonnegative entries.}
+  \item{x}{a matrix with nonnegative entries and at least as many
+    columns as rows.}
   \item{maximum}{a logical indicating whether to minimize of maximize
     the sum of assigned costs.}
 }
 \details{
-  If \eqn{n} is the number of rows and columns of \code{x},
-  \code{solve_LSAP} finds a permutation \code{p} of the numbers from 1
-  to \eqn{n} such that \eqn{\sum_{i=1}^n x[i, p[i]]} is minimized or
-  maximized.
+  If \eqn{nr} and \eqn{nc} are the numbers of rows and columns of
+  \code{x}, \code{solve_LSAP} finds an optimal \emph{assignment} of rows
+  to columns, i.e., a one-to-one map \code{p} of the numbers from 1 to
+  \eqn{nr} to the numbers from 1 to \eqn{nc} (a permutation of these
+  numbers in case \code{x} is a square matrix) such that
+  \eqn{\sum_{i=1}^nr x[i, p[i]]} is minimized or maximized.
 
-  This permutation can be found using a linear program (and package
+  This assignment can be found using a linear program (and package
   \pkg{lpSolve} provides a function \code{lp.assign} for doing so), but
   typically more efficiently and provably in polynomial time
   \eqn{O(n^3)} using primal-dual methods such as the so-called Hungarian

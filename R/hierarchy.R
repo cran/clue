@@ -178,6 +178,12 @@ function(x, ...)
                            max = cl_join(cl_ensemble(list = args)))
            })
 }
+
+### * as.hclust.cl_dendrogram
+
+as.hclust.cl_dendrogram <-
+function(x, ...)
+    as.hclust(.get_representation(x), ...)
   
 
 ### Local variables: ***
