@@ -71,14 +71,38 @@ set_cl_consensus_method("DWH", "partition",
                         .cl_consensus_partition_DWH,
                         dissimilarity = "euclidean",
                         exponent = 2)
+set_cl_consensus_method("soft/euclidean", "partition",
+                        .cl_consensus_partition_soft_euclidean,
+                        dissimilarity = "euclidean",
+                        exponent = 2)
 set_cl_consensus_method("SE", "partition",
-                        .cl_consensus_partition_SE,
+                        .cl_consensus_partition_soft_euclidean,
+                        dissimilarity = "euclidean",
+                        exponent = 2)
+set_cl_consensus_method("hard/euclidean", "partition",
+                        .cl_consensus_partition_hard_euclidean,
                         dissimilarity = "euclidean",
                         exponent = 2)
 set_cl_consensus_method("HE", "partition",
-                        .cl_consensus_partition_HE,
+                        .cl_consensus_partition_hard_euclidean,
                         dissimilarity = "euclidean",
                         exponent = 2)
+set_cl_consensus_method("soft/manhattan", "partition",
+                        .cl_consensus_partition_soft_manhattan,
+                        dissimilarity = "manhattan",
+                        exponent = 1)
+set_cl_consensus_method("SM", "partition",
+                        .cl_consensus_partition_soft_manhattan,
+                        dissimilarity = "manhattan",
+                        exponent = 1)
+set_cl_consensus_method("hard/manhattan", "partition",
+                        .cl_consensus_partition_hard_manhattan,
+                        dissimilarity = "manhattan",
+                        exponent = 1)
+set_cl_consensus_method("HM", "partition",
+                        .cl_consensus_partition_hard_manhattan,
+                        dissimilarity = "manhattan",
+                        exponent = 1)
 set_cl_consensus_method("GV1", "partition",
                         .cl_consensus_partition_GV1,
                         dissimilarity = "GV1",
@@ -87,10 +111,23 @@ set_cl_consensus_method("GV3", "partition",
                         .cl_consensus_partition_GV3,
                         dissimilarity = "comemberships",
                         exponent = 2)
+set_cl_consensus_method("soft/symdiff", "partition",
+                        .cl_consensus_partition_soft_symdiff,
+                        dissimilarity = "symdiff",
+                        exponent = 1)
+
 set_cl_consensus_method("cophenetic", "hierarchy",
                         .cl_consensus_hierarchy_cophenetic,
                         dissimilarity = "euclidean",
                         exponent = 2)
+set_cl_consensus_method("euclidean", "hierarchy",
+                        .cl_consensus_hierarchy_cophenetic,
+                        dissimilarity = "euclidean",
+                        exponent = 2)
+set_cl_consensus_method("manhattan", "hierarchy",
+                        .cl_consensus_hierarchy_manhattan,
+                        dissimilarity = "manhattan",
+                        exponent = 1)
 set_cl_consensus_method("majority", "hierarchy",
                         .cl_consensus_hierarchy_majority,
                         dissimilarity = "symdiff",
@@ -166,6 +203,9 @@ set_cl_dissimilarity_method("Chebyshev", "hierarchy",
 set_cl_dissimilarity_method("Lyapunov", "hierarchy",
                             .cl_dissimilarity_hierarchy_Lyapunov,
                             "Lyapunov distance")
+set_cl_dissimilarity_method("BA", "hierarchy",
+                            .cl_dissimilarity_hierarchy_BA,
+                            "Boorman/Arabie m_delta tree distance")
 
 ### * Agreement Method Registration.
 

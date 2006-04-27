@@ -92,7 +92,8 @@ function(clusterings, weights, control)
 ### * .cl_consensus_partition_AOS
 
 .cl_consensus_partition_AOS <-
-function(clusterings, weights, control, type = c("SE", "HE"))
+function(clusterings, weights, control,
+         type = c("SE", "HE", "SM", "HM"))
 {
     ## The start of a general purpose optimizer for determining
     ## consensus partitions by minimizing
@@ -163,42 +164,53 @@ function(clusterings, weights, control, type = c("SE", "HE"))
     if(k < k_all)
         M <- cbind(M, matrix(0, nrow(M), k_all - k))
 
-    ## Currently, only Euclidean dissimilarities ...
-    value <- function(M, memberships, w) {
-        sum(w * sapply(memberships, function(u) sum((u - M) ^ 2)))
-    }
-    match_memberships <- function(M, N) {
-        ## Return the M[, ind] column permutation of M optimally
-        ## matching N.
-        M[, solve_LSAP(crossprod(N, M), max = TRUE)]
-    }
+    value <-
+        switch(type,
+               SE = , HE = function(M, memberships, w) {
+                   sum(w * sapply(memberships,
+                                  function(u) sum((u - M) ^ 2)))
+               },
+               SM = , HM = function(M, memberships, w) {
+                   sum(w * sapply(memberships,
+                                  function(u) sum(abs(u - M))))
+               })
+    ## Return the M[, ind] column permutation of M optimally matching N.
+    match_memberships <-
+        switch(type,
+               SE = , HE = function(M, N) {
+                   M[, solve_LSAP(crossprod(N, M), max = TRUE)]
+               },
+               SM = , HM = function(M, N) {
+                   M[, solve_LSAP(.cxdist(N, M, "manhattan"))]
+               })
     ## Function for fitting M to (fixed) memberships \{ M_b P_b \}.
     ## As we use a common number of columns for all membership matrices
     ## involved, we need to pass the desired 'k' ...
-    if(type == "SE")
-        fit_M <- function(memberships, w, k) {
-            ## Update M as \sum w_b M_b P_b.
-            M <- matrix(rowSums(mapply("*", memberships, w)), nrow(M))
-            ## If k < k_all, "project" as indicated in Gordon & Vichi
-            ## (2001), p. 238.
-            if(k < ncol(M))
-                M <- .project_to_leading_columns(M, k)
-            M
-        }
-    else if(type == "HE")
-        fit_M <- function(memberships, w, k) {
-            ## Compute M as \sum w_b M_b P_b.
-            M <- matrix(rowSums(mapply("*", memberships, w)), nrow(M))
-            ## And compute a closest hard partition H(M) from that,
-            ## using the first k columns of M.
-            cl_membership(as.cl_membership(max.col(M[ , 1 : k])),
-                          ncol(M))
-            ## <FIXME>
-            ## Perhaps more efficiently:
-            ##   .cl_membership_from_class_ids(max.col(M[ , 1 : k]),
-            ##                                 ncol(M))
-            ## </FIXME>
-        }
+    fit_M <-
+        switch(type,
+               SE = function(memberships, w, k) {
+                   ## Update M as \sum w_b M_b P_b.
+                   M <- .weighted_sum_of_matrices(memberships, w, nrow(M))
+                   ## If k < k_all, "project" as indicated in Gordon &
+                   ## Vichi (2001), p. 238.
+                   if(k < ncol(M))
+                       M <- .project_to_leading_columns(M, k)
+                   M
+               },
+               HE = , HM = function(memberships, w, k) {
+                   ## Compute M as \sum w_b M_b P_b.
+                   M <- .weighted_sum_of_matrices(memberships, w, nrow(M))
+                   ## And compute a closest hard partition H(M) from
+                   ## that, using the first k columns of M.
+                   cl_membership(as.cl_membership(max.col(M[ , 1 : k])),
+                                 ncol(M))
+                   ## <FIXME>
+                   ## Perhaps more efficiently:
+                   ##   .cl_membership_from_class_ids(max.col(M[ , 1 : k]),
+                   ##                                 ncol(M))
+                   ## </FIXME>
+               },
+               SM = .l1_fit_M)
 
     memberships <- lapply(clusterings, cl_membership, k_all)
     memberships <- lapply(memberships, match_memberships, M)
@@ -234,17 +246,114 @@ function(clusterings, weights, control, type = c("SE", "HE"))
     as.cl_partition(M)
 }
 
-### ** .cl_consensus_partition_SE
+.l1_fit_M <-
+function(memberships, w, k)
+{
+    ## Determine stochastic matrix M with at most k leading nonzero
+    ## columns such that
+    ##
+    ##    \sum_b w_b \sum_{i,j} | m_{ij}(b) - m_{ij} | => min
+    ##
+    ## where the sum over j goes from 1 to k.
+    ##
+    ## Clearly, this can be done separately for each row, where we need
+    ## to minimize
+    ##
+    ##    \sum_b w_b \sum_j | y_j(b) - x_j | => min
+    ##
+    ## over all probability vectors x.  Such problems can e.g. be solved
+    ## via the following linear program:
+    ##
+    ##    \sum_b \sum_j w_b e'(u(b) + v(b)) => min
+    ##
+    ## subject to
+    ##
+    ##    u(1), v(1), ..., u(B), v(B), x >= 0
+    ##                   x + u(b) - v(b)  = y(b),    b = 1, ..., B
+    ##                               e'x  = 1
+    ##
+    ## (where e = [1, ..., 1]).
+    ##
+    ## So we have one long vector z of "variables":
+    ##
+    ##    z = [u(1)', v(1)', ..., u(B)', v(B)', x']'
+    ##
+    ## of length (2B + 1) k, with x the object of interest.
+    
+    ## Rather than providing a separate function for weighted L1 fitting
+    ## of probability vectors we prefer doing "everything" at once, in
+    ## order to avoid recomputing the coefficients and constraints of
+    ## the associated linear program.
 
-.cl_consensus_partition_SE <-
+    B <- length(memberships)
+    L <- (2 * B + 1) * k
+
+    ## Set up associated linear program.
+
+    ## Coefficients in the objective function.
+    objective_in <- c(rep(w, each = 2 * k), rep.int(0, k))
+    
+    ## Constraints.
+    constr_mat <- rbind(diag(1, L),
+                        cbind(kronecker(diag(1, B),
+                                        cbind(diag(1, k),
+                                              diag(-1, k))),
+                              kronecker(rep.int(1, B),
+                                        diag(1, k))),
+                        c(rep.int(0, 2 * B * k), rep.int(1, k)))
+    constr_dir <- c(rep.int(">=", L), rep.int("==", B * k + 1))
+
+    ind <- seq(from = 2 * B * k + 1, length = k)
+    nr <- NROW(memberships[[1]])
+    nc <- NCOL(memberships[[1]])
+    M <- matrix(0, nr = nr, nc = k)
+
+    ## Put the memberships into one big array so that we can get their
+    ## rows more conveniently (and efficiently):
+
+    memberships <- array(unlist(memberships), c(nr, nc, B))
+
+    require("lpSolve")
+
+    for(i in seq(length = nr)) {
+        out <- lpSolve::lp("min",
+                           objective_in,
+                           constr_mat,
+                           constr_dir,
+                           c(rep.int(0, L), memberships[i, 1 : k, ], 1))
+        M[i, ] <- out$solution[ind]
+    }
+
+    ## Add zero columns if necessary.
+    if(k < nc)
+        M <- cbind(M, matrix(0, nr, nc - k))
+
+    M
+}
+
+### ** .cl_consensus_partition_soft_euclidean
+
+.cl_consensus_partition_soft_euclidean <-
 function(clusterings, weights, control)
     .cl_consensus_partition_AOS(clusterings, weights, control, "SE")
 
-### ** .cl_consensus_partition_HE
+### ** .cl_consensus_partition_hard_euclidean
 
-.cl_consensus_partition_HE <-
+.cl_consensus_partition_hard_euclidean <-
 function(clusterings, weights, control)
     .cl_consensus_partition_AOS(clusterings, weights, control, "HE")
+
+### ** .cl_consensus_partition_soft_manhattan
+
+.cl_consensus_partition_soft_manhattan <-
+function(clusterings, weights, control)
+    .cl_consensus_partition_AOS(clusterings, weights, control, "SM")
+
+### ** .cl_consensus_partition_hard_manhattan
+
+.cl_consensus_partition_hard_manhattan <-
+function(clusterings, weights, control)
+    .cl_consensus_partition_AOS(clusterings, weights, control, "HM")
 
 ### * .cl_consensus_partition_AOG
 
@@ -427,14 +536,12 @@ function(clusterings, weights, control, type = c("GV1"))
 
         if(k <= min(nc_memberships)) {
             ## Compute the weighted means \bar{M}.
-            M <- matrix(rowSums(mapply("*",
-                                       mapply(function(u, p)
-                                              u[ , p[1 : k]],
-                                              memberships,
-                                              permutations,
-                                              SIMPLIFY = FALSE),
-                                       w)),
-                        nr_M)
+            M <- .weighted_sum_of_matrices(mapply(function(u, p)
+                                                  u[ , p[1 : k]],
+                                                  memberships,
+                                                  permutations,
+                                                  SIMPLIFY = FALSE),
+                                           w, nr_M)
             ## And add dummy classes if necessary.
             if(k < nc_M)
                 M <- cbind(M, matrix(0, nr_M, nc_M - k))
@@ -470,13 +577,11 @@ function(clusterings, weights, control, type = c("GV1"))
                 v[ , ind] <- u[ , p[ind]]
             v
         }
-        beta <- matrix(rowSums(mapply("*",
-                                       mapply(pmem,
-                                              memberships,
-                                              permutations,
-                                              SIMPLIFY = FALSE),
-                                       w)),
-                       nr_M)
+        beta <- .weighted_sum_of_matrices(mapply(pmem,
+                                                 memberships,
+                                                 permutations,
+                                                 SIMPLIFY = FALSE),
+                                          w, nr_M)
         ## Alternatively (more literally):
         ##   beta1 <- matrix(0, nr_M, nc_M)
         ##   for(b in seq(along = permutations)) {
@@ -575,65 +680,169 @@ function(clusterings, weights, control)
     n <- n_of_objects(clusterings)
     max_n_of_classes <- max(sapply(clusterings, n_of_classes))
 
-    ## Control parameters.
-    ## <FIXME>
-    ## Note that the same defaults are used by SUMT() ...
-    eps <- control$eps
-    if(is.null(eps))
-        eps <- .Machine$double.eps
+    ## Control parameters:
+    ## k,
     k <- control$k
     if(is.null(k))
         k <- max_n_of_classes
-    method <- control$method
-    ## We use optim(method = "CG") as default, as nlm() may be
-    ## computationally infeasible.
-    if(is.null(method))
-        method <- "CG"
-    q <- control$q
-    if(is.null(q))
-        q <- 10
+    ## nruns,
+    nruns <- control$nruns
+    ## start.
     start <- control$start
-    verbose <- control$verbose
-    if(is.null(verbose))
-        verbose <- getOption("verbose")
-    ## </FIXME>
-    ## Do this at last ...
-    control <- as.list(control$control)
 
     w <- weights / sum(weights)
 
     comemberships <-
         lapply(clusterings, function(x) {
             ## No need to force a common k here.
-            M <- cl_membership(x)
-            .tcrossprod(M)
+            tcrossprod(cl_membership(x))
         })
 
-    Y <- matrix(rowSums(mapply("*", comemberships, w)), n)
-    M <- if(is.null(start)) {
+    Y <- .weighted_sum_of_matrices(comemberships, w, n)
+
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else {
+        if(is.null(nruns)) {
+            ## Use nruns only if start is not given.
+            nruns <- 1
+        }
         e <- eigen(Y, symmetric = TRUE)
-        ## Use M <- U_k \lambda_k^{1/2}.
-        e$vectors[, 1:k] * rep(sqrt(e$values[1:k]), each = n)
+        ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
+        ## thereof.
+        M <- e$vectors[, 1:k] * rep(sqrt(e$values[1:k]), each = n)
+        m <- c(M)
+        start <- c(list(m),
+                   replicate(nruns - 1,
+                             m + rnorm(length(m), sd = sd(m) / sqrt(3)),
+                             simplify = FALSE))
     }
-    else
-        start
+
     y <- c(Y)
 
-    L <- function(m) sum((y - .tcrossprod(matrix(m, n))) ^ 2)
-    P <- function(m) {
-        sum(pmin(m, 0) ^ 2) + sum((rowSums(matrix(m, n)) - 1) ^ 2)
-    }
+    L <- function(m) sum((y - tcrossprod(matrix(m, n))) ^ 2)
+    P <- .make_penalty_function_membership(n, k)
     grad_L <- function(m) {
         M <- matrix(m, n)
-        4 * c((.tcrossprod(M) - Y) %*% M)
+        4 * c((tcrossprod(M) - Y) %*% M)
     }
-    grad_P <- function(m) {
-        M <- matrix(m, n)
-        2 * (pmin(m, 0) + rep.int(rowSums(M) - 1, k))
+    grad_P <- .make_penalty_gradient_membership(n, k)
+
+    m <- SUMT(start, L, P, grad_L, grad_P,
+              method = control$method, eps = control$eps,
+              q = control$q, verbose = control$verbose,
+              control = as.list(control$control))
+
+    ## Ensure that a stochastic matrix is returned.
+    M <- matrix(pmax(m, 0), n)
+    M <- M / rowSums(M)
+    rownames(M) <- rownames(cl_membership(clusterings[[1]]))
+    as.cl_partition(cl_membership(as.cl_membership(M), k))
+}
+
+### * .cl_consensus_partition_soft_symdiff
+
+.cl_consensus_partition_soft_symdiff <-
+function(clusterings, weights, control)
+{
+    ## Use a SUMT to solve
+    ##   \sum_b w_b \sum_{ij} | c_{ij}(b) - c_{ij} | => min
+    ## where C(b) = comembership(M(b)) and C = comembership(M) and M is
+    ## a membership matrix.
+
+    ## Control parameters:
+    ## gradient,
+    gradient <- control$gradient
+    if(is.null(gradient))
+        gradient <- TRUE
+    ## k,
+    k <- control$k
+    ## nruns,
+    nruns <- control$nruns
+    ## start.
+    start <- control$start
+
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else if(is.null(nruns)) {
+        ## Use nruns only if start is not given.
+        nruns <- 1
+    }
+    
+    max_n_of_classes <- max(sapply(clusterings, n_of_classes))
+    if(is.null(k))
+        k <- max_n_of_classes
+
+    B <- length(clusterings)    
+    n <- n_of_objects(clusterings)
+    
+    w <- weights / sum(weights)
+
+    comemberships <-
+        lapply(clusterings, function(x) {
+            ## No need to force a common k here.
+            tcrossprod(cl_membership(x))
+        })
+
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else {
+        if(is.null(nruns)) {
+            ## Use nruns only if start is not given.
+            nruns <- 1
+        }
+        ## Try using a rank k "root" of the weighted median of the
+        ## comemberships as starting value.
+        Y <- apply(array(unlist(comemberships), c(n, n, B)), c(1, 2),
+                   weighted_median, w)
+        e <- eigen(Y, symmetric = TRUE)
+        ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
+        ## thereof.
+        M <- e$vectors[, 1:k] * rep(sqrt(e$values[1:k]), each = n)
+        m <- c(M)
+        start <- c(list(m),
+                   replicate(nruns - 1,
+                             m + rnorm(length(m), sd = sd(m) / sqrt(3)),
+                             simplify = FALSE))
     }
 
-    m <- SUMT(c(M), L, P, grad_L, grad_P, method = method, eps = eps,
-              q = q, verbose = verbose, control = control)
+    L <- function(m) {
+        M <- matrix(m, n)
+        C_M <- tcrossprod(M)
+        sum(w * sapply(comemberships,
+                       function(C) sum(abs(C_M - C))))
+    }
+    P <- .make_penalty_function_membership(n, k)
+    if(gradient) {
+        grad_L <- function(m) {
+            M <- matrix(m, n)
+            C_M <- tcrossprod(M)
+            .weighted_sum_of_matrices(lapply(comemberships,
+                                             function(C)
+                                             2 * sign(C_M - C) %*% M),
+                                      w, n)
+        }
+        grad_P <- .make_penalty_gradient_membership(n, k)
+    }
+    else
+        grad_L <- grad_P <- NULL
+
+    m <- SUMT(start, L, P, grad_L, grad_P,
+              method = control$method, eps = control$eps,
+              q = control$q, verbose = control$verbose,
+              control = as.list(control$control))
 
     ## Ensure that a stochastic matrix is returned.
     M <- matrix(pmax(m, 0), n)
@@ -650,8 +859,7 @@ function(clusterings, weights, control)
     w <- weights / sum(weights)
     B <- length(clusterings)
     ultrametrics <- lapply(clusterings, cl_ultrametric)
-    w <- rep.int(w, rep.int(length(ultrametrics[[1]]), B))
-    dissimilarities <- rowSums(matrix(w * unlist(ultrametrics), nc = B))
+    dissimilarities <- .weighted_sum_of_vectors(ultrametrics, w)
     ## Cannot use as.cl_ultrametric() as we only have a dissimilarity
     ## (and are trying to fit an ultrametric to it) ...
     ## <FIXME 2.1.0>
@@ -662,7 +870,93 @@ function(clusterings, weights, control)
     labels <- attr(ultrametrics[[1]], "Labels")
     d <- .dist_from_vector(dissimilarities, labels = labels)
     ## </FIXME>
-    as.cl_hierarchy(ls_fit_ultrametric(d, control = control))
+    as.cl_dendrogram(ls_fit_ultrametric(d, control = control))
+}
+
+### * .cl_consensus_hierarchy_manhattan
+
+.cl_consensus_hierarchy_manhattan <-
+function(clusterings, weights, control)
+{
+    ## Control parameters:
+    ## gradient,
+    gradient <- control$gradient
+    if(is.null(gradient))
+        gradient <- TRUE
+    ## nruns,
+    nruns <- control$nruns
+    ## start.
+    start <- control$start
+
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else if(is.null(nruns)) {
+        ## Use nruns only if start is not given.
+        nruns <- 1
+    }
+    
+    w <- weights / sum(weights)
+    B <- length(clusterings)
+    ultrametrics <- lapply(clusterings, cl_ultrametric)
+    
+    if(B == 1)
+        return(as.cl_dendrogram(ultrametrics[[1]]))
+
+    n <- n_of_objects(ultrametrics[[1]])
+    labels <- cl_object_names(ultrametrics[[1]])
+
+    ## We need to do
+    ##
+    ##   \sum_b w_b \sum_{i,j} | u_{ij}(b) - u_{ij} | => min
+    ##
+    ## over all ultrametrics u.  Let's use a SUMT (for which "gradients"
+    ## can optionally be switched off) ...
+    
+    L <- function(d) {
+        sum(w * sapply(ultrametrics, function(u) sum(abs(u - d))))
+        ## Could also do something like
+        ##   sum(w * sapply(ultrametrics, cl_dissimilarity, d,
+        ##                  "manhattan"))
+    }
+    P <- .make_penalty_function_ultrametric(n)
+    if(gradient) {
+        grad_L <- function(d) {
+            ## "Gradient" is \sum_b w_b sign(d - u(b)).
+            .weighted_sum_of_vectors(lapply(ultrametrics,
+                                            function(u) sign(d - u)),
+                                     w)
+        }
+        grad_P <- .make_penalty_gradient_ultrametric(n)
+    } else
+        grad_L <- grad_P <- NULL
+            
+    if(is.null(start)) {
+        ## Initialize by "random shaking" of the weighted median of the
+        ## ultrametrics.  Any better ideas?
+        ## <FIXME>
+        ## Using var(x) / 3 is really L2 ...
+        ## </FIXME>
+        x <- apply(matrix(unlist(ultrametrics), nc = B), 1, 
+                   weighted_median, w)
+        start <- replicate(nruns,  
+                           x + rnorm(length(x), sd = sd(x) / sqrt(3)),
+                           simplify = FALSE)
+    }
+
+    d <- SUMT(start, L, P, grad_L, grad_P,
+              method = control$method, eps = control$eps,
+              q = control$q, verbose = control$verbose,
+              control = as.list(control$control))
+
+    ## Round to enforce ultrametricity, and hope for the best ...
+    d <- .cl_ultrametric_from_ultrametric_approximation(d, size = n,
+                                                        labels = labels)
+
+    as.cl_dendrogram(d)
 }
 
 ### * .cl_consensus_hierarchy_majority
@@ -749,6 +1043,24 @@ function(A, x)
     ## Could also use sweep(A, 2, x, "*")
     rep(x, each = nrow(A)) * A
 }
+## </FIXME>
+
+## .make_penalty_function_membership
+
+.make_penalty_function_membership <-
+function(nr, nc)
+    function(m) {
+        sum(pmin(m, 0) ^ 2) + sum((rowSums(matrix(m, nr)) - 1) ^ 2)
+    }
+
+## .make_penalty_gradient_membership
+
+.make_penalty_gradient_membership <-
+function(nr, nc)
+    function(m) {
+        2 * (pmin(m, 0) + rep.int(rowSums(matrix(m, nr)) - 1, nc))
+    }
+
 
 ### Local variables: ***
 ### mode: outline-minor ***

@@ -150,21 +150,21 @@ deviation_from_additivity_gradient(double *x, int *n, double *out)
 		    B = D[i][k] + D[j][l];
 		    C = D[i][l] + D[j][k];
 		    if((A <= B) && (A <= C)) {
-			delta = 2 * (C - B);
+			delta = 2 * (B - C);
 			G[i][l] -= delta;
 			G[j][k] -= delta;
 			G[i][k] += delta;
 			G[j][l] += delta;
 		    }
 		    else if(B <= C) {
-			delta = 2 * (A - C);
+			delta = 2 * (C - A);
 			G[i][l] += delta;
 			G[j][k] += delta;
 			G[i][j] -= delta;
 			G[k][l] -= delta;
 		    }
 		    else {
-			delta = 2 * (B - A);
+			delta = 2 * (A - B);
 			G[i][k] -= delta;
 			G[j][l] -= delta;
 			G[i][j] += delta;

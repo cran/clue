@@ -1,10 +1,12 @@
 ### * cl_dissimilarity
 
 cl_dissimilarity <-
-function(x, y = NULL, method = "euclidean")
+function(x, y = NULL, method = "euclidean", ...)
 {
     x <- as.cl_ensemble(x)
-    is_partition_ensemble <- inherits(x, "cl_partition_ensemble")
+    is_partition_ensemble <-
+        (inherits(x, "cl_partition_ensemble")
+         || all(sapply(x, .has_object_memberships)))
 
     ## Be nice.
     if(is.character(y) || is.function(y)) {
@@ -28,15 +30,17 @@ function(x, y = NULL, method = "euclidean")
               
     if(!is.null(y)) {
         y <- as.cl_ensemble(y)
-        if(inherits(y, "cl_partition_ensemble")
-           != is_partition_ensemble)
+        is_partition_ensemble_y <-
+            (inherits(y, "cl_partition_ensemble")
+             || all(sapply(x, .has_object_memberships)))
+        if(!identical(is_partition_ensemble, is_partition_ensemble_y))
             stop("Cannot mix partitions and hierarchies.")
         if(n_of_objects(x) != n_of_objects(y))
             stop("All clusterings must have the same number of objects.")
         ## Build a cross-proximity object of cross-dissimilarities.
         d <- matrix(0, length(x), length(y))
         for(j in seq(along = y))
-            d[, j] <- sapply(x, method, y[[j]])
+            d[, j] <- sapply(x, method, y[[j]], ...)
         dimnames(d) <- list(names(x), names(y))
         description <- paste("Dissimilarities using", method_name)
         return(cl_cross_proximity(d, description,
@@ -50,7 +54,7 @@ function(x, y = NULL, method = "euclidean")
     while(length(ind) > 1) {
         j <- ind[1]
         ind <- ind[-1]
-        d[[j]] <- sapply(x[ind], method, x[[j]])
+        d[[j]] <- sapply(x[ind], method, x[[j]], ...)
     }
     
     cl_proximity(unlist(d),
@@ -204,27 +208,27 @@ function(x, y)
 ### ** .cl_dissimilarity_hierarchy_euclidean
 
 .cl_dissimilarity_hierarchy_euclidean <-
-function(x, y)
+function(x, y, weights = 1)
 {
     if(!.has_object_dissimilarities(x) ||
        !.has_object_dissimilarities(y))
         return(NA)
     u <- cl_object_dissimilarities(x)
     v <- cl_object_dissimilarities(y)
-    sqrt(sum((u - v) ^ 2))
+    sqrt(sum(weights * (u - v) ^ 2))
 }
 
 ### ** .cl_dissimilarity_hierarchy_manhattan
 
 .cl_dissimilarity_hierarchy_manhattan <-
-function(x, y)
+function(x, y, weights = 1)
 {
     if(!.has_object_dissimilarities(x) ||
        !.has_object_dissimilarities(y))
         return(NA)
     u <- cl_object_dissimilarities(x)
     v <- cl_object_dissimilarities(y)
-    sum(abs(u - v))
+    sum(weights * abs(u - v))
 }
 
 ### ** .cl_dissimilarity_hierarchy_cophenetic
@@ -307,6 +311,62 @@ function(x, y)
     q <- cl_object_dissimilarities(x) / cl_object_dissimilarities(y)
     if(is.matrix(q)) q <- q[lower.tri(q)]
     log(max(q) / min(q))
+}
+
+### ** .cl_dissimilarity_hierarchy_BA
+
+.cl_dissimilarity_hierarchy_BA <-
+function(x, y, delta, ...)
+{
+    ## Compute Boorman-Arabie (1973) dendrogram ("valued tree")
+    ## dissimilarities of the form
+    ##
+    ##    m_\delta(T_1, T_2)
+    ##      = \int_0^\infty \delta(P_1(\alpha), P_2(\alpha)) d\alpha
+    ##
+    ## where the trees (dendrograms) are defined as right-continuous
+    ## maps from [0, \Infty) to the partition lattice.
+
+    ## We can compute this as follows.  Take the ultrametrics and use
+    ## as.hclust() to detemine the heights \alpha_1(k) and \alpha_2(l)
+    ## of the splits.  Let \alpha_i be the sequence obtained by
+    ## combining these two.  Then
+    ##
+    ##   m_\delta
+    ##     = \sum_{i=0}^{L-1} (\alpha_{i+1} - \alpha_i)
+    ##                        \delta(P_1(\alpha_i), P_2(\alpha_i))
+    ##
+    ## We use cutree() for computing the latter partitions.  As we
+    ## already have the hclust representations, we should be able to do
+    ## things more efficiently ...
+
+    if(inherits(x, "hclust"))
+        t_x <- x
+    else if(inherits(x, "cl_ultrametric"))
+        t_x <- as.hclust(x)
+    else if(is.cl_dendrogram(x))
+        t_x <- as.hclust(cl_ultrametric(x))
+    else
+        return(NA)
+    if(inherits(y, "hclust"))
+        t_y <- y
+    else if(inherits(y, "cl_ultrametric"))
+        t_y <- as.hclust(y)
+    else if(is.cl_dendrogram(y))
+        t_y <- as.hclust(cl_ultrametric(y))
+    else
+        return(NA)
+    
+    alpha <- sort(unique(c(t_x$height, t_y$height)))
+    cuts_x <- cutree(t_x, h = alpha)
+    cuts_y <- cutree(t_y, h = alpha)
+    deltas <- mapply(cl_dissimilarity,
+                     lapply(split(cuts_x, col(cuts_x)),
+                            as.cl_partition),
+                     lapply(split(cuts_y, col(cuts_y)),
+                            as.cl_partition),
+                     MoreArgs = list(delta, ...))
+    sum(diff(alpha) * deltas[-length(deltas)])
 }
 
 ### * as.dist.cl_dissimilarity

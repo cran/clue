@@ -20,6 +20,8 @@ export("cl_agreement",
        "cl_prototypes",
        "cl_tabulate",
        "cl_ultrametric", "as.cl_ultrametric",
+       "ls_fit_addtree",
+       "ls_fit_centroid",
        "ls_fit_ultrametric",
        "ls_fit_ultrametric_target",
        "l1_fit_ultrametric_target",
@@ -64,6 +66,7 @@ S3method("as.dendrogram", "cl_ultrametric")
 
 S3method("as.dist", "cl_dissimilarity")
 
+S3method("as.hclust", "cl_dendrogram")
 S3method("as.hclust", "cl_ultrametric")
 
 S3method("as.matrix", "cl_proximity")
@@ -236,6 +239,7 @@ S3method("n_of_objects", "twins")
 
 S3method("names", "cl_proximity")
 
+S3method("plot", "cl_addtree")
 S3method("plot", "cl_dendrogram")
 S3method("plot", "cl_ultrametric")
 

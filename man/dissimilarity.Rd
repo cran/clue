@@ -4,7 +4,7 @@
 \description{Compute the dissimilarity between (ensembles) of partitions
   or hierarchies.}
 \usage{
-cl_dissimilarity(x, y = NULL, method = "euclidean")
+cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
 }
 \arguments{
   \item{x}{an ensemble of partitions or hierarchies and dissimilarities,
@@ -16,6 +16,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
     version is matched against the lower-cased names of the available
     built-in methods using \code{\link{pmatch}}.  See \bold{Details} for
     available built-in methods.}
+  \item{\dots}{further arguments to be passed to methods.}
 }
 \value{
   If \code{y} is \code{NULL}, an object of class
@@ -147,6 +148,17 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
       represented by the ultrametrics (e.g., Jardine & Sibson (1971),
       page 107), and only defined for \emph{strict} ultrametrics (which
       are strictly positive for distinct objects).}
+    \item{\code{"BA"}}{the \eqn{m_\delta} family of tree metrics by
+      Boorman and Arabie (1973), which are of the form \eqn{m_\delta =
+	\int_0^\infty \delta(p(h), q(h)) dh}, where \eqn{p(h)} and
+      \eqn{q(h)} are the hard partitions obtaining by cutting the trees
+      (dendrograms) at height \eqn{h}, and \eqn{\delta} is a suitably
+      dissimilarity measure for partitions.  In particular, when taking
+      \eqn{\delta} as symdiff or Rand dissimilarity, \eqn{m_\delta} is
+      the Manhattan dissimilarity of the hierarchies.
+
+      If \code{\dots} has an argument named \code{delta} it is taken to
+      specify the partition dissimilarity \eqn{\delta} to be employed.}
   }
 
   The measures based on ultrametrics also allow computing dissimilarity
@@ -175,9 +187,13 @@ cl_dissimilarity(x, y = NULL, method = "euclidean")
   S. A. Boorman and P. Arabie (1972).
   Structural measures and the method of sorting.
   In R. N. Shepard, A. K. Romney, & S. B. Nerlove (eds.),
-  \emph{Multidimensional scaling: Theory and applications in the
-    behavioral sciences, 1: Theory} (pages 225--249).
-  New York: Seminar Press. 
+  \emph{Multidimensional Scaling: Theory and Applications in the
+    Behavioral Sciences, 1: Theory} (pages 225--249).
+  New York: Seminar Press.
+
+  S. A. Boorman and P. Arabie (1973).
+  Metrics on spaces of finite trees.
+  \emph{Journal of Mathematical Psychology}, \bold{10}, 26--59.
   
   I. Charon and L. Denoeud and A. Guénoche and O. Hudry (2005).
   \emph{Maximum Transfer Distance Between Partitions}.

@@ -1,14 +1,22 @@
 solve_LSAP <-
 function(x, maximum = FALSE)
 {
-    if(!is.matrix(x)
-       || ((n <- nrow(x)) != ncol(x))
-       || any(x < 0))
-        stop("x must be a square matrix with nonnegative entries.")
+    if(!is.matrix(x) || any(x < 0))
+        stop("x must be a matrix with nonnegative entries.")
+
+    nr <- nrow(x)
+    nc <- ncol(x)
+    if(nr > nc)
+        stop("x must not have more rows than columns.")
+    if(nc > nr)
+        x <- rbind(x, matrix(2 * sum(x), nc - nr, nc))
+
     if(maximum) x <- max(x) - x
+
     storage.mode(x) <- "double"
-    out <- .C("solve_LSAP", x, n, p = integer(n),
+    out <- .C("solve_LSAP", x, nc, p = integer(nc),
               PACKAGE = "clue")$p + 1
+    out <- out[seq(length = nr)]
     class(out) <- "solve_LSAP"
     out
 }

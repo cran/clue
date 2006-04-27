@@ -10,8 +10,8 @@ as.cl_ensemble(x)
 is.cl_ensemble(x)
 }
 \arguments{
-  \item{\dots}{R objects representing clusterings or dissimilarities on
-    the same objects.}
+  \item{\dots}{R objects representing clusterings of or dissimilarities
+    between the same objects.}
   \item{list}{a list of R objects as in \code{\dots}.}
   \item{x}{for \code{as.cl_ensemble}, an R object as in \code{\dots};
     for \code{is.cl_ensemble}, an arbitrary R object.}

@@ -191,6 +191,21 @@ function(x, ...)
     invisible(x)
 }
 
+### .has_object_memberships
+
+## Be nice to users when computing proximities: all measures for
+## "partitions" we currently consider really only assume that we can
+## compute memberships and/or class ids.
+
+## Note that the cl_membership() default method works for cl_class_ids.
+
+.has_object_memberships <-
+function(x)
+    (is.cl_partition(x)
+     || inherits(x, "cl_membership")
+     || inherits(x, "cl_class_ids"))
+
+
 ### Local variables: ***
 ### mode: outline-minor ***
 ### outline-regexp: "### [*]+" ***

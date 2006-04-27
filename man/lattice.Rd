@@ -25,7 +25,7 @@ cl_join(x, y)
   (hard) partitions of \eqn{X} can be partially ordered by defining a
   partition \eqn{P} to be \dQuote{finer} than a partition \eqn{Q}, i.e.,
   \eqn{P \le Q}, if each class of \eqn{P} is contained in some class of
-  \eqn{P}.  With this partial order, \eqn{H(X)} becomes a bounded
+  \eqn{Q}.  With this partial order, \eqn{H(X)} becomes a bounded
   \dfn{lattice}, with intersection and union of two elements given by
   their greatest lower bound (\dfn{meet}) and their least upper bound
   (\dfn{join}), respectively.

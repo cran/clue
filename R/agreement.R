@@ -1,7 +1,7 @@
 ### * cl_agreement
 
 cl_agreement <-
-function(x, y = NULL, method = "euclidean")
+function(x, y = NULL, method = "euclidean", ...)
 {
     ## <NOTE>
     ## This code is repeated from cl_dissimilarity(), mutatis mutandis.
@@ -9,7 +9,9 @@ function(x, y = NULL, method = "euclidean")
     ## </NOTE>
     
     x <- as.cl_ensemble(x)
-    is_partition_ensemble <- inherits(x, "cl_partition_ensemble")
+    is_partition_ensemble <-
+        (inherits(x, "cl_partition_ensemble")
+         || all(sapply(x, .has_object_memberships)))
 
     ## Be nice.
     if(is.character(y) || is.function(y)) {
@@ -33,15 +35,17 @@ function(x, y = NULL, method = "euclidean")
 
     if(!is.null(y)) {
         y <- as.cl_ensemble(y)
-        if(inherits(y, "cl_partition_ensemble")
-           != is_partition_ensemble)
+        is_partition_ensemble_y <-
+            (inherits(y, "cl_partition_ensemble")
+             || all(sapply(x, .has_object_memberships)))
+        if(!identical(is_partition_ensemble, is_partition_ensemble_y))
             stop("Cannot mix partitions and hierarchies.")
         if(n_of_objects(x) != n_of_objects(y))
             stop("All clusterings must have the same number of objects.")
         ## Build a cross-proximity object of cross-agreements.
         d <- matrix(0, length(x), length(y))
         for(j in seq(along = y))
-            d[, j] <- sapply(x, method, y[[j]])
+            d[, j] <- sapply(x, method, y[[j]], ...)
         dimnames(d) <- list(names(x), names(y))
         description <- paste("Agreements using", method_name)
         return(cl_cross_proximity(d, description,
@@ -55,7 +59,7 @@ function(x, y = NULL, method = "euclidean")
     while(length(ind) > 1) {
         j <- ind[1]
         ind <- ind[-1]
-        d[[j]] <- sapply(x[ind], method, x[[j]])
+        d[[j]] <- sapply(x[ind], method, x[[j]], ...)
     }
 
     ## <NOTE>

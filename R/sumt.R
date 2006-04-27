@@ -1,10 +1,11 @@
 SUMT <-
-function(x0, L, P, grad_L = NULL, grad_P = NULL, method = "CG",
+function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
          eps = NULL, q = NULL, verbose = NULL, control = list())
 {
     ## Default values: make it nice for others to call us.
 
     if(is.null(eps)) eps <- .Machine$double.eps
+    if(is.null(method)) method <- "CG"
     if(is.null(q)) q <- 10
     if(is.null(verbose)) verbose <- getOption("verbose")
     
@@ -53,29 +54,46 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = "CG",
     }
     ## </NOTE>
 
-    x <- x0
-    ## <TODO>
-    ## Better upper/lower bounds for rho?
-    rho <- max(L(x), 0.00001) / max(P(x), 0.00001)
-    ## </TODO>
+    ## We currently require that x0 be a *list* of start values, the
+    ## length of which gives the number of SUMT runs.  But as always,
+    ## let's be nice to users and developers, just in case ...
+    if(!is.list(x0))
+        x0 <- list(x0)
 
-    iter <- 1
-    repeat {
-        ## <TODO>
-        ## Shouldnt't we also have maxiter, just in case ...?
-        ## </TODO>
+    v_opt <- Inf
+    x_opt <- NULL
+    for(run in seq(along = x0)) {
         if(verbose)
-            cat("Iteration:", iter,
-                "Rho:", rho,
-                "P:", P(x),
-                "\n")
-        x_old <- x
-        x <- optimize_with_penalty(rho, x)
-        if(sum((x_old - x) ^ 2) < eps)
-            break
-        iter <- iter + 1        
-        rho <- q * rho
+            cat("SUMT run:", run, "\n")
+        x <- x0[[run]]
+        ## <TODO>
+        ## Better upper/lower bounds for rho?
+        rho <- max(L(x), 0.00001) / max(P(x), 0.00001)
+        ## </TODO>
+        iter <- 1
+        repeat {
+            ## <TODO>
+            ## Shouldnt't we also have maxiter, just in case ...?
+            ## </TODO>
+            if(verbose)
+                cat("Iteration:", iter,
+                    "Rho:", rho,
+                    "P:", P(x),
+                    "\n")
+            x_old <- x
+            x <- optimize_with_penalty(rho, x)
+            if(sum((x_old - x) ^ 2) < eps)
+                break
+            iter <- iter + 1        
+            rho <- q * rho
+        }
+        v <- Phi(rho, x)
+        if(v < v_opt) {
+            v_opt <- v
+            x_opt <- x
+        }
     }
 
-    x
+    x_opt
+
 }

@@ -1,4 +1,22 @@
-## * Matrix utilities
+### * Matrix/vector utilities
+
+### * .dist_from_vector
+        
+.dist_from_vector <-
+function(x, n = NULL, labels = NULL)
+{
+    ## This might be useful as as.dist.vector, perhaps without the extra
+    ## argument n then which we only have for minimal performance gains.
+    if(is.null(n))
+        n <- as.integer((sqrt(1 + 8 * length(x)) + 1) / 2)
+    attr(x, "Size") <- n
+    if(!is.null(labels))
+        attr(x, "Labels") <- labels
+    class(x) <- "dist"
+    x
+}
+
+### ** .one_entry_per_column
 
 .one_entry_per_column <-
 function(x, j)
@@ -19,22 +37,45 @@ function(x, j, value)
     x
 }
 
-## <FIXME>
-## Transition function.
-## Remove once R 2.3.0 is out and required.
-.tcrossprod <- if(exists("tcrossprod", envir = baseenv())) {
-    tcrossprod
-} else {
-    function(x, y = NULL) {
-        if(is.null(y))
-            x %*% t(x)
-        else
-            x %*% t(y)
-    }
-}
-## </FIXME>
+### * .symmetric_matrix_from_veclh
 
-## * Containers
+.symmetric_matrix_from_veclh <-
+function(x, n = NULL)
+{
+    ## In essence the same as as.matrix.dist, but without handling the
+    ## additional attributes that dist objects might have.
+    if(is.null(n))
+        n <- as.integer((sqrt(1 + 8 * length(x)) + 1) / 2)
+    M <- matrix(0, n, n)
+    M[row(M) > col(M)] <- x
+    M + t(M)
+}
+
+### ** .weighted_sum_of_matrices
+
+.weighted_sum_of_matrices <-
+function(x, w = NULL, nr = NULL)
+{
+    ## Quite often we need to compute weighted sums \sum_b w_b X_b of
+    ## conforming matrices \{ X_b \}.  If x is a list containing the
+    ## matrices and w the vector of weights, it seems that one
+    ## reasonably efficient way of doing this is the following.
+    if(is.null(w)) w <- rep(1, length = length(x))
+    if(is.null(nr)) nr <- NROW(x[[1]])
+    matrix(rowSums(mapply("*", x, w)), nr)
+}
+
+### ** .weighted_sum_of_vectors
+
+.weighted_sum_of_vectors <-
+function(x, w = NULL)
+{
+    ## See above.
+    if(is.null(w)) w <- rep(1, length = length(x))
+    rowSums(mapply("*", x, w))
+}
+
+### * Containers
 
 ## Creator.
 .make_container <-
@@ -76,7 +117,7 @@ function(x, cls, ...)
     invisible(x)
 }
     
-## * Others
+### * Others
 
 weighted_median <-
 function(x, w = 1, na.rm = FALSE)
