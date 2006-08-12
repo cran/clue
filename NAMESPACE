@@ -1,5 +1,7 @@
 useDynLib("clue")
 
+importFrom("stats",
+           "as.dendrogram", "as.dist", "as.hclust", "cophenetic")
 importFrom("cluster", "silhouette")
 
 export("cl_agreement",
@@ -112,6 +114,7 @@ S3method("cl_membership", "flexmix")
 S3method("cl_membership", "kmeans")
 S3method("cl_membership", "partition")
 
+S3method("cl_object_names", "cl_ensemble")
 S3method("cl_object_names", "cl_hierarchy")
 S3method("cl_object_names", "cl_membership")
 S3method("cl_object_names", "cl_partition")
