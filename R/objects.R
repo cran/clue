@@ -152,6 +152,14 @@ function(x)
 cl_object_names.cl_hierarchy <-
 function(x)
     cl_object_names(.get_representation(x))
+## Package clue: ensembles.
+cl_object_names.cl_ensemble <-
+function(x)
+{
+    nms <- lapply(x, cl_object_names)
+    ind <- which(sapply(nms, length) > 0)
+    if(any(ind)) nms[[ind[1]]] else NULL
+}
 
 ### * cl_object_labels
 
