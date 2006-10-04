@@ -25,7 +25,7 @@ n_of_classes.kmeans <- n_of_classes.default
 ## respective class inheriting from class "partition".
 n_of_classes.fanny <-
 function(x)
-    sum(colSums(x$membership) > 0)
+    sum(colSums(x$membership, na.rm = TRUE) > 0)
 n_of_classes.partition <- n_of_classes.default
 
 ## Package cclust: cclust().
@@ -411,10 +411,12 @@ function(x, labels = NULL)
 cl_partition_by_memberships <-
 function(x, labels = NULL)
 {
-    if(!is.matrix(x) || any(x < 0) || any(x > 1))
+    if(!is.matrix(x)
+       || any(x < 0, na.rm = TRUE)
+       || any(x > 1, na.rm = TRUE))
         stop("Not a valid membership matrix.")
     ## Be nice.
-    x <- x / rowSums(x)
+    x <- x / rowSums(x, na.rm = TRUE)
     ## (Note that this does not imply all(rowSums(x) == 1).  If we
     ## wanted to test for this, something like
     ##    .is_stochastic_matrix <- function(x)
@@ -460,7 +462,7 @@ is.cl_hard_partition.kmeans <- .true
 is.cl_hard_partition.fanny <-
 function(x)
 {
-    all(rowSums(cl_membership(x)) == 1)
+    all(rowSums(cl_membership(x), na.rm = TRUE) == 1)
 }
 ## </NOTE>
 is.cl_hard_partition.partition <- .true

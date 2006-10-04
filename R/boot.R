@@ -25,7 +25,7 @@ function(x, B, k = NULL,
                       out <- eval(as.call(c(list(algorithm, train),
                                             if(!is.null(k)) list(k),
                                             parameters)))
-                      as.cl_partition(cl_predict(out, x))
+                      as.cl_partition(cl_predict(out, x, "memberships"))
                   },
                   simplify = FALSE)
     }

@@ -2,10 +2,12 @@
 \alias{cl_predict}
 \title{Predict Memberships}
 \description{
-  Predict class memberships from R objects representing partitions.
+  Predict class ids or memberships from R objects representing
+  partitions.
 }
 \usage{
-cl_predict(object, newdata = NULL, ...)
+cl_predict(object, newdata = NULL,
+           type = c("class_ids", "memberships"), ...)
 }
 \arguments{
   \item{object}{an R object representing a partition of objects.}
@@ -13,11 +15,14 @@ cl_predict(object, newdata = NULL, ...)
     predictions for.  This must be of the same \dQuote{kind} as the data
     set employed for obtaining the partition.  If omitted, the original
     data are used.}
+  \item{type}{a character string indicating whether class ids or
+    memberships should be returned. May be abbreviated.}
   \item{\dots}{arguments to be passed to and from methods.}
 }
 \value{
-  An object of class \code{"cl_membership"} with the matrix of predicted
-  membership values.
+  Depending on \code{type}, an object of class \code{"cl_class_ids"}
+  with the predicted class ids, or of class \code{"cl_membership"} with
+  the matrix of predicted membership values.
 }
 \details{
   Many algorithms resulting in partitions of a given set of objects can
@@ -42,7 +47,7 @@ data("Cassini")
 nr <- NROW(Cassini$x)
 ind <- sample(nr, 0.9 * nr, replace = FALSE)
 party <- kmeans(Cassini$x[ind, ], 3)
-table(cl_class_ids(cl_predict(party, Cassini$x[-ind, ])),
+table(cl_predict(party, Cassini$x[-ind, ]),
       Cassini$classes[-ind])
 }
 \keyword{cluster}

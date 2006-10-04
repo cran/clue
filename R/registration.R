@@ -181,6 +181,12 @@ set_cl_dissimilarity_method("BA/D", "partition",
 set_cl_dissimilarity_method("BA/E", "partition",
                             .cl_dissimilarity_partition_BA_E,
                             "Boorman/Arabie normalized information distance")
+set_cl_dissimilarity_method("VI", "partition",
+                            .cl_dissimilarity_partition_VI,
+                            "Variation of information")
+set_cl_dissimilarity_method("Mallows", "partition",
+                            .cl_dissimilarity_partition_Mallows,
+                            "Mallows dissimilarity")
 
 set_cl_dissimilarity_method("euclidean", "hierarchy",
                             .cl_dissimilarity_hierarchy_euclidean,

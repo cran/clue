@@ -1,20 +1,29 @@
+## <FIXME>
+## Maybe add support for "auto" type (class_ids when predicting from a
+## hard, memberships when predicting from a soft partition) eventually.
+## </FIXME>
+
 cl_predict <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
     UseMethod("cl_predict")
 
 ## Default method.
 ## Should also work for kcca() from package flexclust.
 cl_predict.default <-
-function(object, newdata = NULL, ...)
-    as.cl_membership(predict(object, newdata, ...))
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
+    .as_cl_class_ids_or_membership(predict(object, newdata, ...), type)
 
 ## Package stats: kmeans() (R 2.1.0 or better).
 cl_predict.kmeans <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
-    as.cl_membership(max.col(- .rxdist(newdata, object$centers)))
+        return(.cl_class_ids_or_membership(object, type))
+    d <- .rxdist(newdata, object$centers)
+    .as_cl_class_ids_or_membership(max.col(-d), type)
 }
 
 ## Package cluster:
@@ -33,18 +42,20 @@ function(object, newdata = NULL, ...)
 ## accomodate modern needs, e.g., for bagging.
 
 cl_predict.fanny <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
+        return(.cl_class_ids_or_membership(object, type))
     stop("Cannot make new predictions.")
-}    
+}
 
 cl_predict.clara <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
+        return(.cl_class_ids_or_membership(object, type))
     ## <FIXME>
     ## Add support eventually ...
     if(identical(object$call$stand, TRUE))
@@ -57,14 +68,15 @@ function(object, newdata = NULL, ...)
         ## (Or hard-wire the default value: "euclidean".)
     }
     d <- .rxdist(newdata, object$medoids, method)
-    as.cl_membership(max.col(-d))
+    .as_cl_class_ids_or_membership(max.col(-d), type)
 }
 
-cl_predict.pam <- 
-function(object, newdata = NULL, ...)
+cl_predict.pam <-
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
+        return(.cl_class_ids_or_membership(object, type))
     prototypes <- object$medoids
     if(!is.matrix(prototypes))
         stop("Cannot make new predictions.")
@@ -80,27 +92,32 @@ function(object, newdata = NULL, ...)
         ## (Or hard-wire the default value: "euclidean".)
     }
     d <- .rxdist(newdata, object$medoids, method)
-    as.cl_membership(max.col(-d))
+    .as_cl_class_ids_or_membership(max.col(-d), type)
 }
 
 ## Package RWeka: clusterers return objects inheriting from
 ## "Weka_clusterer".
 cl_predict.Weka_clusterer <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
-    as.cl_membership(predict(object, newdata = newdata,
-                             type = "memberships", ...))
+        return(.cl_class_ids_or_membership(object, type))
+    .as_cl_class_ids_or_membership(predict(object, newdata = newdata,
+                                           type = type, ...),
+                                   type)
 }
 
 ## Package cba: ccfkms().
 cl_predict.ccfkms <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
-    as.cl_membership(as.vector(predict(object, newdata)$cl))
+        return(.cl_class_ids_or_membership(object, type))
+    .as_cl_class_ids_or_membership(as.vector(predict(object,
+                                                     newdata)$cl),
+                                   type)
 }
 ## Package cba: rockCluster() returns objects of class "rock".
 ## Currently, no predictions.
@@ -115,22 +132,24 @@ function(object, newdata = NULL, ...)
 
 ## Package cclust: cclust().
 cl_predict.cclust <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     ## Package cclust provides predict.cclust() which returns (again) an
     ## object of class "cclust", but does not give the labels of the
     ## original data in case no new data are given.
     if(is.null(newdata))
-        return(cl_membership(object))
-    cl_membership(predict(object, newdata))
+        return(.cl_class_ids_or_membership(object, type))
+    .as_cl_class_ids_or_membership(predict(object, newdata), type)
 }
 
 ## Package e1071: cmeans() gives objects of class "fclust".
 cl_predict.fclust <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
+        return(.cl_class_ids_or_membership(object, type))
 
     ## Note that the 'fclust' objects returned by cmeans() do not always
     ## directly contain the information on the fuzzification parameter m
@@ -149,22 +168,24 @@ function(object, newdata = NULL, ...)
     method <- if("dist" %in% nms)
         object$call$dist
     else {
-        ## Not given in the call, hence use default value.        
+        ## Not given in the call, hence use default value.
         formals(e1071::cmeans)$dist
         ## (Or hard-wire the default value: "euclidean".)
     }
-    
+
     d <- .rxdist(newdata, object$centers, method)
     power <- c(m, if(method == "euclidean") 2 else 1)
-    as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
+    M <- .memberships_from_cross_dissimilarities(d, power)
+    .as_cl_class_ids_or_membership(M, type)
 }
 
 ## Package e1071: cshell().
 cl_predict.cshell <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
+        return(.cl_class_ids_or_membership(object, type))
 
     ## Not surprisingly, this is rather similar to what we do for fclust
     ## objects.  Only dissimiliraties (and exponents) need to be
@@ -180,14 +201,15 @@ function(object, newdata = NULL, ...)
     method <- if("dist" %in% nms)
         object$call$dist
     else {
-        ## Not given in the call, hence use default value.        
+        ## Not given in the call, hence use default value.
         formals(e1071::cshell)$dist
         ## (Or hard-wire the default value: "euclidean".)
     }
 
     d <- .rxdist(newdata, object$centers, method)
     d <- sweep(d, 2, object$radius) ^ 2
-    as.cl_membership(.memberships_from_cross_dissimilarities(d, m))
+    M <- .memberships_from_cross_dissimilarities(d, m)
+    .as_cl_class_ids_or_membership(M, type)
 }
 
 ## Package e1071: bclust().
@@ -207,17 +229,45 @@ cl_predict.kcca <- cl_predict.default
 
 ## Package clue: cl_pclust().
 cl_predict.cl_pclust <-
-function(object, newdata = NULL, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
-        return(cl_membership(object))
+        return(.cl_class_ids_or_membership(object, type))
 
     d <- object$d(newdata, object$prototypes)
     power <- c(object$m, object$e)
-    as.cl_membership(.memberships_from_cross_dissimilarities(d, power))
+    M <- .memberships_from_cross_dissimilarities(d, power)
+    .as_cl_class_ids_or_membership(M, type)
 }
 
 ## Package clue: (virtual) class "cl_partition".
 cl_predict.cl_partition <-
-function(object, newdata = NULL, ...)
-    cl_predict(.get_representation(object), newdata = newdata, ...)
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
+    cl_predict(.get_representation(object), newdata = newdata, type, ...)
+
+## Internal helpers: this looks a bit silly, but makes the rest of the
+## code look nicer ...
+
+.cl_class_ids_or_membership <-
+function(x, type = c("class_ids", "memberships"))
+{
+    type <- match.arg(type)
+
+    if(type == "class_ids")
+        cl_class_ids(x)
+    else
+        cl_membership(x)
+}
+
+.as_cl_class_ids_or_membership <-
+function(x, type = c("class_ids", "memberships"))
+{
+    type <- match.arg(type)
+
+    if(type == "class_ids")
+        as.cl_class_ids(x)
+    else
+        as.cl_membership(x)
+}
