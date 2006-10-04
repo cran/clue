@@ -106,6 +106,21 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       partition into the other, which, differently from the \eqn{A} and
       \eqn{C} distance measures is hard to compute (Day, 1981) and
       (currently) not provided.)}
+    \item{\code{"VI"}}{Variation of Information, see Meila (2003).  If
+      \code{\dots} has an argument named \code{weights}, it is taken to
+      specify case weights.}
+    \item{\code{"Mallows"}}{the Mallows-type distance by Zhou, Li and
+      Zha (2005), which is related to the Monge-Kantorovich mass
+      transfer problem, and given as the \eqn{p}-th root of the minimal
+      cost flow of \eqn{\sum w_{jk} \sum_i |u_{ij} - v_{ik}| ^ p} with
+      constraints \eqn{w_{jk} \ge 0}, \eqn{\sum_j w_{jk} = \alpha_j},
+      \eqn{\sum_k w_{jk} = \beta_k}, where \eqn{\sum_j \alpha_j = \sum_k
+	\beta_k}.  The parameters \eqn{p}, \eqn{\alpha} and \eqn{\beta}
+      all default to one (in this case, the Mallows distance coincides
+      with the Manhattan dissimilarity), and can be specified via
+      additional arguments named \code{p}, \code{alpha}, and
+      \code{beta}, respectively.  (Currently, only cases with integer
+      solutions for the \eqn{w_{jk}} can be handled.)}
   }
 
   For hard partitions, both Manhattan and squared Euclidean
@@ -223,14 +238,28 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   \emph{Mathematical Taxonomy}.
   London: Wiley.
 
+  M. Meila (2003).
+  Comparing clusterings by the variation of information.
+  In B. Schölkopf and M. K. Warmuth (eds.), \emph{Learning Theory and
+    Kernel Machines}, pages 173--187.
+  Springer-Verlag: Lecture Notes in Computer Science 2777.
+
   C. Rajski (1961).
   A metric space of discrete probability distributions,
   \emph{Information and Control}, \bold{4}, 371--377.
 
-  J. Rubin, J (1967).
+  J. Rubin (1967).
   Optimal classification into groups: An approach for solving the
   taxonomy problem.
   \emph{Journal of Theoretical Biology}, \bold{15}, 103--144.
+
+  D. Zhou, J. Li and H. Zha (2005).
+  A new Mallows distance based metric for comparing clusterings.
+  In \emph{Proceedings of the 22nd international Conference on Machine
+    Learning} (Bonn, Germany, August 07--11, 2005), pages 1028--1035.
+  ICML '05, volume 119.
+  ACM Press, New York, NY.
+  DOI: \url{http://doi.acm.org/10.1145/1102351.1102481}
 }  
 \seealso{
   \code{\link{cl_agreement}}

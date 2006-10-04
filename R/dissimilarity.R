@@ -205,6 +205,66 @@ function(x, y)
     1 - I / H
 }
 
+### ** .cl_dissimilarity_partition_VI
+
+.cl_dissimilarity_partition_VI <-
+function(x, y, weights = 1)
+{
+    ## Variation of information for general "soft clusterings", cf
+    ## Section 5.2. in Meila (2002). 
+    weights <- rep(weights, length = n_of_objects(x))
+    weights <- weights / sum(weights)
+    M_x <- cl_membership(x)
+    ## Weighted marginal distribution of x:
+    m_x <- rowSums(weights * M_x)
+    M_y <- cl_membership(y)
+    ## Weighted marginal distribution of y:
+    m_y <- rowSums(weights * M_y)
+    gamma <- crossprod(weights * M_x, M_y)
+    delta <- outer(m_x, m_y)
+    ## Entropy of x:
+    H_x <- - sum(m_x * log(ifelse(m_x > 0, m_x, 1)))
+    ## Entropy of y:
+    H_y <- - sum(m_y * log(ifelse(m_y > 0, m_y, 1)))
+    ## VI is H_x + H_y minus twice the (weighted) joint information.
+    i <- which((gamma > 0) & (delta > 0))
+    H_x + H_y - 2 * sum(gamma[i] * log(gamma[i] / delta[i]))
+}
+
+### ** .cl_dissimilarity_partition_Mallows
+
+.cl_dissimilarity_partition_Mallows <-
+function(x, y, p = 1, alpha = NULL, beta = NULL)
+{
+    ## Currently, no "real" primal-dual solver for minimum cost flow
+    ## problems, and lpSolve::lp.transport() seems to work only for
+    ## integer bounds.  Hence, rather than using
+    ##
+    ##   C <- .cxdist(cl_membership(x), cl_membership(y),
+    ##                "minkowski", p) ^ p
+    ##   n_x <- nrow(C)
+    ##   n_y <- ncol(C)
+    ##   if(is.null(alpha))
+    ##       alpha <- rep.int(1 / n_x, n_x)
+    ##   else {
+    ##       alpha <- rep(alpha, length.out = n_x)
+    ##       alpha <- alpha / sum(alpha)
+    ##   }
+    ##
+    ## etc right away, ensure a square cost matrix so that we can have
+    ## integer bounds for at least the default case.
+
+    k <- max(n_of_classes(x), n_of_classes(y))
+    M_x <- cl_membership(x, k)
+    M_y <- cl_membership(y, k)
+    C <- .cxdist(M_x, M_y, "minkowski", p) ^ p
+    if(is.null(alpha)) alpha <- rep.int(1, k)
+    if(is.null(beta)) beta <- rep.int(1, k)
+    lpSolve::lp.transport(C, "min",
+                          rep("==", k), alpha,
+                          rep("==", k), beta)$objval ^ (1 / p)
+}
+
 ### ** .cl_dissimilarity_hierarchy_euclidean
 
 .cl_dissimilarity_hierarchy_euclidean <-
@@ -401,7 +461,7 @@ function(x, i, j)
 ### .cxdist
 
 .cxdist <-
-function(A, B, method = "manhattan")
+function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
 {
     ## Return the column cross distance matrix of A and B.
     ## I.e., the matrix C = [c_{j,k}] with
@@ -432,18 +492,34 @@ function(A, B, method = "manhattan")
     ## The one actually used seems to be the best performer, with the
     ## "for" version a close second (note that "typically", A and B have
     ## much fewer columns than rows).
-    ## only few columns 
+    ## only few columns
+
+    method <- match.arg(method)
+    
+    ## Workhorse.
+    FOO <- switch(method,
+                  "euclidean" =
+                  function(M) sqrt(colSums(M ^ 2)),
+                  "manhattan" = 
+                  function(M) colSums(abs(M)),
+                  "minkowski" = {
+                      ## Power needs to be given.
+                      p <- list(...)[[1]]
+                      function(M)
+                          (colSums(abs(M) ^ p)) ^ (1 / p)
+                  })
+    
     
     out <- matrix(0, NCOL(A), NCOL(B))
     for(k in seq(length = NCOL(B)))
-        out[, k] <- colSums(abs(A - B[, k]))
+        out[, k] <- FOO(A - B[, k])
     out
 }
 
 ### .rxdist
 
 .rxdist <-
-function(A, B, method = c("euclidean", "manhattan"))
+function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
 {
     ## Return the row cross distance matrix of A and B.
     ## I.e., the matrix C = [c_{j,k}] with
@@ -461,11 +537,18 @@ function(A, B, method = c("euclidean", "manhattan"))
     method <- match.arg(method)
     
     ## Workhorse: Full A, single row of b.
-    FOO <- if(method == "euclidean")
-        function(A, b) sqrt(rowSums(sweep(A, 2, b) ^ 2))
-    else
-        function(A, b) rowSums(abs(sweep(A, 2, b)))
-        
+    FOO <- switch(method,
+                  "euclidean" =
+                  function(A, b) sqrt(rowSums(sweep(A, 2, b) ^ 2)),
+                  "manhattan" = 
+                  function(A, b) rowSums(abs(sweep(A, 2, b))),
+                  "minkowski" = {
+                      ## Power needs to be given.
+                      p <- list(...)[[1]]
+                      function(A, b)
+                          (rowSums(abs(sweep(A, 2, b)) ^ p)) ^ (1 / p)
+                  })
+                      
     out <- matrix(0, NROW(A), NROW(B))
     for(k in seq(length = NROW(B)))
         out[, k] <- FOO(A, B[k, ])

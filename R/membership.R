@@ -96,6 +96,8 @@ function(x, k = NULL)
     ## (Could also use .one_entry_per_column(M, as.numeric(x)) <- 1 for
     ## the time being.)
     M[cbind(seq(length = n_of_objects), as.numeric(x))] <- 1
+    ## But note that we also need to handle NAs ...
+    M[is.na(x), ] <- NA
     ## </TODO>
     if(nlevels(x) == k)
         colnames(M) <- levels(x)
@@ -113,7 +115,7 @@ function(x, k = NULL)
 function(x, k = NULL)
 {
     n_of_objects <- nrow(x)
-    x <- x[ , colSums(x) > 0, drop = FALSE]
+    x <- x[ , colSums(x, na.rm = TRUE) > 0, drop = FALSE]
     n_of_classes <- ncol(x)
     if(!is.null(k)) {
         if(k < n_of_classes)
@@ -121,10 +123,12 @@ function(x, k = NULL)
         if(k > n_of_classes) {
             ## Fill up with zero columns.
             x <- cbind(x, matrix(0, nrow(x), k - n_of_classes))
+            ## Handle NAs if necessary.
+            x[apply(is.na(x), 1, any), ] <- NA
         }
     }
     attr(x, "n_of_classes") <- n_of_classes
-    attr(x, "is_cl_hard_partition") <- all(rowSums(x == 1))
+    attr(x, "is_cl_hard_partition") <- all(rowSums(x == 1), na.rm = TRUE)
     class(x) <- "cl_membership"
     x
 }
