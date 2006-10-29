@@ -44,7 +44,7 @@ function(x, y = NULL, method = "euclidean", ...)
             stop("All clusterings must have the same number of objects.")
         ## Build a cross-proximity object of cross-agreements.
         d <- matrix(0, length(x), length(y))
-        for(j in seq(along = y))
+        for(j in seq_along(y))
             d[, j] <- sapply(x, method, y[[j]], ...)
         dimnames(d) <- list(names(x), names(y))
         description <- paste("Agreements using", method_name)
@@ -55,7 +55,7 @@ function(x, y = NULL, method = "euclidean", ...)
     ## Otherwise, build a proximity object of dissimilarities.
     n <- length(x)
     d <- vector("list", length = n - 1)
-    ind <- seq(length = n)
+    ind <- seq_len(n)
     while(length(ind) > 1) {
         j <- ind[1]
         ind <- ind[-1]

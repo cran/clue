@@ -112,15 +112,14 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
     \item{\code{"Mallows"}}{the Mallows-type distance by Zhou, Li and
       Zha (2005), which is related to the Monge-Kantorovich mass
       transfer problem, and given as the \eqn{p}-th root of the minimal
-      cost flow of \eqn{\sum w_{jk} \sum_i |u_{ij} - v_{ik}| ^ p} with
-      constraints \eqn{w_{jk} \ge 0}, \eqn{\sum_j w_{jk} = \alpha_j},
-      \eqn{\sum_k w_{jk} = \beta_k}, where \eqn{\sum_j \alpha_j = \sum_k
-	\beta_k}.  The parameters \eqn{p}, \eqn{\alpha} and \eqn{\beta}
-      all default to one (in this case, the Mallows distance coincides
-      with the Manhattan dissimilarity), and can be specified via
-      additional arguments named \code{p}, \code{alpha}, and
-      \code{beta}, respectively.  (Currently, only cases with integer
-      solutions for the \eqn{w_{jk}} can be handled.)}
+      value of the transportation problem \eqn{\sum w_{jk} \sum_i
+      |u_{ij} - v_{ik}| ^ p} with constraints \eqn{w_{jk} \ge 0},
+      \eqn{\sum_j w_{jk} = \alpha_j}, \eqn{\sum_k w_{jk} = \beta_k},
+      where \eqn{\sum_j \alpha_j = \sum_k \beta_k}.  The parameters
+      \eqn{p}, \eqn{\alpha} and \eqn{\beta} all default to one (in this
+      case, the Mallows distance coincides with the Manhattan
+      dissimilarity), and can be specified via additional arguments
+      named \code{p}, \code{alpha}, and \code{beta}, respectively.}
   }
 
   For hard partitions, both Manhattan and squared Euclidean

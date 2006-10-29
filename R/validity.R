@@ -79,7 +79,7 @@ function(m, d)
     ## where m is the membership matrix and d a *symmetric* matrix of
     ## dissimilarities.
     within_sums <-
-        rowSums(sapply(seq(length = ncol(m)),
+        rowSums(sapply(seq_len(ncol(m)),
                        function(k) {
                            z <- m[, k]
                            w <- outer(z, z, "*")

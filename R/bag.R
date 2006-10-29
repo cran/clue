@@ -29,7 +29,7 @@ function(x, B, k = NULL,
     k <- max(sapply(c(clusterings, reference), n_of_classes))
     M_ref <- cl_membership(reference, k)
     M <- matrix(0, NROW(M_ref), k)
-    for(b in seq(length = B)) {
+    for(b in seq_len(B)) {
         mem <- cl_membership(clusterings[[b]], k)
         ## Match classes to reference partition.
         ind <- solve_LSAP(crossprod(M_ref, mem), max = TRUE)

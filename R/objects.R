@@ -167,7 +167,7 @@ cl_object_labels <-
 function(x)
 {
     if(is.null(out <- cl_object_names(x)))
-        out <- as.character(seq(length = n_of_objects(x)))
+        out <- as.character(seq_len(n_of_objects(x)))
     out
 }
 

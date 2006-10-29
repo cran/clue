@@ -16,7 +16,7 @@ function(x, maximum = FALSE)
     storage.mode(x) <- "double"
     out <- .C("solve_LSAP", x, nc, p = integer(nc),
               PACKAGE = "clue")$p + 1
-    out <- out[seq(length = nr)]
+    out <- out[seq_len(nr)]
     class(out) <- "solve_LSAP"
     out
 }
@@ -26,7 +26,7 @@ function(x, ...)
 {
     writeLines(c("Optimal assignment:",
                  gsub("x", " ",
-                      strwrap(paste(seq(length = length(x)), x,
+                      strwrap(paste(seq_along(x), x,
                                     sep = "x=>x", collapse = ", ")))))
     invisible(x)
 }

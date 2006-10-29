@@ -67,7 +67,7 @@ function(clusterings, weights, control)
         k <- max_n_of_classes
     order <- control$order
     if(is.null(order))
-        order <- sample(seq(along = clusterings))
+        order <- sample(seq_along(clusterings))
 
     clusterings <- clusterings[order]
     weights <- weights[order]
@@ -77,7 +77,7 @@ function(clusterings, weights, control)
     s[is.na(s)] <- 0                    # Division by zero ...
     
     M <- cl_membership(clusterings[[1]], k_max)
-    for(b in seq(along = clusterings)[-1]) {
+    for(b in seq_along(clusterings)[-1]) {
         mem <- cl_membership(clusterings[[b]], k_max)
         ## Match classes from conforming memberships.
         ind <- solve_LSAP(crossprod(M, mem), max = TRUE)
@@ -315,7 +315,7 @@ function(memberships, w, k)
 
     require("lpSolve")
 
-    for(i in seq(length = nr)) {
+    for(i in seq_len(nr)) {
         out <- lpSolve::lp("min",
                            objective_in,
                            constr_mat,
@@ -561,7 +561,7 @@ function(clusterings, weights, control, type = c("GV1"))
         ## Alternatively (more literally):
         ##   X <- lapply(permutations, .make_X_from_p)
         ##   alpha1 <- double(length = k)
-        ##   for(b in seq(along = permutations)) {
+        ##   for(b in seq_along(permutations)) {
         ##       alpha1 <- alpha1 +
         ##           w[b] * colSums(X[[b]][1 : nc_memberships[b], ])
         ##   }
@@ -584,8 +584,8 @@ function(clusterings, weights, control, type = c("GV1"))
                                           w, nr_M)
         ## Alternatively (more literally):
         ##   beta1 <- matrix(0, nr_M, nc_M)
-        ##   for(b in seq(along = permutations)) {
-        ##     ind <- seq(length = nc_memberships[b])
+        ##   for(b in seq_along(permutations)) {
+        ##     ind <- seq_len(nc_memberships[b])
         ##     beta1 <- beta1 +
         ##       w[b] * memberships[[b]][, ind] %*% X[[b]][ind, ]
         ##   }
@@ -976,7 +976,7 @@ function(clusterings, weights, control)
     classes <- lapply(clusterings, cl_classes)
     all_classes <- unique(unlist(classes, recursive = FALSE))
     gamma <- double(length = length(all_classes))
-    for(i in seq(along = classes))
+    for(i in seq_along(classes))
         gamma <- gamma + w[i] * !is.na(match(all_classes, classes[[i]]))
 
     maj_classes <- if(p == 1) {
@@ -1017,7 +1017,7 @@ function(p) {
     ## X matrix corresponding to permutation p as needed for the AO
     ## algorithms.  I.e., x_{ij} = 1 iff j->p(j)=i.
     X <- matrix(0, length(p), length(p))
-    i <- seq(along = p)
+    i <- seq_along(p)
     X[cbind(p[i], i)] <- 1
     X
 }

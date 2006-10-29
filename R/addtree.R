@@ -185,7 +185,7 @@ function(x, weights = 1, control = list())
 
     d_opt <- NULL
     v_opt <- Inf
-    for(run in seq(along = order)) {
+    for(run in seq_along(order)) {
         if(verbose)
             cat("Iterative projection run:", run, "\n")
         d <- .C("ls_fit_addtree_by_iterative_projection",
@@ -261,7 +261,7 @@ function(x, weights = 1, control = list())
 
     d_opt <- NULL
     v_opt <- Inf
-    for(run in seq(along = order)) {
+    for(run in seq_along(order)) {
         if(verbose)
             cat("Iterative reduction run:", run, "\n")
         d <- .C("ls_fit_addtree_by_iterative_reduction",
