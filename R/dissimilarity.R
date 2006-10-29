@@ -39,7 +39,7 @@ function(x, y = NULL, method = "euclidean", ...)
             stop("All clusterings must have the same number of objects.")
         ## Build a cross-proximity object of cross-dissimilarities.
         d <- matrix(0, length(x), length(y))
-        for(j in seq(along = y))
+        for(j in seq_along(y))
             d[, j] <- sapply(x, method, y[[j]], ...)
         dimnames(d) <- list(names(x), names(y))
         description <- paste("Dissimilarities using", method_name)
@@ -50,7 +50,7 @@ function(x, y = NULL, method = "euclidean", ...)
     ## Otherwise, build a proximity object of dissimilarities.
     n <- length(x)
     d <- vector("list", length = n - 1)
-    ind <- seq(length = n)
+    ind <- seq_len(n)
     while(length(ind) > 1) {
         j <- ind[1]
         ind <- ind[-1]
@@ -87,7 +87,7 @@ function(x, y)
     M_y <- cl_membership(y, k)
     C <- .cxdist(M_x, M_y, "manhattan")
     ind <- solve_LSAP(C)
-    sum(C[cbind(seq(along = ind), ind)])
+    sum(C[cbind(seq_along(ind), ind)])
 }    
 
 ### ** .cl_dissimilarity_partition_comemberships
@@ -157,7 +157,7 @@ function(x, y)
     else if(k_x > k_y)
         C <- cbind(C, matrix(0, nr = k_x, nc = k_x - k_y))
     ind <- solve_LSAP(C)
-    sqrt(sum(C[cbind(seq(along = ind), ind)]))
+    sqrt(sum(C[cbind(seq_along(ind), ind)]))
     ## (Note that this sum really only includes matched non-dummy
     ## classes.)
 }
@@ -262,7 +262,8 @@ function(x, y, p = 1, alpha = NULL, beta = NULL)
     if(is.null(beta)) beta <- rep.int(1, k)
     lpSolve::lp.transport(C, "min",
                           rep("==", k), alpha,
-                          rep("==", k), beta)$objval ^ (1 / p)
+                          rep("==", k), beta,
+                          integers = NULL)$objval ^ (1 / p)
 }
 
 ### ** .cl_dissimilarity_hierarchy_euclidean
@@ -339,7 +340,7 @@ function(x, y)
     lx <- sapply(x, length)
     ly <- sapply(y, length)
     s <- 0
-    for(i in seq(length = n)) {
+    for(i in seq_len(n)) {
         sx <- x[lx == i]
         sy <- y[lx == i]
         s <- s + sum(is.na(match(sx, sy))) + sum(is.na(match(sy, sx)))
@@ -479,12 +480,12 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
     ##   out <- as.matrix(dist(rbind(t(A), t(B)), "manhattan"))
     ##   dimnames(out) <- NULL
     ##   nc_B <- NCOL(B)
-    ##   out[seq(from = NCOL(A) + 1, length = nc_B), seq(length = nc_B)]
+    ##   out[seq(from = NCOL(A) + 1, length = nc_B), seq_len(nc_B)]
     ## }
     ## foo_f <- function(A, B) {
     ##   out <- matrix(0, NCOL(A), NCOL(B))
-    ##   for(j in seq(length = NCOL(A)))
-    ##     for(k in seq(length = NCOL(B)))
+    ##   for(j in seq_len(NCOL(A)))
+    ##     for(k in seq_len(NCOL(B)))
     ##       out[j, k] = sum(abs(A[, j] - B[, k]))
     ##   out
     ## }
@@ -511,7 +512,7 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
     
     
     out <- matrix(0, NCOL(A), NCOL(B))
-    for(k in seq(length = NCOL(B)))
+    for(k in seq_len(NCOL(B)))
         out[, k] <- FOO(A - B[, k])
     out
 }
@@ -527,7 +528,7 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
     
     ## <NOTE>
     ## Could also do something like
-    ##   ind <- seq(length = NROW(B))
+    ##   ind <- seq_len(NROW(B))
     ##   as.matrix(dist(rbind(B, A)))[-ind, ind]
     ## but that is *very* inefficient for the "usual" data by prototype
     ## case (where NROW(B) << NROW(A)).
@@ -550,7 +551,7 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
                   })
                       
     out <- matrix(0, NROW(A), NROW(B))
-    for(k in seq(length = NROW(B)))
+    for(k in seq_len(NROW(B)))
         out[, k] <- FOO(A, B[k, ])
     out
 }

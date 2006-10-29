@@ -5,7 +5,7 @@ function(x)
         out <- rep.int(1, n_of_objects(x))
     else if(is.cl_partition(x)) {
         x <- cl_membership(x)
-        i <- seq(length = nrow(x))
+        i <- seq_len(nrow(x))
         j <- cbind(i, max.col(x))
         out <- x[j]
         x[j] <- 0

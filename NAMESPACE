@@ -57,6 +57,7 @@ S3method("Ops", "cl_partition")
 
 S3method("Summary", "cl_dendrogram")
 S3method("Summary", "cl_partition")
+S3method("Summary", "cl_partition_ensemble")
 
 S3method("as.cl_membership", "default")
 S3method("as.cl_membership", "matrix")

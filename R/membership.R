@@ -95,7 +95,7 @@ function(x, k = NULL)
     M <- matrix(0, n_of_objects, k)
     ## (Could also use .one_entry_per_column(M, as.numeric(x)) <- 1 for
     ## the time being.)
-    M[cbind(seq(length = n_of_objects), as.numeric(x))] <- 1
+    M[cbind(seq_len(n_of_objects), as.numeric(x))] <- 1
     ## But note that we also need to handle NAs ...
     M[is.na(x), ] <- NA
     ## </TODO>

@@ -26,14 +26,14 @@ function(x)
     if(length(x) == 1)
         return(cl_partition_by_class_ids(cl_class_ids(x[[1]])))
 
-    ids <- seq(length = n_of_objects(x[[1]]))
+    ids <- seq_len(n_of_objects(x[[1]]))
     ## Cross-classify the objects.
     z <- split(ids, lapply(x, cl_class_ids))
     ## Subscript on the non-empty cells to get adjacent class ids.
     lens <- sapply(z, length)
     pos <- which(lens > 0)
     ids[unlist(z, use.names = FALSE)] <-
-        rep(seq(along = z[pos]), lens[pos])
+        rep(seq_along(z[pos]), lens[pos])
     cl_partition_by_class_ids(ids)
 }
 
@@ -81,7 +81,7 @@ function(x)
     ## one to the number of classes.
     n <- sapply(x, n_of_classes)
     ids <- mapply(function(p, ncp) match(cl_class_ids(p),
-                                         seq(length = ncp)),
+                                         seq_len(ncp)),
                   x, n, SIMPLIFY = FALSE)
     ## Order according to the number of classes.
     ids <- ids[order(n)]
@@ -102,7 +102,7 @@ function(x)
         ## Next, compute the map of the join class ids to the ids of
         ## these components. 
         cnt <- 0
-        map <- remaining_ids <- seq(length = jnc)
+        map <- remaining_ids <- seq_len(jnc)
         while(length(remaining_ids)) {
             cnt <- cnt + 1
             pos <- which(C[remaining_ids[1], remaining_ids] > 0)

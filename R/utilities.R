@@ -25,7 +25,7 @@ function(x, j)
     ## n is the number of rows of x, get x[1,j_1], ..., x[n,j_n].
     if(!is.matrix(x))
         stop("Argument 'x' must be a matrix.")
-    x[cbind(seq(length = nrow(x)), j)]
+    x[cbind(seq_len(nrow(x)), j)]
 }
 
 ".one_entry_per_column<-" <-
@@ -33,7 +33,7 @@ function(x, j, value)
 {
     if(!is.matrix(x))
         stop("Argument 'x' must be a matrix.")        
-    x[cbind(seq(length = nrow(x)), j)] <- value
+    x[cbind(seq_len(nrow(x)), j)] <- value
     x
 }
 

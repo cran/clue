@@ -62,7 +62,7 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
 
     v_opt <- Inf
     x_opt <- NULL
-    for(run in seq(along = x0)) {
+    for(run in seq_along(x0)) {
         if(verbose)
             cat("SUMT run:", run, "\n")
         x <- x0[[run]]

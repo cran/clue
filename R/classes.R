@@ -18,7 +18,7 @@ cl_classes.cl_partition <-
 function(x)
 {
     n <- n_of_objects(x)
-    out <- split(seq(length = n), cl_class_ids(x))
+    out <- split(seq_len(n), cl_class_ids(x))
     class(out) <- c("cl_classes_of_partition_of_objects",
                     "cl_classes_of_objects")
     attr(out, "n_of_objects") <- n
@@ -31,7 +31,7 @@ function(x)
 {
     x <- as.hclust(x)
     n <- n_of_objects(x)
-    labels <- seq(length = n)
+    labels <- seq_len(n)
     groups <- cutree(x, labels)
     ## Give a list with the (unique) sets of numbers of the objects.
     out <- unique(unlist(sapply(split(groups, col(groups)),

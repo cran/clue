@@ -296,7 +296,7 @@ function(x, weights = 1, control = list())
 
     d_opt <- NULL
     v_opt <- Inf
-    for(run in seq(along = order)) {
+    for(run in seq_along(order)) {
         if(verbose)
             cat("Iterative projection run:", run, "\n")
         d <- .C("ls_fit_ultrametric_by_iterative_projection",
@@ -368,7 +368,7 @@ function(x, weights = 1, control = list())
 
     d_opt <- NULL
     v_opt <- Inf
-    for(run in seq(along = order)) {
+    for(run in seq_along(order)) {
         if(verbose)
             cat("Iterative reduction run:", run, "\n")
         d <- .C("ls_fit_ultrametric_by_iterative_reduction",
@@ -634,7 +634,7 @@ function(x, nterms = 1, weights = 1, control = list())
         if(verbose)
             cat("Iteration:", iter, "\n")
         delta <- 0
-        for(i in seq(length = nterms)) {
+        for(i in seq_len(nterms)) {
             if(verbose)
                 cat("Term:", i)
             u_old <- u[[i]]
@@ -706,7 +706,7 @@ function(x)
     heights <- double(length = length(x))
     for(i in which(sapply(x, length) > 1)) {
         ## Find the relevant classes.
-        j <- sapply(x[seq(length = i - 1)],
+        j <- sapply(x[seq_len(i - 1)],
                     function(s) all(s %in% x[[i]]))
         heights[i] <- max(heights[j]) + 1
     }

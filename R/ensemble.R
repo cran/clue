@@ -83,6 +83,24 @@ function(x, ...)
     invisible(x)
 }
 
+Summary.cl_partition_ensemble <-
+function(x, ...)
+{
+    ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
+    if(!ok)
+        stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
+                      .Generic, .Class))
+    args <- list(x, ...)
+    ## Remove 'na.rm' component ...
+    args$na.rm <- NULL
+    ## Combine the given partition ensembles.
+    x <- do.call(c, args)
+    switch(.Generic,
+           "min" = cl_meet(x),
+           "max" = cl_join(x),
+           "range" = cl_ensemble(min = cl_meet(x), max = cl_join(x)))
+}
+
 print.cl_dendrogram_ensemble <-
 function(x, ...)
 {

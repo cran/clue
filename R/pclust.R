@@ -109,7 +109,7 @@ function(x, k, m = 1, control = list())
             iter <- iter + 1
         }
         u <- matrix(0, B, k)
-        u[cbind(seq(length = B), class_ids)] <- 1
+        u[cbind(seq_len(B), class_ids)] <- 1
     }
     else {
         ## Soft secondary partitions.
