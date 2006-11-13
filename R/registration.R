@@ -209,9 +209,9 @@ set_cl_dissimilarity_method("Chebyshev", "hierarchy",
 set_cl_dissimilarity_method("Lyapunov", "hierarchy",
                             .cl_dissimilarity_hierarchy_Lyapunov,
                             "Lyapunov distance")
-set_cl_dissimilarity_method("BA", "hierarchy",
-                            .cl_dissimilarity_hierarchy_BA,
-                            "Boorman/Arabie m_delta tree distance")
+set_cl_dissimilarity_method("BO", "hierarchy",
+                            .cl_dissimilarity_hierarchy_BO,
+                            "Boorman/Olivier m_delta tree distance")
 
 ### * Agreement Method Registration.
 

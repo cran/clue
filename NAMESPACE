@@ -139,6 +139,7 @@ S3method("cl_predict", "fclust")
 S3method("cl_predict", "kcca")
 S3method("cl_predict", "kmeans")
 S3method("cl_predict", "pam")
+S3method("cl_predict", "rock")
 
 S3method("cl_prototypes", "Mclust")
 S3method("cl_prototypes", "bclust")

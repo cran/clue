@@ -374,12 +374,12 @@ function(x, y)
     log(max(q) / min(q))
 }
 
-### ** .cl_dissimilarity_hierarchy_BA
+### ** .cl_dissimilarity_hierarchy_BO
 
-.cl_dissimilarity_hierarchy_BA <-
+.cl_dissimilarity_hierarchy_BO <-
 function(x, y, delta, ...)
 {
-    ## Compute Boorman-Arabie (1973) dendrogram ("valued tree")
+    ## Compute Boorman-Olivier (1973) dendrogram ("valued tree")
     ## dissimilarities of the form
     ##
     ##    m_\delta(T_1, T_2)
