@@ -162,8 +162,8 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       represented by the ultrametrics (e.g., Jardine & Sibson (1971),
       page 107), and only defined for \emph{strict} ultrametrics (which
       are strictly positive for distinct objects).}
-    \item{\code{"BA"}}{the \eqn{m_\delta} family of tree metrics by
-      Boorman and Arabie (1973), which are of the form \eqn{m_\delta =
+    \item{\code{"BO"}}{the \eqn{m_\delta} family of tree metrics by
+      Boorman and Olivier (1973), which are of the form \eqn{m_\delta =
 	\int_0^\infty \delta(p(h), q(h)) dh}, where \eqn{p(h)} and
       \eqn{q(h)} are the hard partitions obtaining by cutting the trees
       (dendrograms) at height \eqn{h}, and \eqn{\delta} is a suitably
@@ -205,7 +205,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
     Behavioral Sciences, 1: Theory} (pages 225--249).
   New York: Seminar Press.
 
-  S. A. Boorman and P. Arabie (1973).
+  S. A. Boorman and D. C. Olivier (1973).
   Metrics on spaces of finite trees.
   \emph{Journal of Mathematical Psychology}, \bold{10}, 26--59.
   

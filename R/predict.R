@@ -120,15 +120,20 @@ function(object, newdata = NULL,
                                    type)
 }
 ## Package cba: rockCluster() returns objects of class "rock".
-## Currently, no predictions.
-## Note that if x is a Rock object, fitted(x) and predict(x, newdata)
-## can result in missing classifications, as
+## If x is a Rock object, fitted(x) and predict(x, newdata) can result
+## in missing classifications, as
 ##   In the case a 'drop' value greater than zero is specified, all
 ##   clusters with size equal or less than this value are removed from
-##   the classifier. Especially, 'fitted' uses a threshold of one
+##   the classifier.  Especially, 'fitted' uses a threshold of one
 ##   because for singleton clusters the neighborhood is empty.
-## so we need to discuss with CeeBoo whether this is really what we
-## want, or if e.g. cl_predict() should use drop = 0.
+cl_predict.rock <-
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
+{
+    if(is.null(newdata)) newdata <- object$x
+    ids <- as.vector(predict(object, newdata, ...)$cl)
+    .as_cl_class_ids_or_membership(ids, type)
+}
 
 ## Package cclust: cclust().
 cl_predict.cclust <-
