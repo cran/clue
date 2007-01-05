@@ -20,7 +20,7 @@ solve_LSAP(x, maximum = FALSE)
   to columns, i.e., a one-to-one map \code{p} of the numbers from 1 to
   \eqn{nr} to the numbers from 1 to \eqn{nc} (a permutation of these
   numbers in case \code{x} is a square matrix) such that
-  \eqn{\sum_{i=1}^nr x[i, p[i]]} is minimized or maximized.
+  \eqn{\sum_{i=1}^{nr} x[i, p[i]]} is minimized or maximized.
 
   This assignment can be found using a linear program (and package
   \pkg{lpSolve} provides a function \code{lp.assign} for doing so), but
