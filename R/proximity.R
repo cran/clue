@@ -71,7 +71,7 @@ function(x, ...)
 ### * as.matrix.cl_proximity
 
 as.matrix.cl_proximity <-
-function(x)
+function(x, ...)
 {
     size <- attr(x, "Size")
     m <- matrix(0, size, size)

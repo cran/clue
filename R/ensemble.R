@@ -84,15 +84,13 @@ function(x, ...)
 }
 
 Summary.cl_partition_ensemble <-
-function(x, ...)
+function(..., na.rm = FALSE)
 {
     ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
     if(!ok)
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
                       .Generic, .Class))
-    args <- list(x, ...)
-    ## Remove 'na.rm' component ...
-    args$na.rm <- NULL
+    args <- list(...)
     ## Combine the given partition ensembles.
     x <- do.call(c, args)
     switch(.Generic,

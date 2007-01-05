@@ -356,15 +356,13 @@ function(e1, e2)
 ### * Summary.cl_partition
 
 Summary.cl_partition <-
-function(x, ...)
+function(..., na.rm = FALSE)
 {
     ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
     if(!ok)
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
                       .Generic, .Class))
-    args <- list(x, ...)
-    ## Remove 'na.rm' component ...
-    args$na.rm <- NULL
+    args <- list(...)
     switch(.Generic,
            "min" = cl_meet(cl_ensemble(list = args)),
            "max" = cl_join(cl_ensemble(list = args)),
