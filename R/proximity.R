@@ -57,7 +57,17 @@ function(x)
 print.cl_proximity <-
 function(x, ...)
 {
-    cat(attr(x, "description"), ":\n", sep = "")    
+    description <- attr(x, "description")
+    if(length(description) > 0) {
+        ## Could make this generic ...
+        kind <- if(inherits(x, "cl_dissimilarity"))
+            "Dissimilarities"
+        else if(inherits(x, "cl_agreement"))
+            "Agreements"
+        else
+            "Proximities"
+        cat(sprintf("%s using %s", kind, description), ":\n", sep = "")
+    }
     m <- format(as.matrix(x))
     if(is.null(self <- attr(x, "self")))
         m[row(m) <= col(m)] <- ""
@@ -144,12 +154,22 @@ print.cl_cross_proximity <-
 function(x, ...)
 {
     description <- attr(x, "description")
-    if(length(description) > 0)
-        cat(description, ":\n", sep = "")
+    if(length(description) > 0) {
+        ## Could make this generic ...
+        kind <- if(inherits(x, "cl_cross_dissimilarity"))
+            "Cross-dissimilarities"
+        else if(inherits(x, "cl_cross_agreement"))
+            "Cross-agreements"
+        else
+            "Cross-proximities"
+        cat(sprintf("%s using %s", kind, description), ":\n", sep = "")
+    }
     print(matrix(as.vector(x), nr = nrow(x), dimnames = dimnames(x)),
           ...)
     invisible(x)
 }
+
+### ** print_description_prefix
 
 ### Local variables: ***
 ### mode: outline-minor ***

@@ -17,6 +17,7 @@ export("cl_agreement",
        "cl_medoid",
        "cl_membership", "as.cl_membership",
        "cl_object_names",
+       "cl_pam",
        "cl_pclust",
        "cl_predict",
        "cl_prototypes",
@@ -37,7 +38,9 @@ export("cl_agreement",
        "is.cl_soft_partition", "is.cl_dendrogram",
        "as.cl_dendrogram",
        "is.cl_hierarchy", "as.cl_hierarchy",
-       "solve_LSAP")
+       "kmedoids",
+       "solve_LSAP",
+       "sumt")
 
 ## S3 methods, sorted alphabetically.
 
@@ -145,6 +148,7 @@ S3method("cl_prototypes", "Mclust")
 S3method("cl_prototypes", "bclust")
 S3method("cl_prototypes", "ccfkms")
 S3method("cl_prototypes", "cclust")
+S3method("cl_prototypes", "cl_pam")
 S3method("cl_prototypes", "cl_pclust")
 S3method("cl_prototypes", "cl_partition")
 S3method("cl_prototypes", "clara")
@@ -249,6 +253,8 @@ S3method("plot", "cl_dendrogram")
 S3method("plot", "cl_ultrametric")
 
 S3method("print", "cl_class_ids")
+S3method("print", "cl_classes_of_partition_of_objects")
+S3method("print", "cl_classes_of_hierarchy_of_objects")
 S3method("print", "cl_cross_proximity")
 S3method("print", "cl_dendrogram")
 S3method("print", "cl_dendrogram_ensemble")
@@ -257,14 +263,16 @@ S3method("print", "cl_fuzziness")
 S3method("print", "cl_hierarchy")
 S3method("print", "cl_hierarchy_ensemble")
 S3method("print", "cl_membership")
+S3method("print", "cl_pam")
 S3method("print", "cl_partition")
 S3method("print", "cl_partition_by_class_ids")
 S3method("print", "cl_partition_by_memberships")
 S3method("print", "cl_partition_ensemble")
 S3method("print", "cl_proximity")
 S3method("print", "cl_pclust")
-S3method("print", "solve_LSAP")
 S3method("print", "cl_validity")
+S3method("print", "kmedoids")
+S3method("print", "solve_LSAP")
 
 S3method("rep", "cl_ensemble")
 

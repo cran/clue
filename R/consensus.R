@@ -34,10 +34,8 @@ function(x, method = NULL, weights = 1, control = list())
             type <- ifelse(is_partition_ensemble,
                            "partition", "hierarchy")
             if(is.null(method)) {
-                ## Defaults: change to SBH (Soft Boehm-Hornik)
-                ## eventually. 
                 method <- ifelse(is_partition_ensemble,
-                                 "DWH", "cophenetic")
+                                 "SE", "euclidean")
             }
             method <- get_cl_consensus_method(method, type)
         }
@@ -732,7 +730,7 @@ function(clusterings, weights, control)
     }
     grad_P <- .make_penalty_gradient_membership(n, k)
 
-    m <- SUMT(start, L, P, grad_L, grad_P,
+    m <- sumt(start, L, P, grad_L, grad_P,
               method = control$method, eps = control$eps,
               q = control$q, verbose = control$verbose,
               control = as.list(control$control))
@@ -839,7 +837,7 @@ function(clusterings, weights, control)
     else
         grad_L <- grad_P <- NULL
 
-    m <- SUMT(start, L, P, grad_L, grad_P,
+    m <- sumt(start, L, P, grad_L, grad_P,
               method = control$method, eps = control$eps,
               q = control$q, verbose = control$verbose,
               control = as.list(control$control))
@@ -947,7 +945,7 @@ function(clusterings, weights, control)
                            simplify = FALSE)
     }
 
-    d <- SUMT(start, L, P, grad_L, grad_P,
+    d <- sumt(start, L, P, grad_L, grad_P,
               method = control$method, eps = control$eps,
               q = control$q, verbose = control$verbose,
               control = as.list(control$control))

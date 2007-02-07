@@ -44,19 +44,64 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   \code{\link{cl_medoid}}).  For \eqn{p = 2}, we obtain \emph{least
     squares} consensus partitions and hierarchies (generalized means).
   See also Gordon (1999) for more information.
-  
-  If all elements of the ensemble are partitions, the built-in consensus
-  methods compute soft least squares consensus partitions for Euclidean,
-  GV1 and co-membership dissimilarities (i.e., minima of \eqn{L(x) =
-    \sum w_b d(x_b, x)^2} over all soft partitions with \eqn{k}
-  classes).
 
-  Available methods are as follows.
+  If all elements of the ensemble are partitions, the built-in consensus
+  methods compute consensus partitions by minimizing a criterion of the
+  form \eqn{L(x) = \sum w_b d(x_b, x)^p} over all hard or soft
+  partitions \eqn{x} with a given (maximal) number \eqn{k} of classes.
+  Available built-in methods are as follows.
   
   \describe{
+    \item{\code{"SE"}}{a fixed-point algorithm for obtaining \emph{soft}
+      least squares Euclidean consensus partitions (i.e., for minimizing
+      \eqn{L} with Euclidean dissimilarity \eqn{d} and \eqn{p =	2} over
+      all soft partitions with a given maximal number of classes).
+
+      This iterates between individually matching all partitions to the
+      current approximation to the consensus partition, and computing
+      the next approximation as the membership matrix closest to a
+      suitable weighted average of the memberships of all partitions
+      after permuting their columns for the optimal matchings of class
+      ids.
+
+      The following control parameters are available for this method.
+      
+      \describe{
+	\item{\code{k}}{an integer giving the number of classes to be
+	  used for the least squares consensus partition.
+	  By default, the maximal number of classes in the ensemble is
+	  used.}
+	\item{\code{maxiter}}{an integer giving the maximal number of
+	  iterations to be performed.
+	  Defaults to 100.}
+	\item{\code{reltol}}{the relative convergence tolerance.
+	  Defaults to \code{sqrt(.Machine$double.eps)}.}
+	\item{\code{start}}{a matrix with number of rows equal to the
+	  number of objects of the cluster ensemble, and \eqn{k}
+	  columns, to be used as a starting value.
+	  By default, suitable random membership matrices are used.}
+	\item{\code{verbose}}{a logical indicating whether to provide
+	  some output on minimization progress.
+	  Defaults to \code{getOption("verbose")}.}
+      }
+
+      Can also be referred to as \code{"soft/euclidean"}.
+    }
+
+    \item{\code{"GV1"}}{the fixed-point algorithm for the \dQuote{first
+	model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
+      \eqn{d} being GV1 dissimilarity and \eqn{p = 2} over all soft
+      partitions with a given maximal number of classes.
+
+      This is similar to \code{"SE"}, but uses GV1 rather than Euclidean
+      dissimilarity.
+
+      Available control parameters are the same as for \code{"SE"}.
+    }
+    
     \item{\code{"DWH"}}{an extension of the greedy algorithm in
-      Dimitriadou, Weingessel and Hornik (2002) for approximately
-      minimizing \eqn{L} with \eqn{d} being Euclidean dissimilarity.
+      Dimitriadou, Weingessel and Hornik (2002) for (approximately)
+      obtaining soft least squares Euclidean consensus partitions.
       The reference provides some structure theory relating finding
       the consensus partition to an instance of the multiple assignment
       problem, which is known to be NP-hard, and suggests a simple
@@ -68,6 +113,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       ids.
 
       The following control parameters are available for this method.
+      
       \describe{
 	\item{\code{k}}{an integer giving the number of classes to be
 	  used for the least squares consensus partition.  By default,
@@ -80,54 +126,39 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       }
     }
 
-    \item{\code{"GV1"}}{the fixed-point algorithm for the \dQuote{first
-	model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
-      \eqn{d} being GV1 dissimilarity.  This iterates between
-      individually matching all partitions to the current approximation
-      to the consensus partition, and computing the next approximation
-      as the membership matrix closest to a suitable weighted average of
-      the memberships of all partitions after permuting their columns
-      for the optimal matchings of class ids.
+    \item{\code{"HE"}}{a fixed-point algorithm for obtaining \emph{hard}
+      least squares Euclidean consensus partitions (i.e., for minimizing
+      \eqn{L} with Euclidean dissimilarity \eqn{d} and \eqn{p =	2} over
+      all hard partitions with a given maximal number of classes.)
 
-      The following control parameters are available for this method.
-      \describe{
-	\item{\code{k}}{an integer giving the number of classes to be
-	  used for the least squares consensus partition.  By default,
-	  the maximal number of classes in the ensemble is used.}
-	\item{\code{maxiter}}{an integer giving the maximal number of
-	  iterations to be performed.  Defaults to 100.}
-	\item{\code{reltol}}{the relative convergence tolerance.
-	  Defaults to \code{sqrt(.Machine$double.eps)}.}
-	\item{\code{start}}{a matrix with number of rows equal to the
-	  size of the cluster ensemble, and \eqn{k} columns, to be used
-	  as a starting value.  By default, suitable random membership
-	  matrices are used.}
-	\item{\code{verbose}}{a logical indicating whether to provide
-	  some output on minimization progress.  Defaults to
-	  \code{getOption("verbose")}.}
-      }
+      Available control parameters are the same as for \code{"SE"}.
 
+      Can also be referred to as \code{"hard/euclidean"}.
     }
+    
+    \item{\code{"SM"}}{a fixed-point algorithm for obtaining \emph{soft}
+      median Manhattan consensus partitions (i.e., for minimizing
+      \eqn{L} with Manhattan dissimilarity \eqn{d} and \eqn{p =	1} over 
+      all soft partitions with a given maximal number of classes).
 
-    \item{\code{"SE"}}{a fixed-point algorithm for obtaining least
-      squares Euclidean consensus partitions similar to \code{"GV1"}
-      (which however is based on GV1 rather than Euclidean
-      dissimilarity).  Available control parameters are the same as for
-      \code{"GV1"}.
+      Available control parameters are the same as for \code{"SE"}.
+
+      Can also be referred to as \code{"soft/manhattan"}.
     }
 
     \item{\code{"GV3"}}{a SUMT algorithm for the \dQuote{third model} in
       Gordon and Vichi (2001) for minimizing \eqn{L} with \eqn{d} being
-      co-membership dissimilarity.  (See \code{\link{ls_fit_ultrametric}}
-      for more information on the SUMT approach.)  This optimization
-      problem is equivalent to finding the membership matrix \eqn{m} for
-      which the sum of the squared differences between \eqn{C(m) = m m'}
-      and the weighted average co-membership matrix \eqn{\sum_b w_b
-	C(m_b)} of the partitions is minimal.
+      co-membership dissimilarity and \eqn{p = 2}.  (See
+      \code{\link{sumt}} for more information on the SUMT approach.)
+      This optimization problem is equivalent to finding the membership
+      matrix \eqn{m} for which the sum of the squared differences
+      between \eqn{C(m) = m m'} and the weighted average co-membership
+      matrix \eqn{\sum_b w_b C(m_b)} of the partitions is minimal.
 
       Availabe control parameters are \code{method}, \code{control},
       \code{eps}, \code{q}, and \code{verbose}, which have the same
-      roles as for \code{\link{ls_fit_ultrametric}}, and the following.
+      roles as for \code{\link{sumt}}, and the following.
+      
       \describe{
 	\item{\code{k}}{an integer giving the number of classes to be
 	  used for the least squares consensus partition.  By default,
@@ -141,22 +172,41 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
     }
 
+    \item{\code{"soft/symdiff"}}{a SUMT approach for minimizing
+      \eqn{L = \sum w_b d(x_b, x)} over all soft partitions with a given
+      maximal number of classes, where \eqn{d} is the Manhattan
+      dissimilarity of the co-membership matrices (coinciding with
+      symdiff partition dissimilarity in the case of hard partitions).
+
+      Available control parameters are the same as for \code{"GV3"}.
+    }
   }
   
-  By default, method \code{"DWH"} is used for ensembles of partitions.
+  By default, method \code{"SE"} is used for ensembles of partitions.
   
   If all elements of the ensemble are hierarchies, the following
   built-in methods for computing consensus hierarchies are available.
   
   \describe{
-    \item{\code{"cophenetic"}}{an algorithm for minimizing
+    \item{\code{"euclidean"}}{an algorithm for minimizing
       \eqn{L(x) = \sum w_b d(x_b, x) ^ 2} over all dendrograms, where
       \eqn{d} is Euclidean dissimilarity.  This is equivalent to finding
       the best least squares ultrametric approximation of the weighted
       average \eqn{d = \sum w_b u_b} of the ultrametrics \eqn{u_b} of
       the hierarchies \eqn{x_b}, which is attempted by calling
       \code{\link{ls_fit_ultrametric}} on \eqn{d} with appropriate
-      control parameters.}
+      control parameters.
+
+      Can also be referred to as \code{"cophenetic"}.
+    }
+
+    \item{\code{"manhattan"}}{a SUMT for minimizing \eqn{L = \sum w_b
+	d(x_b, x)} over all dendrograms, where \eqn{d} is Manhattan
+      dissimilarity.
+
+      Available control parameters are the same as for
+      \code{"euclidean"}.
+    }
     
     \item{\code{"majority"}}{a hierarchy obtained from an extension of
       the majority consensus tree of Margush and McMorris (1981), which
@@ -179,7 +229,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     }
   }
 
-  By default, method \code{"cophenetic"} is used for ensembles of
+  By default, method \code{"euclidean"} is used for ensembles of
   hierarchies.
 
   If a user-defined agreement method is to be employed, it must be a
@@ -238,7 +288,7 @@ cl_dissimilarity(as.cl_hard_partition(m1),
 ## partition data based on Euclidean dissimilarities.
 data("GVME")
 set.seed(1)
-## First, using k=2 classes.
+## First, using k = 2 classes.
 m1 <- cl_consensus(GVME, method = "GV1",
                    control = list(k = 2, verbose = TRUE))
 ## (Note that one should really use several replicates of this.)
@@ -257,7 +307,7 @@ max(abs(cl_membership(m1) - cl_membership(m2)))
 ## Do the "nearest" hard partitions fully agree?
 table(cl_class_ids(m1), cl_class_ids(m2))
 
-## And now for k=3 classes.
+## And now for k = 3 classes.
 m1 <- cl_consensus(GVME, method = "GV1",
                    control = list(k = 3, verbose = TRUE))
 sum(cl_dissimilarity(GVME, m1, "GV1") ^ 2)

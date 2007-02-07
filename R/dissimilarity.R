@@ -42,8 +42,7 @@ function(x, y = NULL, method = "euclidean", ...)
         for(j in seq_along(y))
             d[, j] <- sapply(x, method, y[[j]], ...)
         dimnames(d) <- list(names(x), names(y))
-        description <- paste("Dissimilarities using", method_name)
-        return(cl_cross_proximity(d, description,
+        return(cl_cross_proximity(d, method_name,
                                   class = "cl_cross_dissimilarity"))
     }
     
@@ -58,7 +57,7 @@ function(x, y = NULL, method = "euclidean", ...)
     }
     
     cl_proximity(unlist(d),
-                 paste("Dissimilarities using", method_name),
+                 method_name,
                  labels = names(x),
                  size = n,
                  class = c("cl_dissimilarity", "cl_proximity", "dist"))

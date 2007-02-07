@@ -39,47 +39,25 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   Method \code{"SUMT"} implements the SUMT (Sequential Unconstrained
   Minimization Technique, Fiacco and McCormick, 1968) approach of de
   Soete (1986) which in turn simplifies the suggestions in Carroll and
-  Pruzansky (1980).  One iteratively minimizes \eqn{L(u) + \rho_k P(u)},
-  where \eqn{P(u)} is a non-negative function penalizing violations of
-  the ultrametric constraints such that \eqn{P(u)} is zero iff \eqn{u}
-  is an ultrametric.  The \eqn{\rho} values are increased according to
-  the rule \eqn{\rho_{k+1} = q \rho_k} for some constant \eqn{q > 1},
-  until convergence is obtained in the sense that the Euclidean distance 
-  between successive solutions \eqn{u_k} and \eqn{u_{k+1}} is small
-  enough.  We then use a final rounding step to ensure that the returned
-  object exactly satisfies the ultrametric constraints.  The starting
-  value \eqn{u_0} is obtained by \dQuote{random shaking} of the given
-  dissimilarity object (if not given).  If there are missing values in
-  \code{x}, i.e., the given dissimilarities are \emph{incomplete}, we
-  follow a suggestion of de Soete (1984), imputing the missing values by
-  the weighted mean of the non-missing ones, and setting the
-  corresponding weights to zero.
+  Pruzansky (1980).  (See \code{\link{sumt}} for more information on the
+  SUMT approach.)  We then use a final rounding step to ensure that the
+  returned object exactly satisfies the ultrametric constraints.  The
+  starting value \eqn{u_0} is obtained by \dQuote{random shaking} of the
+  given dissimilarity object (if not given).  If there are missing
+  values in \code{x}, i.e., the given dissimilarities are
+  \emph{incomplete}, we follow a suggestion of de Soete (1984), imputing
+  the missing values by the weighted mean of the non-missing ones, and
+  setting the corresponding weights to zero.
 
-  The unconstrained minimizations are carried out using either
-  \code{\link[stats]{optim}} or \code{\link[stats]{nlm}}, using the
-  analytic gradients given in Carroll and Pruzansky (1980).  The
-  following control parameters can be provided via the \code{control}
-  argument.
-
+  Availabe control parameters are \code{method}, \code{control},
+  \code{eps}, \code{q}, and \code{verbose}, which have the same roles as
+  for \code{\link{sumt}}, and the following.
+  
   \describe{
     \item{\code{nruns}}{an integer giving the number of runs to be
       performed.  Defaults to 1.}
     \item{\code{start}}{a single dissimilarity, or a list of
       dissimilarities to be employed as starting values.}
-    \item{\code{method}}{a character string, or \code{NULL}.  If not
-      given, \code{"CG"} is used.  If equal to \code{"nlm"},
-      minimization is carried out using \code{\link[stats]{nlm}}.
-      Otherwise, \code{\link[stats]{optim}} is used with \code{method}
-      as the given method.}
-    \item{\code{control}}{a list of control parameters to be passed to
-      the minimization routine in case \code{optim} is used.}
-    \item{\code{eps}}{the absolute convergence tolerance.
-      Defaults to \code{sqrt(.Machine$double.eps)}.}
-    \item{\code{q}}{a double greater than one controlling the growth of
-      the \eqn{\rho_k} as described above.  Defaults to 10.}
-    \item{\code{verbose}}{a logical indicating whether to provide some
-      output on minimization progress.  Defaults to
-      \code{getOption("verbose")}.}
   }
 
   The default optimization using conjugate gradients should work
@@ -155,11 +133,6 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   Discrete and hybrid scaling models.
   In E. D. Lantermann and H. Feger (eds.), \emph{Similarity and Choice}.
   Bern (Switzerland): Huber.
-
-  A. V. Fiacco and G. P. McCormick (1968).
-  \emph{Nonlinear programming: Sequential unconstrained minimization
-    techniques}.
-  New York: John Wiley & Sons.
 
   L. Hubert and P. Arabie (1995).
   Iterative projection strategies for the least squares fitting of tree

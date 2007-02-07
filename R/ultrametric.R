@@ -204,7 +204,7 @@ function(x, weights = 1, control = list())
     }
     
     ## And now ...
-    d <- SUMT(start, L, P, grad_L, grad_P,
+    d <- sumt(start, L, P, grad_L, grad_P,
               method = control$method, eps = control$eps,
               q = control$q, verbose = control$verbose,
               control = as.list(control$control))
@@ -551,7 +551,7 @@ function(x, weights = 1, control = list())
     }
 
     ## And now ...
-    d <- SUMT(start, L, P, grad_L, grad_P,
+    d <- sumt(start, L, P, grad_L, grad_P,
               method = control$method, eps = control$eps,
               q = control$q, verbose = control$verbose,
               control = as.list(control$control))

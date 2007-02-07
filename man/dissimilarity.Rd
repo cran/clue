@@ -1,4 +1,5 @@
 \name{dissimilarity}
+\encoding{UTF-8}
 \alias{cl_dissimilarity}
 \title{Dissimilarity Between Partitions or Hierarchies}
 \description{Compute the dissimilarity between (ensembles) of partitions
