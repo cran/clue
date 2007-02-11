@@ -1,4 +1,4 @@
-SUMT <-
+sumt <-
 function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
          eps = NULL, q = NULL, verbose = NULL, control = list())
 {

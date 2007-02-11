@@ -63,6 +63,11 @@ function(x)
     p
 }
 
+## Package clue: cl_pam().
+cl_prototypes.cl_pam <-
+function(x)
+    x$prototypes
+
 ## Package clue: cl_pclust().
 cl_prototypes.cl_pclust <-
 function(x)

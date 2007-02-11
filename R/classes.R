@@ -52,9 +52,23 @@ function(x)
 ## dendrograms.
 cl_classes.cl_ultrametric <- cl_classes.cl_dendrogram
 
-## <FIXME>
-## Add a decent print method for class "cl_classes_of_objects"
-## eventually, giving the usual
-##   { {A}, {B}, {C}, {A, B}, {A, B, C} }
-## output.
-## </FIXME>
+print.cl_classes_of_partition_of_objects <-
+function(x, ...)
+{
+    labels <- attr(x, "labels")
+    y <- lapply(x, function(i) paste(labels[i], collapse = ", "))
+    writeLines(formatDL(names(x), sprintf("{%s}", unlist(y)),
+                        style = "list", ...))
+    invisible(x)
+}
+
+print.cl_classes_of_hierarchy_of_objects <-
+function(x, ...)
+{
+    labels <- attr(x, "labels")
+    y <- lapply(x, function(i) paste(labels[i], collapse = ", "))
+    y <- strwrap(sprintf("{%s},", unlist(y)), exdent = 2)
+    y[length(y)] <- sub(",$", "", y[length(y)])
+    writeLines(y)
+    invisible(x)
+}

@@ -47,8 +47,7 @@ function(x, y = NULL, method = "euclidean", ...)
         for(j in seq_along(y))
             d[, j] <- sapply(x, method, y[[j]], ...)
         dimnames(d) <- list(names(x), names(y))
-        description <- paste("Agreements using", method_name)
-        return(cl_cross_proximity(d, description,
+        return(cl_cross_proximity(d, method_name,
                                   class = "cl_cross_agreement"))
     }
     
@@ -66,7 +65,7 @@ function(x, y = NULL, method = "euclidean", ...)
     ## We assume that self-agreements are always one ...
     ## </NOTE>
     cl_proximity(unlist(d),
-                 paste("Agreements using", method_name),
+                 method_name,
                  labels = names(x),
                  self = rep.int(1, length(x)),
                  size = n, class = "cl_agreement")
