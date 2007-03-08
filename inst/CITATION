@@ -1,0 +1,43 @@
+citHeader("To cite in publications use:")
+
+meta <- packageDescription("clue")
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s.", meta$Version)
+
+citEntry(entry = "Manual",
+         title = "clue: Cluster ensembles",
+         author = {
+             personList(person(first = "Kurt", last = "Hornik",
+                               email = "Kurt.Hornik@R-project.org"))
+         },
+         year = year,
+         note = note,
+         url = "http://CRAN.R-project.org/",
+         textVersion = {
+             paste("Kurt Hornik",
+                   sprintf("(%s).", year),                         
+                   "clue: Cluster ensembles.",
+                   note,
+                   sep = "  ")
+         })
+
+citEntry(entry = "Article",
+         title = "A {CLUE} for {CLUster Ensembles}",
+         author = {
+             personList(person(first = "Kurt", last = "Hornik",
+                               email = "Kurt.Hornik@R-project.org"))
+         },
+         year = 2005,
+         journal = "Journal of Statistical Software",
+         volume = 14,
+         number = 12,
+         url = "http://www.jstatsoft.org/v14/i12/",
+         month = "September",
+         textVersion = {
+             paste("Kurt Hornik (2005).",
+                   "A CLUE for CLUster Ensembles.",
+                   "Journal of Statistical Software 14/12.",
+                   "URL: http://www.jstatsoft.org/v14/i12/.",
+                   sep = "  ")
+         })
+

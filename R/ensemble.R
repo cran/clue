@@ -60,12 +60,9 @@ function(..., recursive = FALSE)
 "[.cl_ensemble" <-
 function(x, i)
 {
-    clusterings <- unclass(x)[i]
-    ## <NOTE>
-    ## This is not very efficient.
-    ## But note that we need to special-case zero length clusterings.
-    cl_ensemble(list = clusterings)
-    ## </NOTE>
+    ## Make subscripting empty ensembles a noop.
+    if(length(x) == 0) return(x)
+    cl_ensemble(list = NextMethod("["))
 }
 
 rep.cl_ensemble <-
