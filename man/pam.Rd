@@ -36,9 +36,10 @@ cl_pam(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
 }  
 \details{
   An optimal \eqn{k}-medoids partition of the given cluster ensemble is
-  defined as a partition of the objects \eqn{x_i} into \eqn{k} classes
-  \eqn{C_1, \ldots, C_k} such that the criterion function
-  \eqn{L = \sum_l \min_{j \in C_l} \sum_{i \in C_l} d(x_i, x_j)}
+  defined as a partition of the objects \eqn{x_i} (the elements of the
+  ensemble) into \eqn{k} classes \eqn{C_1, \ldots, C_k} such that the
+  criterion function
+  \eqn{L = \sum_{l=1}^k \min_{j \in C_l} \sum_{i \in C_l} d(x_i, x_j)} 
   is minimized.
 
   Such secondary partitions (e.g., Gordon & Vichi, 1998) are obtained by
