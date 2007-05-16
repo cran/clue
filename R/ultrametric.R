@@ -4,9 +4,9 @@ cl_ultrametric <-
 function(x, size = NULL, labels = NULL) 
 {
     if(inherits(x, "cl_hierarchy")) {
-        ## <FIXME>
+        ## <NOTE>
         ## Strictly, not every hierarchy corresponds to an ultrametric.
-        ## </FIXME>
+        ## </NOTE>
         return(cl_ultrametric(.get_representation(x),
                               size = size, labels = labels))
     }
@@ -19,12 +19,6 @@ function(x, size = NULL, labels = NULL)
         ## Or use the fact that in R >= 2.1.0, stats::cophenetic() is
         ## generic.
         out <- cophenetic(x)
-        ## <FIXME 2.1.0>
-        ## In R <= 2.0.1, cophenetic() does not preserve labels.
-        ## Remove eventually.
-        if(is.null(labels))
-            labels <- as.hclust(x)$labels
-        ## </FIXME>
     }
     else {
         out <- x

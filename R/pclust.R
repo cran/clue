@@ -157,7 +157,22 @@ function(x, k, m = 1, control = list())
                 call = match.call())
     attr(out, "converged") <- (iter <= maxiter)
     class(out) <- "cl_pclust"
-    as.cl_partition(out)
+
+    ## <FIXME>
+    ## Revision 1151 changed from
+    ##   out
+    ## to
+    ##   as.cl_partition(out)
+    ## so that the cl_pclust object 'out' is used as the internal
+    ## representation of the virtually classed cl_partition object
+    ## returned.  To make this "really" work, we would need methods for
+    ## class cl_partition (using the internal representation) for at
+    ## least all generics with methods for class cl_pclust (and e.g.
+    ## cl_validity() only has a method for the latter [2007-05-15]).
+    ## Revisit this eventually, and also consider dealing with cl_pam
+    ## analogously.
+    out
+    ## </FIXME>
 }
 
 print.cl_pclust <-
@@ -180,14 +195,13 @@ function(x, ...)
     ## </TODO>
     writeLines(strwrap(txt))
     if(is_hard) {
-        writeLines("Class ids:")
         print(class_ids, ...)
     }
     else {
         writeLines("Class memberships:")
         print(cl_membership(x), ...)
         writeLines("Class ids of closest hard partition:")
-        print(class_ids, ...)
+        print(unclass(class_ids), ...)
     }
     print(cl_validity(x), ...)
     invisible(x)

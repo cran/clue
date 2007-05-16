@@ -180,6 +180,15 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
       Available control parameters are the same as for \code{"GV3"}.
     }
+
+    \item{\code{"hard/symdiff"}}{an exact solver for minimizing
+      \eqn{L = \sum w_b d(x_b, x)} over all hard partitions (possibly
+      with a given maximal number of classes as specified by the control
+      parameter \code{k}), where \eqn{d} is symdiff partition
+      dissimilarity (so that soft partitions in the ensemble are
+      replaced by their closest hard partitions).  The consensus
+      solution is found via mixed linear or quadratic programming.
+    }
   }
   
   By default, method \code{"SE"} is used for ensembles of partitions.
@@ -214,7 +223,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       where \eqn{d} is the symmetric difference dissimilarity.  The
       unweighted \eqn{p}-majority tree is the \eqn{n}-tree (hierarchy in
       the strict sense) consisting of all subsets of objects contained
-      in more than \eqn{p} of the \eqn{n}-trees $T_b$ induced by the
+      in more than \eqn{p} of the \eqn{n}-trees \eqn{T_b} induced by the
       dendrograms, where \eqn{1/2 \le p < 1} and \eqn{p = 1/2} (default)
       corresponds to the standard majority tree.  In the weighted case,
       it consists of all subsets \eqn{A} for which \eqn{\sum_{b: A \in

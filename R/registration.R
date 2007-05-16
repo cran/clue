@@ -115,6 +115,10 @@ set_cl_consensus_method("soft/symdiff", "partition",
                         .cl_consensus_partition_soft_symdiff,
                         dissimilarity = "symdiff",
                         exponent = 1)
+set_cl_consensus_method("hard/symdiff", "partition",
+                        .cl_consensus_partition_hard_symdiff,
+                        dissimilarity = "symdiff",
+                        exponent = 1)
 
 set_cl_consensus_method("cophenetic", "hierarchy",
                         .cl_consensus_hierarchy_cophenetic,

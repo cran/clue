@@ -68,16 +68,13 @@ function(x)
 cl_class_ids.default <-
 function(x)
 {
-    ## Assume data structure returned by kmeans.
-    ## But only if this gives "something" ...
-    ids <- x$cluster
-    if(!length(ids))
-        stop("Cannot infer class ids from given object.")
-    as.cl_class_ids(ids)
+    stop("Cannot infer class ids from given object.")
 }
 
 ## Package stats: kmeans() (R 2.1.0 or better).
-cl_class_ids.kmeans <- cl_class_ids.default
+cl_class_ids.kmeans <-
+function(x)
+    as.cl_class_ids(x$cluster)
 
 ## Package cluster: clara(), fanny(), and pam() give objects of the
 ## respective class inheriting from class "partition".
@@ -101,14 +98,14 @@ function(x)
     as.cl_class_ids(as.vector(x$cl))
 
 ## Package cclust: cclust().
-cl_class_ids.cclust <- cl_class_ids.default
+cl_class_ids.cclust <- cl_class_ids.kmeans
 
 ## Package e1071: cmeans() gives objects of class "fclust".
-cl_class_ids.fclust <- cl_class_ids.default
+cl_class_ids.fclust <- cl_class_ids.kmeans
 ## Package e1071: cshell().
-cl_class_ids.cshell <- cl_class_ids.default
+cl_class_ids.cshell <- cl_class_ids.kmeans
 ## Package e1071: bclust().
-cl_class_ids.bclust <- cl_class_ids.default
+cl_class_ids.bclust <- cl_class_ids.kmeans
 
 ## Package flexclust: kcca() returns objects of S4 class "kcca" which
 ## extends S4 class "flexclust".
@@ -135,6 +132,11 @@ cl_class_ids.Mclust <-
 function(x)
     as.cl_class_ids(x$classification)
 
+## Package relations: equivalence and preference relations.
+cl_class_ids.relation <-
+function(x)
+    as.cl_class_ids(relations::relation_class_ids(x))
+
 ## Package clue: Class ids.
 cl_class_ids.cl_class_ids <- .identity
 ## Package clue: Memberships.
@@ -143,12 +145,14 @@ function(x)
     as.cl_class_ids(structure(max.col(x), names = rownames(x)))
 ## (Cannot do cl_class_ids.cl_membership <- max.col for generic/method
 ## consistency.)
+## Package clue: cl_pam().
+cl_class_ids.cl_pam <- cl_class_ids.kmeans
 ## Package clue: cl_partition_by_class_ids().
 cl_class_ids.cl_partition_by_class_ids <-
 function(x)
     .get_representation(x)
 ## Package clue: cl_pclust().
-cl_class_ids.cl_pclust <- cl_class_ids.default
+cl_class_ids.cl_pclust <- cl_class_ids.kmeans
 ## Package clue: (virtual) class "cl_partition".
 cl_class_ids.cl_partition <-
 function(x)
@@ -197,16 +201,7 @@ function(x)
     UseMethod("is.cl_partition")
 
 ## Default method.
-is.cl_partition.default <-
-function(x)
-{
-    ## Ugly, but what else can we do?
-    ## <FIXME 2.1.0>
-    ## Maybe change eventually now that in R 2.1.0 or better,
-    ## stats::kmeans() returns something classed ...) 
-    !is.null(x$cluster)
-    ## </FIXME>    
-}
+is.cl_partition.default <- .false
 
 ## Package stats: kmeans() (R 2.1.0 or better).
 is.cl_partition.kmeans <- .true
@@ -379,10 +374,8 @@ function(x, labels = NULL)
 {
     if(!is.atomic(x))
         stop("Class ids must be atomic.")
-    ## <FIXME>
-    ## Play with labels vs names later ...
-    attr(x, "Labels") <- labels
-    ## </FIXME>
+    if(is.null(names(x)))
+        names(x) <- labels
     ## <FIXME>
     ## Perhaps give the raw class ids more structure?
     ## E.g, class "cl_class_ids"?
@@ -420,10 +413,8 @@ function(x, labels = NULL)
     ##    .is_stochastic_matrix <- function(x)
     ##       identical(all.equal(rowSums(x), rep(1, nrow(x))), TRUE))
     ## should do.)
-    ## <FIXME>
-    ## Play with labels vs rownames later ...
-    attr(x, "Labels") <- labels
-    ## </FIXME>
+    if(is.null(rownames(x)))
+        rownames(x) <- labels
     .make_container(as.cl_membership(x),
                     c("cl_partition_by_memberships",
                       .cl_partition_classes),
@@ -439,16 +430,7 @@ function(x)
     UseMethod("is.cl_hard_partition")
 
 ## Default method.
-is.cl_hard_partition.default <-
-function(x)
-{
-    ## Ugly, but what else can we do?
-    ## <FIXME 2.1.0>
-    ## Maybe change eventually now that in R 2.1.0 or better,
-    ## stats::kmeans() returns something classed ...) 
-    !is.null(x$cluster)
-    ## </FIXME>    
-}
+is.cl_hard_partition.default <- .false
 
 ## Package stats: kmeans() (R 2.1.0 or better).
 is.cl_hard_partition.kmeans <- .true
@@ -551,7 +533,6 @@ function(x)
         ## A vector of raw class ids, hopefully ...
         cl_partition_by_class_ids(x, names(x))
     }
-    ## </FIXME>
     else
         stop("Cannot coerce to 'cl_hard_partition'.")
 }
