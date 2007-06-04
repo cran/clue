@@ -91,8 +91,9 @@ function(x, ...)
         diag(m) <- self
     }
     ## <NOTE>
-    ## stats:::as.matrix.dist() provides default dimnames (1 : size) if
-    ## no labels are available.  We used to do this too, but ...
+    ## stats:::as.matrix.dist() provides default dimnames
+    ## (seq_len(size)) if no labels are available.
+    ## We used to do this too, but ...
     if(!is.null(labels <- attr(x, "Labels")))
         dimnames(m) <- list(labels, labels)
     ## </NOTE>
@@ -119,10 +120,10 @@ function(x, i, j)
         if(missing(i))
             return(x)
         else
-            j <- 1 : size
+            j <- seq_len(size)
     }
     if(missing(i))
-        i <- 1 : size
+        i <- seq_len(size)
     description <- attr(x, "description")
     ## RG's graph:::[.dist avoids as.matrix() in noting that for dist
     ## objects, entry (i,j) is at n(i-1) - i(i-1)/2 + j - i (in the

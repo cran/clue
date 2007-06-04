@@ -171,7 +171,7 @@ function(x, weights = 1, control = list())
         if(!is.list(order))
             order <- as.list(order)
         if(!all(sapply(order,
-                       function(o) all(sort(o) == 1 : n))))
+                       function(o) all(sort(o) == seq_len(n)))))
             stop("All given orders must be valid permutations.")
     }
     else {
@@ -247,7 +247,7 @@ function(x, weights = 1, control = list())
         if(!is.list(order))
             order <- as.list(order)
         if(!all(sapply(order,
-                       function(o) all(sort(o) == 1 : n))))
+                       function(o) all(sort(o) == seq_len(n)))))
             stop("All given orders must be valid permutations.")
     }
     else {

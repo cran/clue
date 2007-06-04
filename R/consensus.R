@@ -84,7 +84,7 @@ function(clusterings, weights, control)
             M <- .project_to_leading_columns(M, k)
     }
 
-    as.cl_partition(cl_membership(as.cl_membership(M[, 1 : k]), k))
+    as.cl_partition(cl_membership(as.cl_membership(M[, seq_len(k)]), k))
 }
 
 ### * .cl_consensus_partition_AOS
@@ -200,7 +200,7 @@ function(clusterings, weights, control,
                    M <- .weighted_sum_of_matrices(memberships, w, nrow(M))
                    ## And compute a closest hard partition H(M) from
                    ## that, using the first k columns of M.
-                   .cl_membership_from_class_ids(max.col(M[ , 1 : k]),
+                   .cl_membership_from_class_ids(max.col(M[ , seq_len(k)]),
                                                  ncol(M))
                },
                SM = .l1_fit_M)
@@ -230,7 +230,7 @@ function(clusterings, weights, control,
     }
 
     rownames(M) <- rownames(memberships[[1]])    
-    M <- cl_membership(as.cl_membership(M[, 1 : k]), k)
+    M <- cl_membership(as.cl_membership(M[, seq_len(k)]), k)
 
     ## Add these attributes here, as the above would not preserve them.
     attr(M, "converged") <- (iter <= maxiter)
@@ -313,7 +313,7 @@ function(memberships, w, k)
                            objective_in,
                            constr_mat,
                            constr_dir,
-                           c(rep.int(0, L), memberships[i, 1 : k, ], 1))
+                           c(rep.int(0, L), memberships[i, seq_len(k), ], 1))
         M[i, ] <- out$solution[ind]
     }
 
@@ -429,7 +429,7 @@ function(clusterings, weights, control, type = c("GV1"))
             }
             else {
                 ## Only include the matched non-dummy classes of M ..
-                ind <- 1 : k
+                ind <- seq_len(k)
                 ## ... which are matched to non-dummy classes of u.
                 ind <- ind[p[ind] <= nc_u]
                 sum((u[, p[ind]] - M[, ind]) ^ 2)
@@ -530,7 +530,7 @@ function(clusterings, weights, control, type = c("GV1"))
         if(k <= min(nc_memberships)) {
             ## Compute the weighted means \bar{M}.
             M <- .weighted_sum_of_matrices(mapply(function(u, p)
-                                                  u[ , p[1 : k]],
+                                                  u[ , p[seq_len(k)]],
                                                   memberships,
                                                   permutations,
                                                   SIMPLIFY = FALSE),
@@ -549,14 +549,14 @@ function(clusterings, weights, control, type = c("GV1"))
 
         ## First, compute the \alpha and \beta.
         alpha <- rowSums(rep(w, each = k) *
-                         mapply(function(p, n) p[1 : k] <= n,
+                         mapply(function(p, n) p[seq_len(k)] <= n,
                                 permutations, nc_memberships))
         ## Alternatively (more literally):
         ##   X <- lapply(permutations, .make_X_from_p)
         ##   alpha1 <- double(length = k)
         ##   for(b in seq_along(permutations)) {
         ##       alpha1 <- alpha1 +
-        ##           w[b] * colSums(X[[b]][1 : nc_memberships[b], ])
+        ##           w[b] * colSums(X[[b]][seq_len(nc_memberships[b]), ])
         ##   }
         
         ## A helper function giving suitably permuted memberships.
@@ -564,7 +564,7 @@ function(clusterings, weights, control, type = c("GV1"))
             ## Only matched classes, similar to the one used in value(),
             ## maybe merge eventually ...
             v <- matrix(0, nr_M, k)
-            ind <- 1 : k
+            ind <- seq_len(k)
             ind <- ind[p[ind] <= ncol(u)]
             if(any(ind))
                 v[ , ind] <- u[ , p[ind]]
@@ -644,7 +644,7 @@ function(clusterings, weights, control, type = c("GV1"))
     }
 
     rownames(M) <- rownames(memberships[[1]])    
-    M <- cl_membership(as.cl_membership(M[, 1 : k]), k)
+    M <- cl_membership(as.cl_membership(M[, seq_len(k)]), k)
 
     ## Add these attributes here, as the above would not preserve them.
     attr(M, "converged") <- (iter <= maxiter)
@@ -707,7 +707,8 @@ function(clusterings, weights, control)
         e <- eigen(Y, symmetric = TRUE)
         ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
         ## thereof.
-        M <- e$vectors[, 1:k] * rep(sqrt(e$values[1:k]), each = n)
+        M <- e$vectors[, seq_len(k)] *
+            rep(sqrt(e$values[seq_len(k)]), each = n)
         m <- c(M)
         start <- c(list(m),
                    replicate(nruns - 1,
@@ -803,7 +804,8 @@ function(clusterings, weights, control)
         e <- eigen(Y, symmetric = TRUE)
         ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
         ## thereof.
-        M <- e$vectors[, 1:k] * rep(sqrt(e$values[1:k]), each = n)
+        M <- e$vectors[, seq_len(k)] *
+            rep(sqrt(e$values[seq_len(k)]), each = n)
         m <- c(M)
         start <- c(list(m),
                    replicate(nruns - 1,
@@ -1004,7 +1006,7 @@ function(x)
     .make_transitivity_constraint_matrix <- function() {
         if(n <= 2) return(matrix(0, 0, NP))
         pos <- function(i, j) i + (j - 1) * (j - 2) / 2
-        ind <- 1 : n    
+        ind <- seq_len(n)
         z <- as.matrix(expand.grid(ind, ind, ind))[, c(3L, 2L, 1L)]
         z <- z[(z[, 1L] < z[, 2L]) & (z[, 2L] < z[, 3L]), , drop = FALSE]
         p_ij <- pos(z[, 1L], z[, 2L])
@@ -1196,7 +1198,7 @@ function(x, k)
     ## For a given matrix stochastic matrix x, return the stochastic
     ## matrix y which has columns from k+1 on all zero which is closest
     ## to x in the Frobenius distance.
-    y <- x[, 1 : k]
+    y <- x[, seq_len(k)]
     y <- cbind(pmax(y + (1 - rowSums(y)) / k, 0),
                matrix(0, nrow(y), ncol(x) - k))
     ## (Use the pmax to ensure that entries remain nonnegative.)
