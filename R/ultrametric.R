@@ -277,7 +277,7 @@ function(x, weights = 1, control = list())
         if(!is.list(order))
             order <- as.list(order)
         if(!all(sapply(order,
-                       function(o) all(sort(o) == 1 : n))))
+                       function(o) all(sort(o) == seq_len(n)))))
             stop("All given orders must be valid permutations.")
     }
     else {
@@ -349,7 +349,7 @@ function(x, weights = 1, control = list())
         if(!is.list(order))
             order <- as.list(order)
         if(!all(sapply(order,
-                       function(o) all(sort(o) == 1 : n))))
+                       function(o) all(sort(o) == seq_len(n)))))
             stop("All given orders must be valid permutations.")
     }
     else {
@@ -426,7 +426,7 @@ function(x, y, w, fitter)
     n <- length(y$order)
     ilist <- vector("list", n)
     out <- matrix(0, n, n)
-    for(i in 1 : (n - 1)) {
+    for(i in seq_len(n - 1)) {
         inds <- y$merge[i, ]
         ids1 <- if(inds[1] < 0) -inds[1] else ilist[[inds[1]]]
         ids2 <- if(inds[2] < 0) -inds[2] else ilist[[inds[2]]]

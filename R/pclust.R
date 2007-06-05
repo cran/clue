@@ -76,7 +76,7 @@ function(x, k, m = 1, control = list())
     
     ## Take random clusterings as prototypes.
     ## For partitions, it may be better to use random soft partitions.
-    prototypes <- clusterings[sample(1 : B, k)]
+    prototypes <- clusterings[sample(seq_len(B), k)]
     dissimilarities <- d(clusterings, prototypes) ^ e
 
     if(m == 1) {
@@ -124,7 +124,7 @@ function(x, k, m = 1, control = list())
             ##   \sum_b u_{bj}^m d(x_b, p) ^ e => \min_p
             ## I.e., p_j is the *weighted* consensus clustering of the
             ## x_b with corresponding weights u_{bj}^m.
-            for(j in 1 : k) {
+            for(j in seq_len(k)) {
                 prototypes[[j]] <-
                     cl_consensus(clusterings, weights = u[, j] ^ m,
                                  method = method, control = control)
