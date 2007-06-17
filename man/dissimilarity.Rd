@@ -180,7 +180,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   with \dQuote{raw} dissimilarities on the underlying objects (R objects
   inheriting from class \code{"dist"}).
 
-  If a user-defined agreement method is to be employed, it must be a
+  If a user-defined dissimilarity method is to be employed, it must be a
   function taking two clusterings as its arguments.
 
   Symmetric dissimilarity objects of class \code{"cl_dissimilarity"} are

@@ -66,8 +66,8 @@ function(x)
     attr(x, "n_of_objects")
 ## Package clue: Memberships.
 n_of_objects.cl_membership <- nrow
-## Package clue: cl_pclust().
-n_of_objects.cl_pclust <- n_of_objects.fclust
+## Package clue: pclust().
+n_of_objects.pclust <- n_of_objects.fclust
 ## Package clue: Ultrametrics.
 n_of_objects.cl_ultrametric <- n_of_objects.dist
 ## Package clue: (virtual) class "cl_partition".

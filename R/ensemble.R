@@ -129,5 +129,16 @@ function(x, ...)
 }
                         
 unique.cl_ensemble <-
-function (x, incomparables = FALSE, ...)
+function(x, incomparables = FALSE, ...)
     cl_ensemble(list = NextMethod("unique"))
+
+.cl_ensemble_type <-
+function(x)
+{
+    if(inherits(x, "cl_partition_ensemble"))
+        "partition"
+    else if(inherits(x, "cl_hierarchy_ensemble"))
+        "hierarchy"
+    else
+        NULL
+}

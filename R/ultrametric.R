@@ -105,7 +105,7 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
             stop("Arguments 'weights' must be compatible with 'x'.")
     }
     else
-        weights <- rep(weights, length = length(x))
+        weights <- rep(weights, length.out = length(x))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
@@ -475,7 +475,7 @@ function(x, method = c("SUMT", "IRIP"), weights = 1,
             stop("Arguments 'weights' must be compatible with 'x'.")
     }
     else
-        weights <- rep(weights, length = length(x))
+        weights <- rep(weights, length.out = length(x))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))

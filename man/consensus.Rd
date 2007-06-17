@@ -241,9 +241,10 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   By default, method \code{"euclidean"} is used for ensembles of
   hierarchies.
 
-  If a user-defined agreement method is to be employed, it must be a
+  If a user-defined consensus method is to be employed, it must be a
   function taking the cluster ensemble, the case weights, and a list of
-  control parameters as its arguments.
+  control parameters as its arguments, with formals named \code{x},
+  \code{weights}, and \code{control}, respectively.
 
   All built-in methods use heuristics for solving hard optimization
   problems, and cannot be guaranteed to find a global minimum.  Standard

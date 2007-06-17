@@ -56,6 +56,11 @@ function(x, ...)
     out
 }
 
+## Package clue: (virtual) class "cl_partition".
+cl_validity.cl_partition <-
+function(x, ...)
+    cl_validity(.get_representation(x), ...)
+## Package clue: cl_pclust().
 cl_validity.cl_pclust <-
 function(x, ...)
     x$validity
@@ -115,6 +120,15 @@ function(u, d)
     ## As this can be arbitrarily negative, we cut at 0.
 
     max(1 - sum(abs(d - u)) / sum(abs(d - median(d))), 0)
-
 }
+
+## Silhouette methods
+
+silhouette.cl_partition <-
+function(x, ...)
+    silhouette(.get_representation(x), ...)
+
+silhouette.cl_pclust <-
+function(x, ...)
+    x$silhouette
 

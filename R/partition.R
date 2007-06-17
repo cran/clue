@@ -45,8 +45,8 @@ n_of_classes.Mclust <- n_of_classes.default
 n_of_classes.cl_membership <-
 function(x)
     attr(x, "n_of_classes")
-## Package clue: cl_pclust().
-n_of_classes.cl_pclust <- n_of_classes.fanny
+## Package clue: pclust().
+n_of_classes.pclust <- n_of_classes.fanny
 ## Package clue: (virtual) class "cl_partition".
 n_of_classes.cl_partition <-
 function(x)
@@ -151,8 +151,8 @@ cl_class_ids.cl_pam <- cl_class_ids.kmeans
 cl_class_ids.cl_partition_by_class_ids <-
 function(x)
     .get_representation(x)
-## Package clue: cl_pclust().
-cl_class_ids.cl_pclust <- cl_class_ids.kmeans
+## Package clue: pclust().
+cl_class_ids.pclust <- cl_class_ids.kmeans
 ## Package clue: (virtual) class "cl_partition".
 cl_class_ids.cl_partition <-
 function(x)
@@ -249,12 +249,8 @@ is.cl_partition.Mclust <- .true
 ## Note that "raw" cl_membership objects are *not* partitions, as they
 ## are meant for numeric computations.
 is.cl_partition.cl_partition <- .true
-## Package clue: cl_pclust().
-## <FIXME>
-## This should not be necessary any more, now that cl_pclust() returns
-## cl_partition objects.
-is.cl_partition.cl_pclust <- .true
-## </FIXME>
+## Package clue: pclust().
+is.cl_partition.pclust <- .true
 
 ### * as.cl_partition
 
@@ -504,8 +500,8 @@ function(x)
     else
         is.cl_hard_partition(y)
 }
-## Package clue: cl_pclust().
-is.cl_hard_partition.cl_pclust <- is.cl_hard_partition.fanny
+## Package clue: pclust().
+is.cl_hard_partition.pclust <- is.cl_hard_partition.fanny
 
 ### * as.cl_hard_partition
 
@@ -575,7 +571,7 @@ function(x)
     else
         .maybe_is_proper_soft_partition(y)
 }
-.maybe_is_proper_soft_partition.cl_pclust <-
+.maybe_is_proper_soft_partition.pclust <-
 function(x)
     x$m > 1
 
