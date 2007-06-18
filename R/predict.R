@@ -232,16 +232,16 @@ cl_predict.kcca <- cl_predict.default
 ## Package mclust: Ron Wehrens will add a predict method for Mclust
 ## objects eventually (as suggested by us).
 
-## Package clue: cl_pclust().
-cl_predict.cl_pclust <-
+## Package clue: pclust().
+cl_predict.pclust <-
 function(object, newdata = NULL,
          type = c("class_ids", "memberships"), ...)
 {
     if(is.null(newdata))
         return(.cl_class_ids_or_membership(object, type))
 
-    d <- object$d(newdata, object$prototypes)
-    power <- c(object$m, object$e)
+    d <- object$family$d(newdata, object$prototypes)
+    power <- c(object$m, object$family$e)
     M <- .memberships_from_cross_dissimilarities(d, power)
     .as_cl_class_ids_or_membership(M, type)
 }

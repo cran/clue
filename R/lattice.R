@@ -89,7 +89,7 @@ function(x)
     ## And now incrementally build the join.
     jcids <- ids[[1]]                   # Class ids of the current join.
     jnc <- length(unique(jcids))        # Number of classes of this.
-    for(b in seq(from = 2, to = length(x))) {
+    for(b in seq.int(from = 2, to = length(x))) {
         z <- table(jcids, ids[[b]])
         ## It is faster to work on the smaller partition, but this
         ## should be ensured by the reordering ...

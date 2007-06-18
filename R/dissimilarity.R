@@ -211,7 +211,7 @@ function(x, y, weights = 1)
 {
     ## Variation of information for general "soft clusterings", cf
     ## Section 5.2. in Meila (2002). 
-    weights <- rep(weights, length = n_of_objects(x))
+    weights <- rep(weights, length.out = n_of_objects(x))
     weights <- weights / sum(weights)
     M_x <- cl_membership(x)
     ## Weighted marginal distribution of x:
@@ -479,7 +479,7 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
     ##   out <- as.matrix(dist(rbind(t(A), t(B)), "manhattan"))
     ##   dimnames(out) <- NULL
     ##   nc_B <- NCOL(B)
-    ##   out[seq(from = NCOL(A) + 1, length = nc_B), seq_len(nc_B)]
+    ##   out[seq(from = NCOL(A) + 1, length.out = nc_B), seq_len(nc_B)]
     ## }
     ## foo_f <- function(A, B) {
     ##   out <- matrix(0, NCOL(A), NCOL(B))

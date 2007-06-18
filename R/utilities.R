@@ -60,7 +60,7 @@ function(x, w = NULL, nr = NULL)
     ## conforming matrices \{ X_b \}.  If x is a list containing the
     ## matrices and w the vector of weights, it seems that one
     ## reasonably efficient way of doing this is the following.
-    if(is.null(w)) w <- rep(1, length = length(x))
+    if(is.null(w)) w <- rep.int(1, length(x))
     if(is.null(nr)) nr <- NROW(x[[1]])
     matrix(rowSums(mapply("*", x, w)), nr)
 }
@@ -71,7 +71,7 @@ function(x, w = NULL, nr = NULL)
 function(x, w = NULL)
 {
     ## See above.
-    if(is.null(w)) w <- rep(1, length = length(x))
+    if(is.null(w)) w <- rep.int(1, length(x))
     rowSums(mapply("*", x, w))
 }
 
@@ -122,7 +122,7 @@ function(x, cls, ...)
 weighted_median <-
 function(x, w = 1, na.rm = FALSE)
 {
-    w <- rep(w, length = length(x))
+    w <- rep(w, length.out = length(x))
     if(na.rm && any(ind <- is.na(x))) {
         x <- x[!ind]
         w <- w[!ind]

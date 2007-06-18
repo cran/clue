@@ -19,25 +19,19 @@ function(x, method = NULL, weights = 1, control = list())
     if(!length(clusterings))
         stop("Cannot compute consensus of empty ensemble.")
 
-    weights <- rep(weights, length = length(clusterings))
+    weights <- rep(weights, length.out = length(clusterings))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
         stop("Argument 'weights' has no positive elements.")
 
-    is_partition_ensemble <-
-        inherits(clusterings, "cl_partition_ensemble")
-
     if(!is.function(method)) {
         if(!inherits(method, "cl_consensus_method")) {
             ## Get the method definition from the registry.
-            type <- ifelse(is_partition_ensemble,
-                           "partition", "hierarchy")
-            if(is.null(method)) {
-                method <- ifelse(is_partition_ensemble,
-                                 "SE", "euclidean")
-            }
-            method <- get_cl_consensus_method(method, type)
+            type <- .cl_ensemble_type(clusterings)
+            if(is.null(method))
+                method <- .cl_consensus_method_default(type)                
+            method <- get_cl_consensus_method(method, type)            
         }
         method <- method$definition
     }
@@ -296,7 +290,7 @@ function(memberships, w, k)
                         c(rep.int(0, 2 * B * k), rep.int(1, k)))
     constr_dir <- c(rep.int(">=", L), rep.int("==", B * k + 1))
 
-    ind <- seq(from = 2 * B * k + 1, length = k)
+    ind <- seq.int(from = 2 * B * k + 1, length.out = k)
     nr <- NROW(memberships[[1]])
     nc <- NCOL(memberships[[1]])
     M <- matrix(0, nr = nr, nc = k)
@@ -1189,6 +1183,14 @@ function(clusterings, weights, control)
 }
 
 ### * Utilities
+
+### ** .cl_consensus_method_default
+
+.cl_consensus_method_default <-
+function(type)
+{
+    switch(type, partition = "SE", hierarchy = "euclidean", NULL)
+}
 
 ### ** .project_to_leading_columns
 

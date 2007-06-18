@@ -1,9 +1,11 @@
+### * cl_pclust
+
 cl_pclust <-
-function(x, k, m = 1, control = list())
+function(x, k, method = NULL, m = 1, weights = 1, control = list())
 {
     ## Partition a cluster ensemble x into (at most) k classes by
     ## minimizing
-    ##   \sum_b \sum_j u_{bj}^m d(x_b, p_j) ^ e
+    ##   \sum_b \sum_j w_b u_{bj}^m d(x_b, p_j) ^ e
     ## for "suitable" prototypes p_1, ..., p_k, where 1 <= m < \infty,
     ## with 1 corresponding to hard (secondary) partitions, and d a
     ## dissimilarity measure (such as Euclidean dissimilarity of
@@ -17,24 +19,12 @@ function(x, k, m = 1, control = list())
     ## we rely on the registration mechanism (set_cl_consensus_method())
     ## to provide the required information about d and e.
 
-    maxiter <- control$maxiter
-    if(is.null(maxiter))
-        maxiter <- 100
-    reltol <- control$reltol
-    if(is.null(reltol))
-        reltol <- sqrt(.Machine$double.eps)
-    ## To be passed on to cl_consensus().
-    method <- control$method
-    ## Do this at last ...
-    control <- as.list(control$control)
-
     clusterings <- as.cl_ensemble(x)
     B <- length(clusterings)
 
-    is_partition_ensemble <-
-        inherits(clusterings, "cl_partition_ensemble")
+    type <- .cl_ensemble_type(clusterings)
 
-    if(is_partition_ensemble) {
+    if(type == "partition") {
         ## Canonicalize by turning into an ensemble of partitions
         ## represented by membership matrices with the same (minimal)
         ## number of columns.
@@ -45,26 +35,13 @@ function(x, k, m = 1, control = list())
             cl_ensemble(list = lapply(memberships, as.cl_partition))
     }
 
-    if(is.null(method)) {
-        ## Default: use squared Euclidean dissimilarities.  Note that
-        ## there is a small catch, as the default consensus methods for
-        ## partitions and hierarchies are *not* named "euclidean".
-        ## Hence, fill in d and e ourselves ...
-        e <- 2
-        d <- function(x, y = NULL)
-            cl_dissimilarity(x, y, method = "euclidean")
-    }
-    else {
-        ## Get required information on d and e from the registry.        
-        if(!inherits(method, "cl_consensus_method")) {
-            type <- if(is_partition_ensemble)
-                "partition"
-            else
-                "hierarchy" 
-            method <- get_cl_consensus_method(method, type)
-            ## Note that this avoids registry lookup in subsequent
-            ## calls to cl_consensus().
-        }
+    if(!inherits(method, "cl_consensus_method")) {
+        ## Get required information on d and e from the registry.
+        if(is.null(method))
+            method <- .cl_consensus_method_default(type)
+        method <- get_cl_consensus_method(method, type)
+        ## Note that this avoids registry lookup in subsequent calls to
+        ## cl_consensus().
         if(is.null(method$exponent))
             stop("No information on exponent in consensus method used.")
         e <- method$exponent
@@ -73,35 +50,143 @@ function(x, k, m = 1, control = list())
         d <- function(x, y = NULL)
             cl_dissimilarity(x, y, method = method$dissimilarity)
     }
+
+    family <- pclust_family(D = d, C = method$definition, e = e)
+    out <- pclust(x, k, family, m, weights, control)
+
+    ## Massage the results a bit.
+    dissimilarities <- as.matrix(d(clusterings) ^ e)
+    out$call <- match.call()
+    out <- structure(c(out,
+                       list(silhouette =
+                            silhouette(out$cluster,
+                                       dmatrix = dissimilarities),
+                            validity =
+                            cl_validity(out$membership,
+                                        dissimilarities))),
+                     class = unique(c("cl_pclust", class(out))))
+
+    as.cl_partition(out)
+}
+
+print.cl_pclust <-
+function(x, ...)
+{
+    txt <- if(x$m == 1)
+        gettextf("A hard partition of a cluster ensemble with %d elements into %d classes.",
+                 n_of_objects(x), n_of_classes(x))
+    else
+        gettextf("A soft partition (degree m = %f) of a cluster ensemble with %d elements into %d classes.",
+                x$m, n_of_objects(x), n_of_classes(x))
+    writeLines(strwrap(txt))
+    NextMethod("print", x, header = FALSE)
+    print(x$validity, ...)
+    invisible(x)
+}
+
+### * pclust
+
+pclust <-
+function(x, k, family, m = 1, weights = 1, control = list())
+{
+    ## A general purpose alternating optimization algorithm for
+    ## prototype-based partitioning.
     
-    ## Take random clusterings as prototypes.
-    ## For partitions, it may be better to use random soft partitions.
-    prototypes <- clusterings[sample(seq_len(B), k)]
-    dissimilarities <- d(clusterings, prototypes) ^ e
+    ## For now, assume family specifies three functions:
+    ## * A dissimilarity function D() for data and a LIST of prototypes.
+    ## * A consensus function C() for data, weights and control.
+    ## * An init function init() of data and k giving an initial LIST of
+    ##   k prototypes.
+
+    ## <NOTE>
+    ## We use k as the second argument as this seems to be common
+    ## practice for partitioning algorithms.
+    ## </NOTE>
+
+    ## <NOTE>
+    ## The 'prototypes' are not necessarily objects of the same kind as
+    ## the data objects.  Therefore, D() is really a 2-argument
+    ## cross-dissimilarity function.
+    ## It would also be useful to have a way of computing the pairwise
+    ## dissimilarities between objects: but this is something different
+    ## from D() is objects and prototypes are not of the same kind.
+    ## A "clean" solution could consist in specifying the family either
+    ## via a (non-symmetric) cross-dissimilarity function X(), or a
+    ## symmetric D() which when called with a single argument gives the
+    ## pairwise object dissimilarities.
+    ## I.e., 
+    ##   pclust_family(D = NULL, C, init = NULL, X = NULL, ......)
+    ## using
+    ## * If both D and X are not given => TROUBLE.
+    ## * If only D is given: use for X as well.
+    ## * If only X is given: only use as such.
+    ## Something for the future ...
+    ## </NOTE>
+
+    ## <NOTE>
+    ## We use a LIST of prototypes as we eventually need to be able to
+    ## modify the i-th prototype (and it seems awkward to handle matrix
+    ## representations).  Similarly, we assume that consensus functions
+    ## can all handle WEIGHTS (formals: x, weights, control; only used
+    ## positionally).
+    ## <NOTE>
+
+    ## <NOTE>
+    ## If people have code for computing cross-dissimilarities for the
+    ## data and a *single* prototype (say, xd()), they can easily wrap
+    ## into what is needed using
+    ##   t(sapply(prototypes, function(p) xd(x, p)))
+    ## Assuming symmetry of the dissimilarity, they could also do
+    ##   t(sapply(prototypes, xd, x))
+    ## </NOTE>
+
+    ## Perhaps check whether 'family' is a feasible/suitable pclust
+    ## family (object).
+    D <- family$D
+    C <- family$C
+    e <- family$e
+
+    maxiter <- control$maxiter
+    if(is.null(maxiter))
+        maxiter <- 100
+    reltol <- control$reltol
+    if(is.null(reltol))
+        reltol <- sqrt(.Machine$double.eps)
+    verbose <- control$verbose
+    if(is.null(verbose))
+        verbose <- getOption("verbose")
+    ## Do this at last ...
+    control <- as.list(control$control)
+
+    ## Initialize.
+    prototypes <- family$init(x, k)
+    dissimilarities <- D(x, prototypes) ^ e
+    B <- NROW(dissimilarities)
+
+    weights <- rep(weights, length.out = B)
+    if(any(weights < 0))
+        stop("Argument 'weights' has negative elements.")
+    if(!any(weights > 0))
+        stop("Argument 'weights' has no positive elements.")
 
     if(m == 1) {
-        ## Hard secondary partitions.
+        ## Hard partitions.
         class_ids <- max.col( - dissimilarities )
         old_value <-
             sum(.one_entry_per_column(dissimilarities, class_ids))
         iter <- 1
         while(iter <= maxiter) {
-            ## Compute new prototypes.
-            ## <NOTE>
-            ## Splitting lists is broken in R versions up to 2.0.1, so
-            ## we use a loop here.  Something based on
-            ##   lapply(split(clusterings, class_ids), cl_consensus, ...)
-            ## would be nicer.
+            if(verbose)
+                cat("Iteration:", iter, "*** old value:", old_value)
             for(j in unique(class_ids))
                 prototypes[[j]] <-
-                    cl_consensus(clusterings[class_ids %in% j],
-                                 method = method, control = control)
-            ## </NOTE>
-            ## Update the class ids.
-            dissimilarities <- d(clusterings, prototypes) ^ e
+                    C(x, weights * (class_ids %in% j), control)
+            dissimilarities <- D(x, prototypes) ^ e
             class_ids <- max.col( - dissimilarities )
             new_value <-
                 sum(.one_entry_per_column(dissimilarities, class_ids))
+            if(verbose)
+                cat(" *** new value:", new_value, "\n")
             if(abs(old_value - new_value)
                < reltol * (abs(old_value) + reltol))
                 break
@@ -112,27 +197,28 @@ function(x, k, m = 1, control = list())
         u[cbind(seq_len(B), class_ids)] <- 1
     }
     else {
-        ## Soft secondary partitions.
+        ## Soft partitions.
         value <- function(u, dissimilarities)
             sum(u ^ m * dissimilarities)
         u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
         old_value <- value(u, dissimilarities)
         iter <- 1        
         while(iter <= maxiter) {
+            if(verbose)
+                cat("Iteration:", iter, "*** old value:", old_value)
             ## Update the prototypes.
             ## This amounts to solving, for each j:
-            ##   \sum_b u_{bj}^m d(x_b, p) ^ e => \min_p
-            ## I.e., p_j is the *weighted* consensus clustering of the
-            ## x_b with corresponding weights u_{bj}^m.
+            ##   \sum_b w_b u_{bj}^m D(x_b, p) ^ e => \min_p
+            ## I.e., p_j is the *weighted* consensus of the x_b with
+            ## corresponding weights u_{bj}^m.
             for(j in seq_len(k)) {
-                prototypes[[j]] <-
-                    cl_consensus(clusterings, weights = u[, j] ^ m,
-                                 method = method, control = control)
+                prototypes[[j]] <- C(x, weights * u[, j] ^ m, control)
             }
             ## Update u.
-            dissimilarities <- d(clusterings, prototypes) ^ e
+            dissimilarities <- D(x, prototypes) ^ e
             u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
             new_value <- value(u, dissimilarities)
+            cat(" *** new value:", new_value, "\n")
             if(abs(old_value - new_value)
                < reltol * (abs(old_value) + reltol))
                 break
@@ -142,58 +228,35 @@ function(x, k, m = 1, control = list())
         class_ids <- max.col(u)
     }
 
-    dissimilarities <- as.matrix(d(clusterings) ^ e)
-    ## Note that our dissimilarities inherit from "cl_proximity" but not
-    ## "dist", and as.dist() is not a generic function.
+    names(class_ids) <- rownames(u) <- rownames(dissimilarities)
     u <- cl_membership(as.cl_membership(u), k)
                                           
     out <- list(prototypes = prototypes,
                 membership = u,
                 cluster = class_ids,
-                silhouette = silhouette(class_ids,
-                                        dmatrix = dissimilarities),
-                validity = cl_validity(u, dissimilarities),
-                m = m, d = d, e = e,
+                family = family,
+                m = m,
                 call = match.call())
     attr(out, "converged") <- (iter <= maxiter)
-    class(out) <- "cl_pclust"
+    class(out) <- "pclust"
 
-    ## <FIXME>
-    ## Revision 1151 changed from
-    ##   out
-    ## to
-    ##   as.cl_partition(out)
-    ## so that the cl_pclust object 'out' is used as the internal
-    ## representation of the virtually classed cl_partition object
-    ## returned.  To make this "really" work, we would need methods for
-    ## class cl_partition (using the internal representation) for at
-    ## least all generics with methods for class cl_pclust (and e.g.
-    ## cl_validity() only has a method for the latter [2007-05-15]).
-    ## Revisit this eventually, and also consider dealing with cl_pam
-    ## analogously.
     out
-    ## </FIXME>
 }
 
-print.cl_pclust <-
-function(x, ...)
+print.pclust <-
+function(x, header = TRUE, ...)
 {
-    is_hard <- x$m == 1
+    is_hard <- (x$m == 1)
     class_ids <- cl_class_ids(x)
-    ## <TODO>
-    ## Note that for m > 1 we could also get hard partitions ...
-    ## Can we really?
-    txt <- paste("A",
-                 if(is_hard) "hard" else "soft",
-                 "partition",
-                 if(!is_hard) paste("(degree m = ", x$m, ")", sep = ""),
-                 "of a cluster ensemble with",
-                 length(class_ids), 
-                 "elements into",
-                 n_of_classes(x),
-                 "classes.")
-    ## </TODO>
-    writeLines(strwrap(txt))
+    if(header) {
+        txt <- if(is_hard)
+            gettextf("A hard partition of %d objects into %d classes.",
+                     length(class_ids), n_of_classes(x))
+        else
+            gettextf("A soft partition (degree m = %f) of %d objects into %d classes.",
+                     x$m, length(class_ids), n_of_classes(x))
+        writeLines(strwrap(txt))
+    }
     if(is_hard) {
         print(class_ids, ...)
     }
@@ -203,10 +266,26 @@ function(x, ...)
         writeLines("Class ids of closest hard partition:")
         print(unclass(class_ids), ...)
     }
-    print(cl_validity(x), ...)
     invisible(x)
 }
+    
 
-silhouette.cl_pclust <-
-function(x, ...)
-    x$silhouette
+### * pclust_family
+
+pclust_family <-
+function(D, C, init = NULL, description = NULL, e = 1)
+{
+    ## Add checking formals (lengths) eventually ...
+    if(is.null(init)) {
+        ## Works for list representations ...
+        init <- function(x, k) sample(x, k)
+    }
+    structure(list(description = description,
+                   D = D, C = C, init = init, e = e),
+              class = "pclust_family")
+}
+
+### Local variables: ***
+### mode: outline-minor ***
+### outline-regexp: "### [*]+" ***
+### End: ***

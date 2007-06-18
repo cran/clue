@@ -71,8 +71,8 @@ function(x, k = n_of_classes(x))
 ## (Note: we cannot simply return x in case k equals n_of_classes(x),
 ## because ncol(x) might be different.)
 
-## Package clue: cl_pclust().
-cl_membership.cl_pclust <- cl_membership.fanny
+## Package clue: pclust().
+cl_membership.pclust <- cl_membership.fanny
 ## Package clue: (virtual) class "cl_partition".
 cl_membership.cl_partition <-
 function(x, k = n_of_classes(x))
