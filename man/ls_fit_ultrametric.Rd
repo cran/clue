@@ -171,7 +171,7 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
 data("Phonemes")
 ## Note that the Phonemes data set has the consonant misclassification
 ## probabilities, i.e., the similarities between the phonemes.
-d <- 1 - as.dist(Phonemes)
+d <- as.dist(1 - Phonemes)
 u <- ls_fit_ultrametric(d, control = list(verbose = TRUE))
 ## Cophenetic correlation:
 cor(d, u)

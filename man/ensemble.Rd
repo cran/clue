@@ -39,11 +39,6 @@ is.cl_ensemble(x)
 
   Available methods for cluster ensembles include those for
   subscripting, \code{c}, \code{rep}, and \code{print}.
-
-  Note that (currently), \code{as.cl_ensemble} assumes that unclassed
-  lists represent \emph{single} clusterings, as this in particular holds
-  true for \code{\link{kmeans}} in versions of R prior to 2.1.0.  This
-  may change eventually.
 }
 \value{
   \code{cl_ensemble} returns a list of the given clusterings or
@@ -55,9 +50,9 @@ d <- dist(USArrests)
 hclust_methods <- c("ward", "single", "complete", "average",
                     "mcquitty", "median", "centroid")
 hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
+names(hclust_results) <- hclust_methods 
 ## Now create an ensemble from the results.
 hens <- cl_ensemble(list = hclust_results)
-names(hens) <- hclust_methods 
 hens
 ## Subscripting.
 hens[1 : 3]

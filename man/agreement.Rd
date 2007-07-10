@@ -179,8 +179,8 @@ d <- dist(USArrests)
 hclust_methods <- c("ward", "single", "complete", "average",
                     "mcquitty", "median", "centroid")
 hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
+names(hclust_results) <- hclust_methods 
 hens <- cl_ensemble(list = hclust_results)
-names(hens) <- hclust_methods 
 summary(c(cl_agreement(hens)))
 ## Note that the Euclidean agreements are *very* small.
 ## This is because the ultrametrics differ substantially in height:
@@ -188,7 +188,7 @@ u <- lapply(hens, cl_ultrametric)
 round(sapply(u, max), 3)
 ## Rescaling the ultrametrics to [0, 1] gives:
 u <- lapply(u, function(x) (x - min(x)) / (max(x) - min(x)))
-shens <- cl_ensemble(list = lapply(u, as.cl_hierarchy))
+shens <- cl_ensemble(list = lapply(u, as.cl_dendrogram))
 summary(c(cl_agreement(shens)))
 ## Au contraire ...
 summary(c(cl_agreement(hens, method = "cophenetic")))

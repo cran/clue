@@ -10,7 +10,7 @@ cl_tabulate(x)
 }
 \value{
   A data frame with components:
-  \item{values}{the unique values (protected by \code{\link{I}}).}
+  \item{values}{the unique values.}
   \item{counts}{an integer vector with the number of times each of the
     unique values occurs in \code{x}.}
 }

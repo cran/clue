@@ -49,14 +49,15 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
   For \eqn{m = 1}, a generalization of the Lloyd-Forgy variant of the
   \eqn{k}-means algorithm is used, which iterates between reclassifying
   objects to their closest prototypes, and computing new prototypes as
-  consensus clusterings for the classes.  This may result in degenerate
-  solutions, and will be replaced by a Hartigan-Wong style algorithm
-  eventually.
+  consensus clusterings for the classes.  Gaul und Schader (1988)
+  introduced this procedure for \dQuote{Clusterwise Aggregation of
+    Relations} (with the same domains), containing equivalence
+  relations, i.e., hard partitions, as a special case.
 
   For \eqn{m > 1}, a generalization of the fuzzy \eqn{c}-means recipe
   (e.g., Bezdek (1981)) is used, which alternates between computing
   optimal memberships for fixed prototypes, and computing new prototypes
-  as the consensus clusterings for the classes.
+  as the suitably weighted consensus clusterings for the classes.
 
   This procedure is repeated until convergence occurs, or the maximal
   number of iterations is reached.
@@ -89,6 +90,10 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
   J. C. Bezdek (1981).
   \emph{Pattern recognition with fuzzy objective function algorithms}.
   New York: Plenum.
+
+  W. Gaul and M. Schader (1988).
+  Clusterwise aggregation of relations.
+  \emph{Applied Stochastic Models and Data Analysis}, \bold{4}:273--282.
 }
 
 \seealso{

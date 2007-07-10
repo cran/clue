@@ -23,7 +23,7 @@ as.cl_ultrametric(x)
 }  
 \details{
   If \code{x} is not an ultrametric or a hierarchy with an ultrametric
-  representation, \code{cl_ultrametric(x)} uses
+  representation, \code{cl_ultrametric} uses
   \code{\link[stats]{cophenetic}} to obtain the ultrametric (also known
   as cophenetic) distances from the hierarchy, which in turn by default
   calls the S3 generic \code{\link[stats]{as.hclust}} on the hierarchy.
