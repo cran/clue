@@ -45,9 +45,19 @@ function(..., list = NULL)
 is.cl_ensemble <-
 function(x)
     inherits(x, "cl_ensemble")
+
+## <NOTE>
+## In the old days, kmeans() results were unclassed lists, hence such
+## objects were taken as representing a single clustering.  Nowadays, we
+## take these as lists of clusterings.
 as.cl_ensemble <-
 function(x)
-    if(is.cl_ensemble(x)) x else cl_ensemble(x)
+{
+    if(is.cl_ensemble(x)) x
+    else if(is.list(x) && !is.object(x)) cl_ensemble(list = x)
+    else cl_ensemble(x)
+}
+## </NOTE>
 
 c.cl_ensemble <-
 function(..., recursive = FALSE)

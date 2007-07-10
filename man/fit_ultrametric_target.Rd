@@ -52,7 +52,7 @@ l1_fit_ultrametric_target(x, y, weights = 1)
 data("Phonemes")
 ## Note that the Phonemes data set has the consonant misclassification
 ## probabilities, i.e., the similarities between the phonemes.
-d <- 1 - as.dist(Phonemes)
+d <- as.dist(1 - Phonemes)
 ## Find the maximal dominated and miminal dominating ultrametrics by
 ## hclust() with single and complete linkage:
 y1 <- hclust(d, "single")

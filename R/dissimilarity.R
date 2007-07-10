@@ -152,9 +152,9 @@ function(x, y)
     C <- outer(colSums(M_x ^ 2), colSums(M_y ^ 2), "+") -
         2 * crossprod(M_x, M_y)
     if(k_x < k_y)
-        C <- rbind(C, matrix(0, nr = k_y - k_x, nc = k_y))
+        C <- rbind(C, matrix(0, nrow = k_y - k_x, ncol = k_y))
     else if(k_x > k_y)
-        C <- cbind(C, matrix(0, nr = k_x, nc = k_x - k_y))
+        C <- cbind(C, matrix(0, nrow = k_x, ncol = k_x - k_y))
     ind <- solve_LSAP(C)
     sqrt(sum(C[cbind(seq_along(ind), ind)]))
     ## (Note that this sum really only includes matched non-dummy

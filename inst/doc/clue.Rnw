@@ -16,7 +16,7 @@
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-\date{2006-02-09}
+\date{2007-06-28}
 \title{A CLUE for CLUster Ensembles}
 \author{Kurt Hornik}
 %% \VignetteIndexEntry{CLUster Ensembles}
@@ -317,7 +317,7 @@ function(x)
 is.cl_hard_partition.glvq <-
 function(x)
     TRUE
-@ %
+@ % $
 
 \subsection{Cluster ensembles}
 
@@ -828,7 +828,7 @@ using \code{cl\_consensus()} or \code{cl\_medoid()}.
 
 Package~\pkg{clue} additionally provides \code{cl\_pclust()} for direct
 prototype-based partitioning based on minimizing criterion functions of
-the form $\sum u_{bj}^m d(x_b, p_j)^e$, the sum of the
+the form $\sum w_b u_{bj}^m d(x_b, p_j)^e$, the sum of the case-weighted
 membership-weighted $e$-th powers of the dissimilarities between the
 elements~$x_b$ of the ensemble and the prototypes~$p_j$, for suitable
 dissimilarities~$d$ and exponents~$e$.  (The underlying feature spaces
@@ -842,13 +842,14 @@ generalization of the Lloyd-Forgy variant \citep{cluster:Lloyd:1957,
   cluster:Forgy:1965, cluster:Lloyd:1982} of the $k$-means algorithm is
 used, which iterates between reclassifying objects to their closest
 prototypes, and computing new prototypes as consensus clusterings for
-the classes.  This may result in degenerate solutions, and will be
-replaced by a Hartigan-Wong \citep{cluster:Hartigan+Wong:1979} style
-algorithm eventually.  For $m > 1$, a generalization of the fuzzy
-$c$-means recipe \citep[e.g.,][]{cluster:Bezdek:1981} is used, which
-alternates between computing optimal memberships for fixed prototypes,
-and computing new prototypes as the consensus clusterings for the
-classes.
+the classes.  \citet{cluster:Gaul+Schader:1988} introduced this
+procedure for \dQuote{Clusterwise Aggregation of Relations} (with the
+same domains), containing equivalence relations, i.e., hard partitions,
+as a special case.  For $m > 1$, a generalization of the fuzzy $c$-means
+recipe \citep[e.g.,][]{cluster:Bezdek:1981} is used, which alternates
+between computing optimal memberships for fixed prototypes, and
+computing new prototypes as the suitably weighted consensus clusterings
+for the classes.
 
 This procedure is repeated until convergence occurs, or the maximal
 number of iterations is reached.  Consensus clusterings are computed
@@ -882,7 +883,7 @@ The data set is shown in Figure~\ref{fig:Cassini}.
 data("Cassini")
 plot(Cassini$x, col = as.integer(Cassini$classes),
      xlab = "", ylab = "")
-@ %
+@ % $
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
@@ -913,11 +914,11 @@ ensemble
 <<>>=
 m1 <- cl_medoid(CKME)
 table(Medoid = cl_class_ids(m1), "True Classes" = Cassini$classes)
-@ %
+@ % $
 and inspecting it (Figure~\ref{fig:Cassini-medoid}):
 <<Cassini-medoid,eval=FALSE>>=
 plot(Cassini$x, col = cl_class_ids(m1), xlab = "", ylab = "")
-@ %
+@ % $
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
@@ -939,11 +940,11 @@ that one should really use several replicates of the consensus
 heuristic.  This consensus partition has confusion matrix
 <<>>=
 table(Consensus = cl_class_ids(m2), "True Classes" = Cassini$classes)
-@ %
+@ % $
 and class details as displayed in Figure~\ref{fig:Cassini-mean}:
 <<Cassini-mean,eval=FALSE>>=
 plot(Cassini$x, col = cl_class_ids(m2), xlab = "", ylab = "")
-@ %
+@ % $
 \begin{figure}
   \centering
 <<fig=TRUE,echo=FALSE>>=
@@ -1107,7 +1108,7 @@ follows.
 
 <<>>=
 data("Phonemes")
-d <- 1 - as.dist(Phonemes)
+d <- as.dist(1 - Phonemes)
 @ %
 (Note that the data set has the consonant misclassification
 probabilities, i.e., the similarities between the phonemes.)

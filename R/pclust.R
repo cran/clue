@@ -169,6 +169,13 @@ function(x, k, family, m = 1, weights = 1, control = list())
     if(!any(weights > 0))
         stop("Argument 'weights' has no positive elements.")
 
+    ## A little helper.
+    .make_unit_weights <- function(B, i) {
+        out <- double(B)
+        out[i] <- 1
+        out
+    }
+
     if(m == 1) {
         ## Hard partitions.
         class_ids <- max.col( - dissimilarities )
@@ -178,11 +185,30 @@ function(x, k, family, m = 1, weights = 1, control = list())
         while(iter <= maxiter) {
             if(verbose)
                 cat("Iteration:", iter, "*** old value:", old_value)
-            for(j in unique(class_ids))
+            class_ids_used <- unique(class_ids)
+            for(j in class_ids_used)
                 prototypes[[j]] <-
                     C(x, weights * (class_ids %in% j), control)
             dissimilarities <- D(x, prototypes) ^ e
             class_ids <- max.col( - dissimilarities )
+            ## Try avoiding degenerate solutions.
+            if(length(class_ids_used) < k) {
+                ## Find the k - l largest object-to-assigned-prototype
+                ## dissimilarities.
+                o <- order(.one_entry_per_column(dissimilarities,
+                                                 class_ids),
+                           decreasing = TRUE)
+                ## Find and recompute unused prototypes.
+                unused <- setdiff(seq_len(k), class_ids_used)
+                for(j in seq_along(unused))
+                    prototypes[[unused[j]]] <-
+                        C(x, .make_unit_weights(B, o[j]), control)
+                dissimilarities[, unused] <-
+                    D(x, prototypes[unused]) ^ e
+                class_ids <- max.col( - dissimilarities )
+                ## For the time being, do not retry in case the solution
+                ## is still degenerate.
+            }
             new_value <-
                 sum(.one_entry_per_column(dissimilarities, class_ids))
             if(verbose)

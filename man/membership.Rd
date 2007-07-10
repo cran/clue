@@ -43,9 +43,9 @@ d <- dist(USArrests)
 hclust_methods <- c("ward", "single", "complete", "average",
                     "mcquitty", "median", "centroid")
 hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
+names(hclust_results) <- hclust_methods 
 ## Now create an ensemble from the results.
 hens <- cl_ensemble(list = hclust_results)
-names(hens) <- hclust_methods
 ## Create a dissimilarity object from this.
 d1 <- cl_dissimilarity(hens)
 ## And compute a soft partition.

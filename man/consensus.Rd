@@ -146,6 +146,16 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       Can also be referred to as \code{"soft/manhattan"}.
     }
 
+    \item{\code{"SM"}}{a fixed-point algorithm for obtaining \emph{hard}
+      median Manhattan consensus partitions (i.e., for minimizing
+      \eqn{L} with Manhattan dissimilarity \eqn{d} and \eqn{p =	1} over 
+      all hard partitions with a given maximal number of classes).
+
+      Available control parameters are the same as for \code{"SE"}.
+
+      Can also be referred to as \code{"hard/manhattan"}.
+    }
+
     \item{\code{"GV3"}}{a SUMT algorithm for the \dQuote{third model} in
       Gordon and Vichi (2001) for minimizing \eqn{L} with \eqn{d} being
       co-membership dissimilarity and \eqn{p = 2}.  (See

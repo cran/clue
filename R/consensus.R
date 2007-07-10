@@ -293,7 +293,7 @@ function(memberships, w, k)
     ind <- seq.int(from = 2 * B * k + 1, length.out = k)
     nr <- NROW(memberships[[1]])
     nc <- NCOL(memberships[[1]])
-    M <- matrix(0, nr = nr, nc = k)
+    M <- matrix(0, nrow = nr, ncol = k)
 
     ## Put the memberships into one big array so that we can get their
     ## rows more conveniently (and efficiently):
@@ -448,9 +448,9 @@ function(clusterings, weights, control, type = c("GV1"))
         nc_u <- ncol(u)
         ## (See above for ncol() vs n_of_classes().)
         if(nc_M < nc_u)
-            C <- rbind(C, matrix(0, nr = nc_u - nc_M, nc = nc_u))
+            C <- rbind(C, matrix(0, nrow = nc_u - nc_M, ncol = nc_u))
         else if(nc_M > nc_u)
-            C <- cbind(C, matrix(0, nr = nc_M, nc = nc_M - nc_u))
+            C <- cbind(C, matrix(0, nrow = nc_M, ncol = nc_M - nc_u))
         
         solve_LSAP(C)
     }
@@ -977,7 +977,7 @@ function(C, nc)
                      constraint_rhs,
                      int.vec = integer_positions)
 
-    M <- matrix(y$solution[integer_positions], nc = nc)
+    M <- matrix(y$solution[integer_positions], ncol = nc)
 
     ## Return incidences.
     tcrossprod(M)
@@ -1129,7 +1129,7 @@ function(clusterings, weights, control)
         ## <NOTE>
         ## Using var(x) / 3 is really L2 ...
         ## </NOTE>
-        x <- apply(matrix(unlist(ultrametrics), nc = B), 1, 
+        x <- apply(matrix(unlist(ultrametrics), ncol = B), 1, 
                    weighted_median, w)
         start <- replicate(nruns,  
                            x + rnorm(length(x), sd = sd(x) / sqrt(3)),

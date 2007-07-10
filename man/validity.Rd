@@ -27,8 +27,10 @@ cl_validity(x, ...)
     accounted for}, defined as \eqn{1 - a_w / a_t}, where \eqn{a_t} is
   the average total dissimilarity, and the \dQuote{average within
     dissimilarity} \eqn{a_w} is given by
-  \deqn{\sum_{i,j} \sum_k m_{ik}m_{jk} d_{ij} /
-        \sum_{i,j} \sum_k m_{ik}m_{jk}} 
+  \deqn{\frac{\sum_{i,j} \sum_k m_{ik}m_{jk} d_{ij}}{
+        \sum_{i,j} \sum_k m_{ik}m_{jk}}}{%
+        \sum_{i,j} \sum_k m_{ik}m_{jk} d_{ij} /
+        \sum_{i,j} \sum_k m_{ik}m_{jk}}
   where \eqn{d} and \eqn{m} are the dissimilarities and memberships,
   respectively, and the sums are over all pairs of objects and all
   classes.
@@ -40,16 +42,16 @@ cl_validity(x, ...)
   and \code{d} the dissimilarity \code{x} was obtained from, these
   validity measures are given by
   \deqn{\mathrm{VAF} =
-    \max\left(1 - \sum_{i,j} (d_{ij} - u_{ij})^2 /
-    \sum_{i,j} (d_{ij} - \mathrm{mean}(d)) ^ 2, 0\right)}{
-    max(1 - sum_{i,j} (d_{ij} - u_{ij})^2 /
-    sum_{i,j} (d_{ij} - mean(d))^2, 0)}
+    \max\left(0, 1 - \frac{\sum_{i,j} (d_{ij} - u_{ij})^2}{
+    \sum_{i,j} (d_{ij} - \mathrm{mean}(d)) ^ 2}\right)}{
+    max(0, 1 - sum_{i,j} (d_{ij} - u_{ij})^2 /
+    sum_{i,j} (d_{ij} - mean(d))^2)}
   and
   \deqn{\mathrm{DEV} =
-    \max\left(1 - \sum_{i,j} |d_{ij} - u_{ij}| /
-    \sum_{i,j} |d_{ij} - \mathrm{median}(d)|, 0\right)}{
-    max(1 - sum_{i,j} |d_{ij} - u_{ij}| /
-    sum_{i,j} |d_{ij} - median(d)|, 0)}
+    \max\left(0, 1 - \frac{\sum_{i,j} |d_{ij} - u_{ij}|}{
+    \sum_{i,j} |d_{ij} - \mathrm{median}(d)|}\right)}{
+    max(0, 1 - sum_{i,j} |d_{ij} - u_{ij}| /
+    sum_{i,j} |d_{ij} - median(d)|)}
   respectively.  Note that VAF and DEV are not invariant under rescaling
   \code{u}, and may be \dQuote{arbitrarily small} (i.e., 0 using the
   above definitions) even though \code{u} and \code{d} are

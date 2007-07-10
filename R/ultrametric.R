@@ -633,7 +633,7 @@ function(x, nterms = 1, weights = 1, control = list())
                 cat("Term:", i)
             u_old <- u[[i]]
             ## Compute residual r = x - \sum_{j: j \ne i} u(j)
-            r <- x - rowSums(matrix(unlist(u[-i]), nc = nterms - 1))
+            r <- x - rowSums(matrix(unlist(u[-i]), ncol = nterms - 1))
             ## Fit residual.
             u[[i]] <- ls_fit_ultrametric(r, method, weights, control)
             ## Accumulate change.

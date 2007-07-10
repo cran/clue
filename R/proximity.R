@@ -165,7 +165,7 @@ function(x, ...)
             "Cross-proximities"
         cat(sprintf("%s using %s", kind, description), ":\n", sep = "")
     }
-    print(matrix(as.vector(x), nr = nrow(x), dimnames = dimnames(x)),
+    print(matrix(as.vector(x), nrow = nrow(x), dimnames = dimnames(x)),
           ...)
     invisible(x)
 }

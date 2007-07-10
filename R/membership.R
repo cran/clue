@@ -190,7 +190,7 @@ print.cl_membership <-
 function(x, ...)
 {
     writeLines("Memberships:")
-    print(matrix(as.vector(x), nr = nrow(x), dimnames = dimnames(x)),
+    print(matrix(as.vector(x), nrow = nrow(x), dimnames = dimnames(x)),
           ...)
     invisible(x)
 }
