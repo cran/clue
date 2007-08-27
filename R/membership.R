@@ -55,9 +55,14 @@ cl_membership.cshell <- cl_membership.fanny
 cl_membership.bclust <- cl_membership.default
 
 ## Package flexmix: class "flexmix".
+## <NOTE>
+## We used to be able to call flexmix::posterior(), but this now only
+## has S4 methods for modeltools::posterior() S4 generic.  Let's call
+## this one, and hope that flexmix has been loaded ...
+## </NOTE>
 cl_membership.flexmix <-
 function(x, k = n_of_classes(x))
-    .cl_membership_from_memberships(flexmix::posterior(x), k)
+    .cl_membership_from_memberships(modeltools::posterior(x), k)
 
 ## Package mclust: Mclust().
 cl_membership.Mclust <-

@@ -262,6 +262,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
                 cluster = class_ids,
                 family = family,
                 m = m,
+                value = new_value,
                 call = match.call())
     attr(out, "converged") <- (iter <= maxiter)
     class(out) <- "pclust"
