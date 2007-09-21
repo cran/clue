@@ -1,8 +1,15 @@
 ### * is.cl_hierarchy
 
 ## Determine whether an object is a hierarchy.
-## Note that strictly speaking we only deal with indexed hierarchies so
-## that there is always a corresponding ultrametric (and dendrogram).
+## Note that hierarchies are n-trees, which can naturally be represented
+## by their classes (as done via cl_classes()) or internal ultrametric
+## obtained by assigning height one to all splits (as done by
+## .cl_ultrametric_from_classes()). 
+## We typically used the latter, but note that this is an *internal*
+## reprsentation.
+## User-level, cl_dendrogram objects are indexed hierarchies, and
+## cl_hierarchy objects are n-trees.  The latter can be "converted" into
+## the former (using height one splits) via as.cl_dendrogram().
 
 is.cl_hierarchy <-
 function(x)
@@ -23,11 +30,15 @@ is.cl_hierarchy.mona <- .true
 ## Package clue: (virtual) class "cl_hierarchy".
 ## Note that "raw" cl_ultrametric objects are *not* hierarchies, as
 ## these are meant for numeric computations.
+## <FIXME>
+## Is this really a good idea?
+## We can as.hclust() a cl_dendrogram and then it is a cl_hierarchy ...
+## </FIXME>
 is.cl_hierarchy.cl_hierarchy <- .true
 
 ### * as.cl_hierarchy
 
-## Note that cl_partition conceptually is a virtual class, so there are
+## Note that cl_hierarchy conceptually is a virtual class, so there are
 ## no prototypes and no cl_hierarchy() creator.
 
 .cl_hierarchy_classes <- "cl_hierarchy"
@@ -67,6 +78,65 @@ Math.cl_hierarchy <-
 function(x, ...)
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
                   .Generic, .Class))
+
+### * Ops.cl_hierarchy
+
+Ops.cl_hierarchy <-
+function(e1, e2)
+{
+    if(nargs() == 1L)
+        stop(gettextf("Unary '%s' not defined for \"%s\" objects.",
+                      .Generic, .Class))
+
+    ## Only comparisons are supprorted.
+    if(!(as.character(.Generic) %in% c("<", "<=", ">", ">=",
+                                       "==", "!=")))
+        stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
+                      .Generic, .Class))
+
+    if(n_of_objects(e1) != n_of_objects(e2))
+        stop("Hierarchies must have the same number of objects.")
+
+    c1 <- cl_classes(e1)
+    c2 <- cl_classes(e2)
+
+    switch(.Generic,
+           "<=" = all(is.finite(match(c1, c2))),
+           "<"  = all(is.finite(match(c1, c2))) && any(is.na(match(c2, c1))),
+           ">=" = all(is.finite(match(c2, c1))),
+           ">"  = all(is.finite(match(c2, c1))) && any(is.na(match(c1, c2))),
+           "==" = all(is.finite(match(c1, c2))) && all(is.finite(match(c2, c1))),
+           "!=" = any(is.na(match(c1, c2))) || any(is.na(match(c2, c1))))
+}
+
+### * Summary.cl_hierarchy
+
+## <NOTE>
+## This is really the same as Summary.cl_partition().
+## </NOTE>
+
+Summary.cl_hierarchy <-
+function(..., na.rm = FALSE)
+{
+    ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
+    if(!ok)
+        stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
+                      .Generic, .Class))
+    args <- list(...)
+    switch(.Generic,
+           "min" = cl_meet(cl_ensemble(list = args)),
+           "max" = cl_join(cl_ensemble(list = args)),
+           "range" = {
+               cl_ensemble(min = cl_meet(cl_ensemble(list = args)),
+                           max = cl_join(cl_ensemble(list = args)))
+           })
+}
+
+### * as.hclust.cl_hierarchy
+
+as.hclust.cl_hierarchy <-
+function(x, ...)
+    as.hclust(.get_representation(x), ...)
 
 ### * is.cl_dendrogram
 
@@ -128,7 +198,7 @@ function(x, ...)
 Ops.cl_dendrogram <-
 function(e1, e2)
 {
-    if(nargs() == 1)
+    if(nargs() == 1L)
         stop(gettextf("Unary '%s' not defined for \"%s\" objects.",
                       .Generic, .Class))
 
@@ -154,35 +224,92 @@ function(e1, e2)
 ### * Summary.cl_dendrogram
 
 ## <NOTE>
-## This is really the same as Summary.cl_partition().
-## Of course, we could make things slighly more efficient by calling
-## .cl_meet_dendrogram() and .cl_join_dendrogram() directly instead of
-## calling cl_meet() and cl_join().
+## This is really the same as Summary.cl_hierarchy() ...
+## We cannot really call the poset specific internal meet and join
+## functions from here as e.g. max(D, H) (D a dendrogram, H an n-tree)
+## should use the n-tree poset functions ...
+## However, dispatch for cl_dendrogram should not be needed if we also
+## dispatch on cl_hierarchy ...
 ## </NOTE>
 
-Summary.cl_dendrogram <-
-function(..., na.rm = FALSE)
-{
-    ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
-    if(!ok)
-        stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
-    args <- list(...)
-    switch(.Generic,
-           "min" = cl_meet(cl_ensemble(list = args)),
-           "max" = cl_join(cl_ensemble(list = args)),
-           "range" = {
-               cl_ensemble(min = cl_meet(cl_ensemble(list = args)),
-                           max = cl_join(cl_ensemble(list = args)))
-           })
-}
+## Summary.cl_dendrogram <-
+## function(..., na.rm = FALSE)
+## {
+##     ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
+##     if(!ok)
+##         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
+##                       .Generic, .Class))
+##     args <- list(...)
+##     switch(.Generic,
+##            "min" = cl_meet(cl_ensemble(list = args)),
+##            "max" = cl_join(cl_ensemble(list = args)),
+##            "range" = {
+##                cl_ensemble(min = cl_meet(cl_ensemble(list = args)),
+##                            max = cl_join(cl_ensemble(list = args)))
+##            })
+## }
 
 ### * as.hclust.cl_dendrogram
 
-as.hclust.cl_dendrogram <-
+## <NOTE>
+## This is really the same as as.hclust.cl_hierarchy() ...
+## Dispatch for cl_dendrogram should not be needed if we also dispatch
+## on cl_hierarchy ...
+## </NOTE>
+
+## as.hclust.cl_dendrogram <-
+## function(x, ...)
+##     as.hclust(.get_representation(x), ...)
+
+### * Utilities
+
+## To turn a mona object into a cl_dendrogram, we need to be able to
+## compute its associated ultrametric.  Hence, provide a cophenetic()
+## method for mona objects ...
+cophenetic.mona <-
+function(x)
+{
+    no <- length(x$order)
+    ns <- max(x$step) + 1
+
+    m <- matrix(NA, no, no)
+    FOO <- function(ind, step, s) {
+        if(length(ind) <= 1) return()
+        grp <- c(0, cumsum(step == s))
+        ind <- split(ind, grp)
+        len <- length(ind)
+        for(a in seq_len(len)) {
+            for(b in seq(from = 1, length.out = a - 1)) {
+                ## Need both as we currently cannot assume that the
+                ## indices are sorted.  Alternatively, work with the
+                ## sequence from one to the number of objects, and
+                ## reorder at the end ...
+                m[ind[[a]], ind[[b]]] <<- s
+                m[ind[[b]], ind[[a]]] <<- s
+            }
+        }
+        ind <- ind[sapply(ind, length) > 1]
+        pos <- which(step == s)
+        step <- split(step[-pos], grp[-1][-pos])
+        if(is.null(step)) return()
+        for(a in seq_along(ind))
+            FOO(ind[[a]], step[[a]], s + 1)
+    }
+    
+    FOO(x$order, x$step, 1)
+    m[is.na(m)] <- ns
+    m <- ns - m
+    rownames(m) <- rownames(x$data)
+    as.dist(m)
+}
+
+## And while we're at it ...
+## (Of course, as.hclust() should really "know" that a cophenetic()
+## method is available ...)
+as.hclust.mona <-
 function(x, ...)
-    as.hclust(.get_representation(x), ...)
-  
+    hclust(cophenetic(x), "single")
+    
 
 ### Local variables: ***
 ### mode: outline-minor ***

@@ -38,7 +38,9 @@ is.cl_ensemble(x)
   of) a cluster ensemble.
 
   Available methods for cluster ensembles include those for
-  subscripting, \code{c}, \code{rep}, and \code{print}.
+  subscripting, \code{c}, \code{rep}, and \code{print}.  There is also a
+  \code{plot} method for ensembles for which all elements can be plotted
+  (currently, additive trees, dendrograms and ultrametrics).
 }
 \value{
   \code{cl_ensemble} returns a list of the given clusterings or
@@ -58,6 +60,8 @@ hens
 hens[1 : 3]
 ## Replication.
 rep(hens, 3)
+## Plotting.
+plot(hens, main = names(hens))
 ## And continue to analyze the ensemble, e.g.
 round(cl_dissimilarity(hens, method = "gamma"), 4)
 }

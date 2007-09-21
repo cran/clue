@@ -329,7 +329,7 @@ function(x, ...)
 Ops.cl_partition <-
 function(e1, e2)
 {
-    if(nargs() == 1)
+    if(nargs() == 1L)
         stop(gettextf("Unary '%s' not defined for \"%s\" objects.",
                       .Generic, .Class))
 

@@ -74,16 +74,20 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 	\item{\code{maxiter}}{an integer giving the maximal number of
 	  iterations to be performed.
 	  Defaults to 100.}
+	\item{\code{nruns}}{an integer giving the number of runs to be
+	  performed.  Defaults to 1.}
 	\item{\code{reltol}}{the relative convergence tolerance.
 	  Defaults to \code{sqrt(.Machine$double.eps)}.}
 	\item{\code{start}}{a matrix with number of rows equal to the
 	  number of objects of the cluster ensemble, and \eqn{k}
-	  columns, to be used as a starting value.
-	  By default, suitable random membership matrices are used.}
+	  columns, to be used as a starting value, or a list of such
+	  matrices.  By default, suitable random membership matrices are
+	  used.}
 	\item{\code{verbose}}{a logical indicating whether to provide
 	  some output on minimization progress.
 	  Defaults to \code{getOption("verbose")}.}
       }
+      In the case of multiple runs, the first optimum found is returned.
 
       Can also be referred to as \code{"soft/euclidean"}.
     }
@@ -173,13 +177,16 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 	\item{\code{k}}{an integer giving the number of classes to be
 	  used for the least squares consensus partition.  By default,
 	  the maximal number of classes in the ensemble is used.}
+	\item{\code{nruns}}{an integer giving the number of runs to be
+	  performed.  Defaults to 1.}
 	\item{\code{start}}{a matrix with number of rows equal to the
 	  size of the cluster ensemble, and \eqn{k} columns, to be used
-	  as a starting value.  By default, a membership based on a rank
-	  \eqn{k} approximation to the weighted average co-membership
-	  matrix is used.}
+	  as a starting value, or a list of such matrices.  By default,
+	  a membership based on a rank \eqn{k} approximation to the
+	  weighted average co-membership matrix is used.}
       }
-
+      In the case of multiple runs, the first optimum found is returned.
+      
     }
 
     \item{\code{"soft/symdiff"}}{a SUMT approach for minimizing

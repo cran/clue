@@ -1,24 +1,27 @@
 \name{lattice}
+\encoding{UTF-8}
 \alias{cl_meet}
 \alias{cl_join}
 \alias{Ops.cl_partition}
 \alias{Summary.cl_partition}
 \alias{Ops.cl_dendrogram}
-\alias{Summary.cl_dendrogram}
+\alias{Ops.cl_hierarchy}
+\alias{Summary.cl_hierarchy}
 \title{Cluster Lattices}
 \description{
   Computations on the lattice of all (hard) partitions, or the lattice
-  of all dendrograms, of a set of objects: meet, join, and comparisons.
+  of all dendrograms, or the meet semilattice of all hierarchies
+  (\eqn{n}-trees) of/on a set of objects: meet, join, and comparisons.
 }
 \usage{
 cl_meet(x, y)
 cl_join(x, y)
 }
 \arguments{
-  \item{x}{an ensemble of partitions or dendrograms, or an R object
-    representing a partition.}
-  \item{y}{an R object representing a partition or dendrogram.  Ignored
-    if \code{x} is an ensemble.}
+  \item{x}{an ensemble of partitions or dendrograms or hierarchies, or
+    an R object representing a partition or dendrogram or hierarchy.}
+  \item{y}{an R object representing a partition or dendrogram or
+    hierarchy.  Ignored if \code{x} is an ensemble.}
 }
 \details{
   For a given finite set of objects \eqn{X}, the set \eqn{H(X)} of all
@@ -65,14 +68,33 @@ cl_join(x, y)
   ultrametric dominated by \eqn{\min(u_{ij}, v_{ij})}, and can be
   obtained by applying single linkage hierarchical clustering to the
   minima.
-  
+
+  The set of all hierarchies on \eqn{X} can be ordered by set-wise
+  inclusion of the classes: i.e., if \eqn{H} and \eqn{G} are two
+  hierarchies, then \eqn{H \le G} if all classes of \eqn{H} are also
+  classes of \eqn{G}.  This yields a meet semilattice, with meet given
+  by the classes contained in both hierarchies.  The join only exists if
+  the union of the classes is a hierarchy.
+
+  In each case, a modular semilattice is obtained, which allows for a
+  natural metrization via least element (semi)lattice move distances,
+  see Barthélémy, Leclerc and Monjardet (1981).  These latticial metrics
+  are given by the BA/C (partitions), Manhattan (dendrograms), and
+  symdiff (hierarchies) dissimilarities, respectively (see
+  \code{\link{cl_dissimilarity}}).
 }
 \value{
   For \code{cl_meet} and \code{cl_join}, an object of class
   \code{"\link{cl_partition}"} or \code{"\link{cl_dendrogram}"} with the
   class ids or ultrametric dissimilarities of the meet and join of the
   partitions or dendrograms, respectively.
-}  
+}
+\references{
+  J.-P. Barthélémy and B. Leclerc and B. Monjardet (1981).
+  On the use of ordered sets in problems of comparison and consensus of
+  classification.
+  \emph{Journal of Classification}, \bold{3}, 187--224.
+}
 \examples{
 ## Two simple partitions of 7 objects.
 A <- as.cl_partition(c(1, 1, 2, 3, 3, 5, 5))

@@ -119,7 +119,6 @@ function(x, k = NULL)
 .cl_membership_from_memberships <-
 function(x, k = NULL)
 {
-    n_of_objects <- nrow(x)
     x <- x[ , colSums(x, na.rm = TRUE) > 0, drop = FALSE]
     n_of_classes <- ncol(x)
     if(!is.null(k)) {
@@ -171,10 +170,10 @@ function(d, power = 2)
     ## cl_membership object (so that it does not deal with possibly
     ## dropping or re-introducing unused classes).
     ## </NOTE>
-    exponent <- if(length(power) == 1)
+    exponent <- if(length(power) == 1L)
         1 / (power - 1)
     else
-        power[2] / (power[1] - 1)
+        power[2L] / (power[1L] - 1)
     u <- matrix(0, nrow(d), ncol(d))
     FUN <- function(s, t) (s / t) ^ exponent
     zero_incidences <- (d == 0)

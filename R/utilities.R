@@ -51,6 +51,23 @@ function(x, n = NULL)
     M + t(M)
 }
 
+### * .weighted_mean_of_object_dissimilarities
+
+.weighted_mean_of_object_dissimilarities <-
+function(x, w = NULL)
+{
+    w <- if(is.null(w)) {
+        rep.int(1, length(x))
+    } else {
+        rep(w, length.out = length(x))
+    }
+    ## (Need the latter because we want w / sum(w) ...)
+    dissimilarities <- lapply(x, cl_object_dissimilarities)
+    m <- rowSums(mapply("*", dissimilarities, w / sum(w)))
+    labels <- attr(dissimilarities[[1L]], "Labels")
+    .dist_from_vector(m, labels = labels)
+}
+
 ### ** .weighted_sum_of_matrices
 
 .weighted_sum_of_matrices <-
@@ -61,7 +78,7 @@ function(x, w = NULL, nr = NULL)
     ## matrices and w the vector of weights, it seems that one
     ## reasonably efficient way of doing this is the following.
     if(is.null(w)) w <- rep.int(1, length(x))
-    if(is.null(nr)) nr <- NROW(x[[1]])
+    if(is.null(nr)) nr <- NROW(x[[1L]])
     matrix(rowSums(mapply("*", x, w)), nr)
 }
 

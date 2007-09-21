@@ -26,13 +26,16 @@ function(x)
     out
 }
 
-cl_classes.cl_dendrogram <-
+cl_classes.cl_hierarchy <-
 function(x)
 {
     x <- as.hclust(x)
     n <- n_of_objects(x)
     labels <- seq_len(n)
     groups <- cutree(x, labels)
+    ## Only use the "maximal" partitions for each height (relevant in
+    ## case of non-binary trees).
+    groups <- groups[, c(which(diff(c(0, x$height)) > 0), n), drop = FALSE]
     ## Give a list with the (unique) sets of numbers of the objects.
     out <- unique(unlist(sapply(split(groups, col(groups)),
                                 function(k) split(labels, k)),
@@ -44,13 +47,13 @@ function(x)
     class(out) <- c("cl_classes_of_hierarchy_of_objects",
                     "cl_classes_of_objects")
     attr(out, "n_of_objects") <- n
-    attr(out, "labels") <- x$labels
+    attr(out, "labels") <- cl_object_labels(x)
     out
 }
 
 ## Be nice to users of ultrametric fitters ... which should really fit
-## dendrograms.
-cl_classes.cl_ultrametric <- cl_classes.cl_dendrogram
+## dendrograms (which inherit from hierarchies).
+cl_classes.cl_ultrametric <- cl_classes.cl_hierarchy
 
 print.cl_classes_of_partition_of_objects <-
 function(x, ...)
