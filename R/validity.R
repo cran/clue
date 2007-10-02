@@ -60,8 +60,9 @@ function(x, ...)
 cl_validity.cl_partition <-
 function(x, ...)
     cl_validity(.get_representation(x), ...)
-## Package clue: cl_pclust().
-cl_validity.cl_pclust <-
+## Package clue: class pclust.
+## So that this works for all classes extending pclust ...
+cl_validity.pclust <-
 function(x, ...)
     x$validity
 
@@ -90,7 +91,7 @@ function(m, d)
                            w <- outer(z, z, "*")
                            c(sum(w * d), sum(w))
                        }))
-    average_within_d <- within_sums[1] / within_sums[2]
+    average_within_d <- within_sums[1L] / within_sums[2L]
     1 - average_within_d / mean(d)
 }
 

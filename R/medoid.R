@@ -184,9 +184,9 @@ function(x, k)
 
     ind <- which(matrix(y$solution[seq_len(n * n)], n) > 0,
                  arr.ind = TRUE)
-    medoid_ids <- unique(ind[, 2])
+    medoid_ids <- unique(ind[, 2L])
     class_ids <- seq_len(n)
-    class_ids[ind[, 1]] <- match(ind[, 2], medoid_ids)
+    class_ids[ind[, 1L]] <- match(ind[, 2L], medoid_ids)
 
     structure(list(cluster = class_ids,
                    medoid_ids = medoid_ids,

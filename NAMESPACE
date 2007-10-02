@@ -56,9 +56,10 @@ S3method("Math", "cl_hierarchy")
 S3method("Math", "cl_partition")
 
 S3method("Ops", "cl_dendrogram")
+S3method("Ops", "cl_hierarchy")
 S3method("Ops", "cl_partition")
 
-S3method("Summary", "cl_dendrogram")
+S3method("Summary", "cl_hierarchy")
 S3method("Summary", "cl_partition")
 S3method("Summary", "cl_partition_ensemble")
 
@@ -72,8 +73,9 @@ S3method("as.dendrogram", "cl_ultrametric")
 
 S3method("as.dist", "cl_dissimilarity")
 
-S3method("as.hclust", "cl_dendrogram")
+S3method("as.hclust", "cl_hierarchy")
 S3method("as.hclust", "cl_ultrametric")
+S3method("as.hclust", "mona")
 
 S3method("as.matrix", "cl_proximity")
 
@@ -101,7 +103,7 @@ S3method("cl_class_ids", "relation")
 S3method("cl_class_ids", "rock")
 S3method("cl_class_ids", "specc")
 
-S3method("cl_classes", "cl_dendrogram")
+S3method("cl_classes", "cl_hierarchy")
 S3method("cl_classes", "cl_partition")
 S3method("cl_classes", "cl_ultrametric")
 S3method("cl_classes", "default")
@@ -126,6 +128,7 @@ S3method("cl_object_names", "cl_membership")
 S3method("cl_object_names", "cl_partition")
 S3method("cl_object_names", "cl_ultrametric")
 S3method("cl_object_names", "default")
+S3method("cl_object_names", "dist")
 S3method("cl_object_names", "hclust")
 S3method("cl_object_names", "mona")
 S3method("cl_object_names", "twins")
@@ -165,9 +168,10 @@ S3method("cl_validity", "agnes")
 S3method("cl_validity", "default")
 S3method("cl_validity", "diana")
 S3method("cl_validity", "cl_partition")
-S3method("cl_validity", "cl_pclust")
+S3method("cl_validity", "pclust")
 
 S3method("cophenetic", "cl_ultrametric")
+S3method("cophenetic", "mona")
 
 S3method("is.cl_dendrogram", "cl_dendrogram")
 S3method("is.cl_dendrogram", "default")
@@ -252,6 +256,7 @@ S3method("n_of_objects", "twins")
 S3method("names", "cl_proximity")
 
 S3method("plot", "cl_addtree")
+S3method("plot", "cl_ensemble")
 S3method("plot", "cl_dendrogram")
 S3method("plot", "cl_ultrametric")
 

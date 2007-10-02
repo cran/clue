@@ -48,11 +48,11 @@ function(x, y = NULL, method = "euclidean", ...)
     
     ## Otherwise, build a proximity object of dissimilarities.
     n <- length(x)
-    d <- vector("list", length = n - 1)
+    d <- vector("list", length = n - 1L)
     ind <- seq_len(n)
-    while(length(ind) > 1) {
-        j <- ind[1]
-        ind <- ind[-1]
+    while(length(ind) > 1L) {
+        j <- ind[1L]
+        ind <- ind[-1L]
         d[[j]] <- sapply(x[ind], method, x[[j]], ...)
     }
     
@@ -72,7 +72,7 @@ function(x, y)
     M_x <- cl_membership(x, k)
     M_y <- cl_membership(y, k)
     ## Match classes from conforming memberships.
-    ind <- solve_LSAP(crossprod(M_x, M_y), max = TRUE)
+    ind <- solve_LSAP(crossprod(M_x, M_y), maximum = TRUE)
     sqrt(sum((M_x - M_y[, ind]) ^ 2))
 }
 
@@ -321,7 +321,7 @@ function(x, y)
     v <- cl_object_dissimilarities(y)
     n <- length(u)
     .C("clue_dissimilarity_count_inversions",
-       u, v, n, count = double(1),
+       u, v, n, count = double(1L),
        PACKAGE = "clue") $ count / choose(n, 2)
 }
 
@@ -333,18 +333,9 @@ function(x, y)
     ## Cardinality of the symmetric difference of the n-trees when
     ## regarded as sets of subsets (classes) of the set of objects.
 
-    n <- n_of_objects(x)
     x <- cl_classes(x)
     y <- cl_classes(y)
-    lx <- sapply(x, length)
-    ly <- sapply(y, length)
-    s <- 0
-    for(i in seq_len(n)) {
-        sx <- x[lx == i]
-        sy <- y[lx == i]
-        s <- s + sum(is.na(match(sx, sy))) + sum(is.na(match(sy, sx)))
-    }
-    s
+    sum(is.na(match(x, y))) + sum(is.na(match(y, x)))
 }
 
 ### ** .cl_dissimilarity_hierarchy_Chebyshev
@@ -504,7 +495,7 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
                   function(M) colSums(abs(M)),
                   "minkowski" = {
                       ## Power needs to be given.
-                      p <- list(...)[[1]]
+                      p <- list(...)[[1L]]
                       function(M)
                           (colSums(abs(M) ^ p)) ^ (1 / p)
                   })
@@ -544,7 +535,7 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
                   function(A, b) rowSums(abs(sweep(A, 2, b))),
                   "minkowski" = {
                       ## Power needs to be given.
-                      p <- list(...)[[1]]
+                      p <- list(...)[[1L]]
                       function(A, b)
                           (rowSums(abs(sweep(A, 2, b)) ^ p)) ^ (1 / p)
                   })

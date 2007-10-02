@@ -20,7 +20,6 @@ function(x, k, method = NULL, m = 1, weights = 1, control = list())
     ## to provide the required information about d and e.
 
     clusterings <- as.cl_ensemble(x)
-    B <- length(clusterings)
 
     type <- .cl_ensemble_type(clusterings)
 
@@ -148,18 +147,37 @@ function(x, k, family, m = 1, weights = 1, control = list())
 
     maxiter <- control$maxiter
     if(is.null(maxiter))
-        maxiter <- 100
+        maxiter <- 100L
+    nruns <- control$nruns
     reltol <- control$reltol
     if(is.null(reltol))
         reltol <- sqrt(.Machine$double.eps)
+    start <- control$start
     verbose <- control$verbose
     if(is.null(verbose))
         verbose <- getOption("verbose")
     ## Do this at last ...
     control <- as.list(control$control)
 
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+    } else {
+        if(is.null(nruns)) {
+            ## Use nruns only if start is not given.
+            nruns <- 1
+        }
+        start <- replicate(nruns, family$init(x, k), simplify = FALSE)
+    }
+    
     ## Initialize.
-    prototypes <- family$init(x, k)
+    ## We need to do this here because it is (currently) the only way to
+    ## figure out the number B of objects to be partitioned (which is
+    ## needed for getting the object weights to the right length).
+    prototypes <- start[[1L]]
     dissimilarities <- D(x, prototypes) ^ e
     B <- NROW(dissimilarities)
 
@@ -178,93 +196,137 @@ function(x, k, family, m = 1, weights = 1, control = list())
 
     if(m == 1) {
         ## Hard partitions.
-        class_ids <- max.col( - dissimilarities )
-        old_value <-
-            sum(.one_entry_per_column(dissimilarities, class_ids))
-        iter <- 1
-        while(iter <= maxiter) {
-            if(verbose)
-                cat("Iteration:", iter, "*** old value:", old_value)
-            class_ids_used <- unique(class_ids)
-            for(j in class_ids_used)
-                prototypes[[j]] <-
-                    C(x, weights * (class_ids %in% j), control)
-            dissimilarities <- D(x, prototypes) ^ e
+        opt_value <- Inf
+        run <- 1L
+        if(verbose && (nruns > 1L))
+            message(gettextf("Pclust run: %d", run))
+        repeat {
             class_ids <- max.col( - dissimilarities )
-            ## Try avoiding degenerate solutions.
-            if(length(class_ids_used) < k) {
-                ## Find the k - l largest object-to-assigned-prototype
-                ## dissimilarities.
-                o <- order(.one_entry_per_column(dissimilarities,
-                                                 class_ids),
-                           decreasing = TRUE)
-                ## Find and recompute unused prototypes.
-                unused <- setdiff(seq_len(k), class_ids_used)
-                for(j in seq_along(unused))
-                    prototypes[[unused[j]]] <-
-                        C(x, .make_unit_weights(B, o[j]), control)
-                dissimilarities[, unused] <-
-                    D(x, prototypes[unused]) ^ e
-                class_ids <- max.col( - dissimilarities )
-                ## For the time being, do not retry in case the solution
-                ## is still degenerate.
-            }
-            new_value <-
+            old_value <-
                 sum(.one_entry_per_column(dissimilarities, class_ids))
             if(verbose)
-                cat(" *** new value:", new_value, "\n")
-            if(abs(old_value - new_value)
-               < reltol * (abs(old_value) + reltol))
-                break
-            old_value <- new_value
-            iter <- iter + 1
+                message(gettextf("Iteration: 0 *** value: %g", old_value))
+            iter <- 1L
+            while(iter <= maxiter) {
+                class_ids_used <- unique(class_ids)
+                for(j in class_ids_used)
+                    prototypes[[j]] <-
+                        C(x, weights * (class_ids %in% j), control)
+                dissimilarities <- D(x, prototypes) ^ e
+                class_ids <- max.col( - dissimilarities )
+                ## Try avoiding degenerate solutions.
+                if(length(class_ids_used) < k) {
+                    ## Find the k - l largest
+                    ## object-to-assigned-prototype dissimilarities.
+                    o <- order(.one_entry_per_column(dissimilarities,
+                                                     class_ids),
+                               decreasing = TRUE)
+                    ## Find and recompute unused prototypes.
+                    unused <- setdiff(seq_len(k), class_ids_used)
+                    for(j in seq_along(unused))
+                        prototypes[[unused[j]]] <-
+                            C(x, .make_unit_weights(B, o[j]), control)
+                    dissimilarities[, unused] <-
+                        D(x, prototypes[unused]) ^ e
+                    class_ids <- max.col( - dissimilarities )
+                    ## For the time being, do not retry in case the
+                    ## solution is still degenerate.
+                }
+                new_value <-
+                    sum(.one_entry_per_column(dissimilarities, class_ids))
+                if(verbose)
+                    message(gettextf("Iteration: %d *** value: %g",
+                                     iter, new_value))
+                if(abs(old_value - new_value)
+                   < reltol * (abs(old_value) + reltol))
+                    break
+                old_value <- new_value
+                iter <- iter + 1L
+            }
+            if(new_value < opt_value) {
+                converged <- (iter <= maxiter)
+                opt_value <- new_value
+                opt_class_ids <- class_ids
+                opt_prototypes <- prototypes
+            }
+            if(run >= nruns) break
+            run <- run + 1L
+            if(verbose)
+                message(gettextf("Pclust run: %d", run))
+            prototypes <- start[[run]]
+            dissimilarities <- D(x, prototypes) ^ e
         }
-        u <- matrix(0, B, k)
-        u[cbind(seq_len(B), class_ids)] <- 1
+        opt_u <- matrix(0, B, k)
+        opt_u[cbind(seq_len(B), opt_class_ids)] <- 1
     }
     else {
         ## Soft partitions.
         value <- function(u, dissimilarities)
             sum(u ^ m * dissimilarities)
-        u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
-        old_value <- value(u, dissimilarities)
-        iter <- 1        
-        while(iter <= maxiter) {
+        opt_value <- Inf
+        run <- 1L
+        if(verbose && (nruns > 1L))
+            message(gettextf("Pclust run: %d", run))
+        repeat {
+            u <- .memberships_from_cross_dissimilarities(dissimilarities,
+                                                         m)
+            old_value <- value(u, dissimilarities)
             if(verbose)
-                cat("Iteration:", iter, "*** old value:", old_value)
-            ## Update the prototypes.
-            ## This amounts to solving, for each j:
-            ##   \sum_b w_b u_{bj}^m D(x_b, p) ^ e => \min_p
-            ## I.e., p_j is the *weighted* consensus of the x_b with
-            ## corresponding weights u_{bj}^m.
-            for(j in seq_len(k)) {
-                prototypes[[j]] <- C(x, weights * u[, j] ^ m, control)
+                message(gettextf("Iteration: 0 *** value: %g", old_value))
+            iter <- 1L
+            while(iter <= maxiter) {
+                ## Update the prototypes.
+                ## This amounts to solving, for each j:
+                ##   \sum_b w_b u_{bj}^m D(x_b, p) ^ e => \min_p
+                ## I.e., p_j is the *weighted* consensus of the x_b with
+                ## corresponding weights u_{bj}^m.
+                for(j in seq_len(k)) {
+                    prototypes[[j]] <- C(x, weights * u[, j] ^ m, control)
+                }
+                ## Update u.
+                dissimilarities <- D(x, prototypes) ^ e
+                u <- .memberships_from_cross_dissimilarities(dissimilarities,
+                                                             m)
+                new_value <- value(u, dissimilarities)
+                if(verbose)
+                    message(gettextf("Iteration: %d *** value: %g",
+                                     iter, new_value))
+                if(abs(old_value - new_value)
+                   < reltol * (abs(old_value) + reltol))
+                    break
+                old_value <- new_value
+                iter <- iter + 1L
             }
-            ## Update u.
+            if(new_value < opt_value) {
+                converged <- (iter <= maxiter)                
+                opt_value <- new_value
+                opt_prototypes <- prototypes
+                opt_u <- u
+            }
+            if(run >= nruns) break
+            run <- run + 1L
+            if(verbose)
+                message(gettextf("Pclust run: %d", run))
+            prototypes <- start[[run]]
             dissimilarities <- D(x, prototypes) ^ e
-            u <- .memberships_from_cross_dissimilarities(dissimilarities, m)
-            new_value <- value(u, dissimilarities)
-            cat(" *** new value:", new_value, "\n")
-            if(abs(old_value - new_value)
-               < reltol * (abs(old_value) + reltol))
-                break
-            old_value <- new_value
-            iter <- iter + 1
         }
-        class_ids <- max.col(u)
+        opt_class_ids <- max.col(opt_u)
+        ## Ensure that opt_u is a stochastic matrix.
+        opt_u <- pmax(opt_u, 0)
+        opt_u <- opt_u / rowSums(opt_u)
     }
 
-    names(class_ids) <- rownames(u) <- rownames(dissimilarities)
-    u <- cl_membership(as.cl_membership(u), k)
+    names(opt_class_ids) <- rownames(opt_u) <- rownames(dissimilarities)
+    opt_u <- cl_membership(as.cl_membership(opt_u), k)
                                           
-    out <- list(prototypes = prototypes,
-                membership = u,
-                cluster = class_ids,
+    out <- list(prototypes = opt_prototypes,
+                membership = opt_u,
+                cluster = opt_class_ids,
                 family = family,
                 m = m,
-                value = new_value,
+                value = opt_value,
                 call = match.call())
-    attr(out, "converged") <- (iter <= maxiter)
+    attr(out, "converged") <- converged
     class(out) <- "pclust"
 
     out

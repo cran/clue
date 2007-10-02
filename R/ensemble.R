@@ -37,7 +37,7 @@ function(..., list = NULL)
     n <- sapply(clusterings, n_of_objects)
     if(any(diff(n)))
         stop("All elements must have the same number of objects.")
-    attr(clusterings, "n_of_objects") <- as.integer(n[1])
+    attr(clusterings, "n_of_objects") <- as.integer(n[1L])
 
     clusterings
 }
@@ -71,7 +71,7 @@ function(..., recursive = FALSE)
 function(x, i)
 {
     ## Make subscripting empty ensembles a noop.
-    if(length(x) == 0) return(x)
+    if(length(x) == 0L) return(x)
     cl_ensemble(list = NextMethod("["))
 }
 
@@ -137,7 +137,77 @@ function(x, ...)
                        length(x)))
     invisible(x)
 }
-                        
+
+plot.cl_ensemble <-
+function(x, ..., main = NULL, layout = NULL)
+{
+    if(!is.cl_ensemble(x))
+        stop("Wrong class.")
+
+    ## What we can definitely plot is are cl_addtree, cl_dendrogram and
+    ## cl_ultrametric objects.  (We could also add simple methods for
+    ## plotting raw dissimilarities, but of course seriation::dissplot()
+    ## would be the thing to use.)  What we cannot reasonably plot is
+    ## partitions (in particular, as these do not know about the
+    ## underlying dissimilarities.  But then we could perhaps provide
+    ## silhoutte plots etc for ensembles of partitions ...
+    ## <FIXME>
+    ## Think about this.
+    ## </FIXME>
+    ## So let us check for the things we can plot.
+
+    ## (Note that currently there is neither is.cl_ultrametric() nor
+    ## is.cl_addtree().)
+    ok <- sapply(x,
+                 function(e)
+                 (is.cl_dendrogram(e) ||
+                  inherits(e, c("cl_addtree", "cl_ultrametric"))))
+    if(!all(ok))
+        stop(gettextf("Plotting not available for elements %s of the ensemble.",
+                      paste(which[!ok], collapse = " ")))
+
+    ## Prefer dendrogram plot methods to those for hclust objects.
+    ind <- sapply(x, is.cl_dendrogram)
+    if(any(ind))
+        x[ind] <- lapply(x, as.cl_dendrogram)
+
+    ## Now the usual layouting ... same as for plotting relation
+    ## ensembles.
+
+    ## Number of elements.
+    n <- length(x)
+    ## Layout.
+    byrow <- TRUE
+    if(is.null(layout)) {
+        nc <- ceiling(sqrt(n))
+        nr <- ceiling(n / nc)
+    }
+    else {
+        layout <- c(as.list(layout), byrow)[seq_len(3)]
+        if(is.null(names(layout)))
+            names(layout) <- c("nr", "nc", "byrow")
+        nr <- layout[["nr"]]
+        nc <- layout[["nc"]]
+        byrow <- layout[["byrow"]]
+    }
+    op <- if(byrow)
+        par(mfrow = c(nr, nc))
+    else
+        par(mfcol = c(nr, nc))
+    on.exit(par(op))
+
+    ## Try recycling main (might want the same for others as well).
+    if(!is.list(main)) {
+        main <- if(is.null(main))
+            vector("list", length = n)
+        else
+            rep.int(as.list(main), n)
+    }
+    
+    for(i in seq_along(x))
+        plot(x[[i]], main = main[[i]], ...)
+}
+                   
 unique.cl_ensemble <-
 function(x, incomparables = FALSE, ...)
     cl_ensemble(list = NextMethod("unique"))

@@ -68,11 +68,11 @@ function(clusterings, weights, control)
     s <- weights / cumsum(weights)
     s[is.na(s)] <- 0                    # Division by zero ...
     
-    M <- cl_membership(clusterings[[1]], k_max)
-    for(b in seq_along(clusterings)[-1]) {
+    M <- cl_membership(clusterings[[1L]], k_max)
+    for(b in seq_along(clusterings)[-1L]) {
         mem <- cl_membership(clusterings[[b]], k_max)
         ## Match classes from conforming memberships.
-        ind <- solve_LSAP(crossprod(M, mem), max = TRUE)
+        ind <- solve_LSAP(crossprod(M, mem), maximum = TRUE)
         M <- (1 - s[b]) * M + s[b] * mem[, ind]
         if(k < k_max)
             M <- .project_to_leading_columns(M, k)
@@ -134,6 +134,7 @@ function(clusterings, weights, control,
     maxiter <- control$maxiter
     if(is.null(maxiter))
         maxiter <- 100
+    nruns <- control$nruns
     reltol <- control$reltol
     if(is.null(reltol))
         reltol <- sqrt(.Machine$double.eps)
@@ -142,19 +143,25 @@ function(clusterings, weights, control,
     if(is.null(verbose))
         verbose <- getOption("verbose")
 
-    if(is.null(start)) {
-        ## Random starting value.
-        M <- matrix(runif(n * k), n, k)
-        M <- M / rowSums(M)
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+        nruns <- length(start)
+    } else {
+        if(is.null(nruns)) {
+            ## Use nruns only if start is not given.
+            nruns <- 1L
+        }
+        start <- replicate(nruns,
+                           .random_stochastic_matrix(n, k),
+                           simplify = FALSE)
     }
-    else
-        M <- start
 
     ## The maximal (possible) number of classes in M and the \{ M_b \}.
     k_all <- max(k, k_max)
-
-    if(k < k_all)
-        M <- cbind(M, matrix(0, nrow(M), k_all - k))
 
     value <-
         switch(type,
@@ -170,7 +177,7 @@ function(clusterings, weights, control,
     match_memberships <-
         switch(type,
                SE = , HE = function(M, N) {
-                   M[, solve_LSAP(crossprod(N, M), max = TRUE)]
+                   M[, solve_LSAP(crossprod(N, M), maximum = TRUE)]
                },
                SM = , HM = function(M, N) {
                    M[, solve_LSAP(.cxdist(N, M, "manhattan"))]
@@ -200,37 +207,62 @@ function(clusterings, weights, control,
                SM = .l1_fit_M)
 
     memberships <- lapply(clusterings, cl_membership, k_all)
-    memberships <- lapply(memberships, match_memberships, M)
-    old_value <- value(M, memberships, w)
-    iter <- 1
 
-    while(iter <= maxiter) {
-        ## Fit M to the M_b P_b.
-        M <- fit_M(memberships, w, k)
-        ## Match the \{ M_b P_b \} to M.
+    V_opt <- Inf
+    M_opt <- NULL
+    for(run in seq_along(start)) {
+        if(verbose && (nruns > 1L))
+            message(gettextf("AOS run: %d", run))
+        M <- start[[run]]
+        if(k < k_all)
+            M <- cbind(M, matrix(0, nrow(M), k_all - k))
         memberships <- lapply(memberships, match_memberships, M)
-        ## Update value.
-        new_value <- value(M, memberships, w)
+        old_value <- value(M, memberships, w)
+        message(gettextf("Iteration: 0 *** value: %g", old_value))
+        iter <- 1L
+        while(iter <= maxiter) {
+            ## Fit M to the M_b P_b.
+            M <- fit_M(memberships, w, k)
+            ## Match the \{ M_b P_b \} to M.
+            memberships <- lapply(memberships, match_memberships, M)
+            ## Update value.
+            new_value <- value(M, memberships, w)
+            if(verbose)
+                message(gettextf("Iteration: %d *** value: %g",
+                                 iter, new_value))
+            if(abs(old_value - new_value)
+               < reltol * (abs(old_value) + reltol))
+                break
+            old_value <- new_value
+            iter <- iter + 1L
+        }
+        if(new_value < V_opt) {
+            converged <- (iter <= maxiter)
+            V_opt <- new_value
+            M_opt <- M
+        }
         if(verbose)
-            cat("Iteration:", iter,
-                "Old value:", old_value,
-                "New value:", new_value,
-                "\n")
-        if(abs(old_value - new_value)
-           < reltol * (abs(old_value) + reltol))
-            break
-        old_value <- new_value
-        iter <- iter + 1
+            message(gettextf("Minimum: %g", V_opt))
     }
 
-    rownames(M) <- rownames(memberships[[1]])    
+    ## Ensure that a stochastic matrix is returned.
+    M <- pmax(M_opt, 0)
+    M <- M / rowSums(M)
+    rownames(M) <- rownames(memberships[[1L]])    
     M <- cl_membership(as.cl_membership(M[, seq_len(k)]), k)
 
     ## Add these attributes here, as the above would not preserve them.
-    attr(M, "converged") <- (iter <= maxiter)
-    attr(M, "value") <- new_value
+    attr(M, "converged") <- converged
+    attr(M, "value") <- V_opt
 
     as.cl_partition(M)
+}
+
+.random_stochastic_matrix <-
+function(n, k)
+{
+    M <- matrix(runif(n * k), n, k)
+    M / rowSums(M)
 }
 
 .l1_fit_M <-
@@ -288,11 +320,11 @@ function(memberships, w, k)
                               kronecker(rep.int(1, B),
                                         diag(1, k))),
                         c(rep.int(0, 2 * B * k), rep.int(1, k)))
-    constr_dir <- c(rep.int(">=", L), rep.int("==", B * k + 1))
+    constr_dir <- c(rep.int(">=", L), rep.int("==", B * k + 1L))
 
-    ind <- seq.int(from = 2 * B * k + 1, length.out = k)
-    nr <- NROW(memberships[[1]])
-    nc <- NCOL(memberships[[1]])
+    ind <- seq.int(from = 2 * B * k + 1L, length.out = k)
+    nr <- NROW(memberships[[1L]])
+    nc <- NCOL(memberships[[1L]])
     M <- matrix(0, nrow = nr, ncol = k)
 
     ## Put the memberships into one big array so that we can get their
@@ -386,7 +418,8 @@ function(clusterings, weights, control, type = c("GV1"))
         k <- k_max
     maxiter <- control$maxiter
     if(is.null(maxiter))
-        maxiter <- 100
+        maxiter <- 100L
+    nruns <- control$nruns
     reltol <- control$reltol
     if(is.null(reltol))
         reltol <- sqrt(.Machine$double.eps)
@@ -395,13 +428,22 @@ function(clusterings, weights, control, type = c("GV1"))
     if(is.null(verbose))
         verbose <- getOption("verbose")
 
-    if(is.null(start)) {
-        ## Random starting value.
-        M <- matrix(runif(n * k), n, k)
-        M <- M / rowSums(M)
+    ## Handle start values and number of runs.
+    if(!is.null(start)) {
+        if(!is.list(start)) {
+            ## Be nice to users.
+            start <- list(start)
+        }
+        nruns <- length(start)
+    } else {
+        if(is.null(nruns)) {
+            ## Use nruns only if start is not given.
+            nruns <- 1L
+        }
+        start <- replicate(nruns,
+                           .random_stochastic_matrix(n, k),
+                           simplify = FALSE)
     }
-    else
-        M <- start
 
     ## <NOTE>
     ## For the given memberships, we can simply use ncol() in the
@@ -614,35 +656,51 @@ function(clusterings, weights, control, type = c("GV1"))
     }
 
     memberships <- lapply(clusterings, cl_membership)
-    permutations <- lapply(memberships, fit_P, M)
-    old_value <- value(M, permutations, memberships, w)
-    iter <- 1
 
-    while(iter <= maxiter) {
-        ## Fit M.
-        M <- fit_M(permutations, memberships, w)
-        ## Fit \{ P_b \}.
+    V_opt <- Inf
+    M_opt <- NULL
+    for(run in seq_along(start)) {
+        if(verbose && (nruns > 1L))
+            message(gettextf("AOG run: %d", run))
+        M <- start[[run]]
         permutations <- lapply(memberships, fit_P, M)
-        ## Update value.
-        new_value <- value(M, permutations, memberships, w)
+        old_value <- value(M, permutations, memberships, w)
+        message(gettextf("Iteration: 0 *** value: %g", old_value))
+        iter <- 1L
+        while(iter <= maxiter) {
+            ## Fit M.
+            M <- fit_M(permutations, memberships, w)
+            ## Fit \{ P_b \}.
+            permutations <- lapply(memberships, fit_P, M)
+            ## Update value.
+            new_value <- value(M, permutations, memberships, w)
+            if(verbose)
+                message(gettextf("Iteration: %d *** value: %g",
+                                 iter, new_value))
+            if(abs(old_value - new_value)
+               < reltol * (abs(old_value) + reltol))
+                break
+            old_value <- new_value
+            iter <- iter + 1L
+        }
+        if(new_value < V_opt) {
+            converged <- (iter <= maxiter)
+            V_opt <- new_value
+            M_opt <- M
+        }
         if(verbose)
-            cat("Iteration:", iter,
-                "Old value:", old_value,
-                "New value:", new_value,
-                "\n")
-        if(abs(old_value - new_value)
-           < reltol * (abs(old_value) + reltol))
-            break
-        old_value <- new_value
-        iter <- iter + 1
+            message(gettextf("Minimum: %g", V_opt))
     }
 
-    rownames(M) <- rownames(memberships[[1]])    
+    ## Ensure that a stochastic matrix is returned.
+    M <- pmax(M_opt, 0)
+    M <- M / rowSums(M)
+    rownames(M) <- rownames(memberships[[1L]])    
     M <- cl_membership(as.cl_membership(M[, seq_len(k)]), k)
 
     ## Add these attributes here, as the above would not preserve them.
-    attr(M, "converged") <- (iter <= maxiter)
-    attr(M, "value") <- new_value
+    attr(M, "converged") <- converged
+    attr(M, "value") <- V_opt
 
     as.cl_partition(M)
 }
@@ -663,7 +721,6 @@ function(clusterings, weights, control)
     ##   \| Y - M M' \|_F^2 => min
     ## where M is a membership matrix and Y = \sum_b w_b M_b M_b'.
 
-    B <- length(clusterings)    
     n <- n_of_objects(clusterings)
     max_n_of_classes <- max(sapply(clusterings, n_of_classes))
 
@@ -728,7 +785,7 @@ function(clusterings, weights, control)
     ## Ensure that a stochastic matrix is returned.
     M <- matrix(pmax(m, 0), n)
     M <- M / rowSums(M)
-    rownames(M) <- rownames(cl_membership(clusterings[[1]]))
+    rownames(M) <- rownames(cl_membership(clusterings[[1L]]))
     as.cl_partition(cl_membership(as.cl_membership(M), k))
 }
 
@@ -836,7 +893,7 @@ function(clusterings, weights, control)
     ## Ensure that a stochastic matrix is returned.
     M <- matrix(pmax(m, 0), n)
     M <- M / rowSums(M)
-    rownames(M) <- rownames(cl_membership(clusterings[[1]]))
+    rownames(M) <- rownames(cl_membership(clusterings[[1L]]))
     as.cl_partition(cl_membership(as.cl_membership(M), k))
 }
 
@@ -1045,21 +1102,11 @@ function(x)
 .cl_consensus_hierarchy_cophenetic <-
 function(clusterings, weights, control)
 {
-    w <- weights / sum(weights)
-    B <- length(clusterings)
-    ultrametrics <- lapply(clusterings, cl_ultrametric)
-    dissimilarities <- .weighted_sum_of_vectors(ultrametrics, w)
-    ## Cannot use as.cl_ultrametric() as we only have a dissimilarity
-    ## (and are trying to fit an ultrametric to it) ...
-    ## <FIXME 2.1.0>
-    ## as.dist() is generic in R >= 2.1.0, maybe turn .dist_from_vector
-    ## into an S3 method for it.
-    ## Note that we need to ensure that labels get preserved ...
-    ## (which is also why we use lapply() rather than sapply() above).
-    labels <- attr(ultrametrics[[1]], "Labels")
-    d <- .dist_from_vector(dissimilarities, labels = labels)
-    ## </FIXME>
-    as.cl_dendrogram(ls_fit_ultrametric(d, control = control))
+    ## d <- .weighted_mean_of_object_dissimilarities(clusterings, weights)
+    ## Alternatively:
+    ## as.cl_dendrogram(ls_fit_ultrametric(d, control = control))
+    control <- c(list(weights = weights), control)
+    as.cl_dendrogram(ls_fit_ultrametric(clusterings, control = control))
 }
 
 ### * .cl_consensus_hierarchy_manhattan
@@ -1093,10 +1140,10 @@ function(clusterings, weights, control)
     ultrametrics <- lapply(clusterings, cl_ultrametric)
     
     if(B == 1)
-        return(as.cl_dendrogram(ultrametrics[[1]]))
+        return(as.cl_dendrogram(ultrametrics[[1L]]))
 
-    n <- n_of_objects(ultrametrics[[1]])
-    labels <- cl_object_names(ultrametrics[[1]])
+    n <- n_of_objects(ultrametrics[[1L]])
+    labels <- cl_object_names(ultrametrics[[1L]])
 
     ## We need to do
     ##
@@ -1173,7 +1220,7 @@ function(clusterings, weights, control)
     }
     else
         all_classes[gamma > p]
-    attr(maj_classes, "labels") <- attr(classes[[1]], "labels")
+    attr(maj_classes, "labels") <- attr(classes[[1L]], "labels")
 
     ## <FIXME>
     ## Stop auto-coercing that to dendrograms once we have suitable ways

@@ -64,27 +64,27 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
     x_opt <- NULL
     for(run in seq_along(x0)) {
         if(verbose)
-            cat("SUMT run:", run, "\n")
+            message(gettextf("SUMT run: %d", run))            
         x <- x0[[run]]
         ## <TODO>
         ## Better upper/lower bounds for rho?
         rho <- max(L(x), 0.00001) / max(P(x), 0.00001)
         ## </TODO>
-        iter <- 1
+        if(verbose)
+            message(gettextf("Iteration: 0 Rho: %g P: %g", rho, P(x)))
+        iter <- 1L
         repeat {
             ## <TODO>
             ## Shouldnt't we also have maxiter, just in case ...?
             ## </TODO>
             if(verbose)
-                cat("Iteration:", iter,
-                    "Rho:", rho,
-                    "P:", P(x),
-                    "\n")
+                message(gettextf("Iteration: %d Rho: %g P: %g",
+                                 iter, rho, P(x)))
             x_old <- x
             x <- optimize_with_penalty(rho, x)
             if(sum((x_old - x) ^ 2) < eps)
                 break
-            iter <- iter + 1        
+            iter <- iter + 1L
             rho <- q * rho
         }
         v <- Phi(rho, x)
@@ -92,6 +92,8 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
             v_opt <- v
             x_opt <- x
         }
+        if(verbose)
+            message(gettextf("Minimum: %g", v_opt))
     }
 
     x_opt

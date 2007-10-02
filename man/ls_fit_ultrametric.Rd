@@ -4,15 +4,15 @@
 \title{Least Squares Fit of Ultrametrics to Dissimilarities}
 \description{
   Find the ultrametric minimizing least squares distance (Euclidean
-  dissimilarity) to a given dissimilarity object.
+  dissimilarity) to given dissimilarity objects.
 }
 \usage{
 ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
                    control = list())
 }
 \arguments{
-  \item{x}{a dissimilarity object inheriting from class
-    \code{"\link{dist}"}.}
+  \item{x}{a dissimilarity object inheriting from or coercible to class
+    \code{"\link{dist}"}, or an ensemble of such objects.} 
   \item{method}{a character string indicating the fitting method to be
     employed.  Must be one of \code{"SUMT"} (default), \code{"IP"}, or
     \code{"IR"}, or a unique abbreviation thereof.}
@@ -28,13 +28,20 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   optimal ultrametric distances.
 }
 \details{
-  With \eqn{L(u) = \sum w_{ij} (x_{ij} - u_{ij})^2}, the problem to be
-  solved is minimizing \eqn{L} over all \eqn{u} satisfying the
-  ultrametric constraints (i.e., for all \eqn{i, j, k}, \eqn{u_{ij} \le
-    \max(u_{ik}, u_{jk})}).  This problem is known to be NP hard
-  (Krivanek and Moravek, 1986).
+  For a single dissimilarity object \code{x}, the problem to be solved
+  is minimizing \eqn{L(u) = \sum_{i,j} w_{ij} (x_{ij} - u_{ij})^2} over
+  all \eqn{u} satisfying the ultrametric constraints (i.e., for all
+  \eqn{i, j, k}, \eqn{u_{ij} \le \max(u_{ik}, u_{jk})}).  This problem
+  is known to be NP hard (Krivanek and Moravek, 1986).
 
-  We provide three heuristics for solving this problem.
+  For an ensemble of dissimilarity objects, the criterion function is
+  \eqn{L(u) = \sum_b w_b \sum_{i,j} w_{ij} (x_{ij}(b) - u_{ij})^2},
+  where \eqn{w_b} is the weight given to element \eqn{x_b} of the
+  ensemble and can be specified via control parameter \code{weights}
+  (default: all ones).  This problem reduces to the above basic problem
+  with \eqn{x} as the \eqn{w_b}-weighted mean of the \eqn{x_b}.
+
+  We provide three heuristics for solving the basic problem.
 
   Method \code{"SUMT"} implements the SUMT (Sequential Unconstrained
   Minimization Technique, Fiacco and McCormick, 1968) approach of de

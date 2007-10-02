@@ -58,7 +58,7 @@ print.cl_proximity <-
 function(x, ...)
 {
     description <- attr(x, "description")
-    if(length(description) > 0) {
+    if(length(description) > 0L) {
         ## Could make this generic ...
         kind <- if(inherits(x, "cl_dissimilarity"))
             "Dissimilarities"
@@ -155,7 +155,7 @@ print.cl_cross_proximity <-
 function(x, ...)
 {
     description <- attr(x, "description")
-    if(length(description) > 0) {
+    if(length(description) > 0L) {
         ## Could make this generic ...
         kind <- if(inherits(x, "cl_cross_dissimilarity"))
             "Cross-dissimilarities"

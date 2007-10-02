@@ -15,6 +15,8 @@ function(x, y)
         .cl_meet_partition(x)
     else if(inherits(x, "cl_dendrogram_ensemble"))
         .cl_meet_dendrogram(x)
+    else if(inherits(x, "cl_hierarchy_ensemble"))
+        .cl_meet_hierarchy(x)
     else
         stop("Cannot compute meet of given clusterings.")
 }
@@ -23,10 +25,10 @@ function(x, y)
 function(x)    
 {
     x <- unique(x)
-    if(length(x) == 1)
-        return(cl_partition_by_class_ids(cl_class_ids(x[[1]])))
+    if(length(x) == 1L)
+        return(cl_partition_by_class_ids(cl_class_ids(x[[1L]])))
 
-    ids <- seq_len(n_of_objects(x[[1]]))
+    ids <- seq_len(n_of_objects(x[[1L]]))
     ## Cross-classify the objects.
     z <- split(ids, lapply(x, cl_class_ids))
     ## Subscript on the non-empty cells to get adjacent class ids.
@@ -49,6 +51,16 @@ function(x)
                             "single"))
 }
 
+.cl_meet_hierarchy <-
+function(x)
+{
+    ## Meet of an ensemble of n-trees.
+    ## Need to find the classes in *all* n-trees.
+    ## Equivalent to computing a strict majority tree.
+    .cl_consensus_hierarchy_majority(x, rep.int(1, length(x)),
+                                     list(p = 1))
+}
+
 cl_join <-
 function(x, y)
 {
@@ -66,6 +78,8 @@ function(x, y)
         .cl_join_partition(x)
     else if(inherits(x, "cl_dendrogram_ensemble"))
         .cl_join_dendrogram(x)
+    else if(inherits(x, "cl_hierarchy_ensemble"))
+        .cl_join_hierarchy(x)
     else
         stop("Cannot compute join of given clusterings.")
 }
@@ -75,7 +89,7 @@ function(x)
 {
     x <- unique(x)
     if(length(x) == 1)
-        return(cl_partition_by_class_ids(cl_class_ids(x[[1]])))
+        return(cl_partition_by_class_ids(cl_class_ids(x[[1L]])))
 
     ## Canonicalize: ensure that class ids are always the integers from
     ## one to the number of classes.
@@ -87,7 +101,7 @@ function(x)
     ids <- ids[order(n)]
 
     ## And now incrementally build the join.
-    jcids <- ids[[1]]                   # Class ids of the current join.
+    jcids <- ids[[1L]]                   # Class ids of the current join.
     jnc <- length(unique(jcids))        # Number of classes of this.
     for(b in seq.int(from = 2, to = length(x))) {
         z <- table(jcids, ids[[b]])
@@ -105,7 +119,7 @@ function(x)
         map <- remaining_ids <- seq_len(jnc)
         while(length(remaining_ids)) {
             cnt <- cnt + 1
-            pos <- which(C[remaining_ids[1], remaining_ids] > 0)
+            pos <- which(C[remaining_ids[1L], remaining_ids] > 0)
             map[remaining_ids[pos]] <- cnt
             remaining_ids <- remaining_ids[-pos]
         }
@@ -122,4 +136,30 @@ function(x)
 {
     ## Join of an ensemble of dendrograms.
     as.cl_dendrogram(do.call(pmax, lapply(x, cl_ultrametric)))
+}
+
+.cl_join_hierarchy <-
+function(x)
+{
+    ## Join of an ensemble of n-trees.
+    ## Only exists if the union of all classes of the n-trees is itself
+    ## an n-tree (see Barthelemy et al).
+    classes <- unique(unlist(lapply(x, cl_classes), recursive = FALSE))
+    ## Now check if this is an n-tree.
+    ## We must verify that for all classes A and B, their intersection
+    ## is A, B, or empty.
+    check <- function(A, B) {
+        m_AB <- match(A, B)
+        m_BA <- match(B, A)
+        ((all(is.na(m_AB)) && all(is.na(m_BA)))
+         || all(is.finite(m_AB))
+         || all(is.finite(m_BA)))
+    }
+    for(i in seq_along(classes)) {
+        A <- classes[[i]]
+        for(j in seq_along(classes))
+            if(!check(A, classes[[j]]))
+                stop("Join of given n-trees does not exist.")
+    }
+    as.cl_hierarchy(.cl_ultrametric_from_classes(classes))
 }

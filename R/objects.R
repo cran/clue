@@ -136,6 +136,12 @@ cl_object_names.mona <- cl_object_names.twins
 
 ## ** Others.
 
+## Package stats: class "dist".
+## (Raw object dissimilarities.)
+cl_object_names.dist <-
+function(x)
+    attr(x, "Labels")
+
 ## Package clue: memberships.
 cl_object_names.cl_membership <-
 function(x)
@@ -158,7 +164,7 @@ function(x)
 {
     nms <- lapply(x, cl_object_names)
     ind <- which(sapply(nms, length) > 0)
-    if(any(ind)) nms[[ind[1]]] else NULL
+    if(any(ind)) nms[[ind[1L]]] else NULL
 }
 
 ### * cl_object_labels

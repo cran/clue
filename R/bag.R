@@ -32,7 +32,7 @@ function(x, B, k = NULL,
     for(b in seq_len(B)) {
         mem <- cl_membership(clusterings[[b]], k)
         ## Match classes to reference partition.
-        ind <- solve_LSAP(crossprod(M_ref, mem), max = TRUE)
+        ind <- solve_LSAP(crossprod(M_ref, mem), maximum = TRUE)
         M <- M + mem[, ind]
     }
     as.cl_partition(cl_membership(as.cl_membership(M / B), k))

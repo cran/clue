@@ -4,6 +4,15 @@ ls_fit_addtree <-
 function(x, method = c("SUMT", "IP", "IR"), weights = 1,
          control = list())
 {
+    if(!inherits(x, "dist"))
+        x <- as.dist(x)
+
+    ## Catch some special cases right away.
+    if(attr(x, "Size") <= 3L)
+        return(as.cl_addtree(x))
+    if(.non_additivity(x, max = TRUE) == 0)
+        return(as.cl_addtree(x))
+
     ## Handle argument 'weights'.
     ## This is somewhat tricky ...
     if(is.matrix(weights)) {
@@ -36,12 +45,6 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
 .ls_fit_addtree_by_SUMT <-
 function(x, weights = 1, control = list())
 {
-    if(.non_additivity(x, max = TRUE) == 0)
-        return(as.cl_addtree(x))
-
-    if(attr(x, "Size") <= 3)
-        return(as.cl_addtree(x))
-
     ## Control parameters:
     ## gradient,
     gradient <- control$gradient
@@ -141,9 +144,6 @@ function(x, weights = 1, control = list())
     if(any(diff(weights)))
         warning("Non-identical weights currently not supported.")
 
-    if(attr(x, "Size") <= 3)
-        return(as.cl_addtree(x))
-
     labels <- attr(x, "Labels")
     x <- as.matrix(x)
     n <- nrow(x)
@@ -152,7 +152,7 @@ function(x, weights = 1, control = list())
     ## maxiter,
     maxiter <- control$maxiter
     if(is.null(maxiter))
-        maxiter <- 10000
+        maxiter <- 10000L
     ## nruns,
     nruns <- control$nruns
     ## order,
@@ -187,16 +187,16 @@ function(x, weights = 1, control = list())
     v_opt <- Inf
     for(run in seq_along(order)) {
         if(verbose)
-            cat("Iterative projection run:", run, "\n")
+            message(gettextf("Iterative projection run: %d", run))
         d <- .C("ls_fit_addtree_by_iterative_projection",
                 as.double(x),
                 as.integer(n),
-                as.integer(order[[run]] - 1),
+                as.integer(order[[run]] - 1L),
                 as.integer(maxiter),
-                iter = integer(1),
+                iter = integer(1L),
                 as.double(tol),
                 as.logical(verbose),
-                PACKAGE = "clue")[[1]]
+                PACKAGE = "clue")[[1L]]
         v <- L(d)
         if(v < v_opt) {
             v_opt <- v
@@ -217,9 +217,6 @@ function(x, weights = 1, control = list())
     if(any(diff(weights)))
         warning("Non-identical weights currently not supported.")
 
-    if(attr(x, "Size") <= 3)
-        return(as.cl_addtree(x))
-
     labels <- attr(x, "Labels")
     x <- as.matrix(x)
     n <- nrow(x)
@@ -228,7 +225,7 @@ function(x, weights = 1, control = list())
     ## maxiter,
     maxiter <- control$maxiter
     if(is.null(maxiter))
-        maxiter <- 10000
+        maxiter <- 10000L
     ## nruns,
     nruns <- control$nruns
     ## order,
@@ -263,16 +260,16 @@ function(x, weights = 1, control = list())
     v_opt <- Inf
     for(run in seq_along(order)) {
         if(verbose)
-            cat("Iterative reduction run:", run, "\n")
+            message(gettextf("Iterative reduction run: %d", run))
         d <- .C("ls_fit_addtree_by_iterative_reduction",
                 as.double(x),
                 as.integer(n),
-                as.integer(order[[run]] - 1),
+                as.integer(order[[run]] - 1L),
                 as.integer(maxiter),
-                iter = integer(1),
+                iter = integer(1L),
                 as.double(tol),
                 as.logical(verbose),
-                PACKAGE = "clue")[[1]]
+                PACKAGE = "clue")[[1L]]
         v <- L(d)
         if(v < v_opt) {
             v_opt <- v
@@ -295,7 +292,7 @@ function(x, max = FALSE)
     .C("deviation_from_additivity",
        as.double(x),
        nrow(x),
-       fn = double(1),
+       fn = double(1L),
        as.logical(max),
        PACKAGE = "clue")$fn
 }
@@ -325,7 +322,7 @@ function(x)
 
     n <- attr(x, "Size")
 
-    if(n <= 2)
+    if(n <= 2L)
         return(as.cl_addtree(0 * x))
 
     x <- as.matrix(x)
