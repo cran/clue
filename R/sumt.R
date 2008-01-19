@@ -4,7 +4,7 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
 {
     ## Default values: make it nice for others to call us.
 
-    if(is.null(eps)) eps <- .Machine$double.eps
+    if(is.null(eps)) eps <- sqrt(.Machine$double.eps)
     if(is.null(method)) method <- "CG"
     if(is.null(q)) q <- 10
     if(is.null(verbose)) verbose <- getOption("verbose")
@@ -52,6 +52,8 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
             optim(x, make_Phi(rho), gr = make_grad_Phi(rho),
                   method = method, control = control) $ par
     }
+    ## Note also that currently we do not check whether optimization was
+    ## "successful" ...
     ## </NOTE>
 
     ## We currently require that x0 be a *list* of start values, the
@@ -62,6 +64,7 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
 
     v_opt <- Inf
     x_opt <- NULL
+    rho_opt <- NULL
     for(run in seq_along(x0)) {
         if(verbose)
             message(gettextf("SUMT run: %d", run))            
@@ -82,7 +85,7 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
                                  iter, rho, P(x)))
             x_old <- x
             x <- optimize_with_penalty(rho, x)
-            if(sum((x_old - x) ^ 2) < eps)
+            if(max(abs(x_old - x)) < eps)
                 break
             iter <- iter + 1L
             rho <- q * rho
@@ -91,11 +94,14 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
         if(v < v_opt) {
             v_opt <- v
             x_opt <- x
+            rho_opt <- rho
         }
         if(verbose)
             message(gettextf("Minimum: %g", v_opt))
     }
 
-    x_opt
+    structure(list(x = x_opt, L = L(x_opt), P = P(x_opt), rho = rho_opt,
+                   call = match.call()),
+              class = "sumt")
 
 }

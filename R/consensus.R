@@ -78,7 +78,9 @@ function(clusterings, weights, control)
             M <- .project_to_leading_columns(M, k)
     }
 
-    as.cl_partition(cl_membership(as.cl_membership(M[, seq_len(k)]), k))
+    M <- .cl_membership_from_memberships(M[, seq_len(k), drop = FALSE], k)
+
+    as.cl_partition(M)
 }
 
 ### * .cl_consensus_partition_AOS
@@ -177,10 +179,12 @@ function(clusterings, weights, control,
     match_memberships <-
         switch(type,
                SE = , HE = function(M, N) {
-                   M[, solve_LSAP(crossprod(N, M), maximum = TRUE)]
+                   M[, solve_LSAP(crossprod(N, M), maximum = TRUE),
+                     drop = FALSE]
                },
                SM = , HM = function(M, N) {
-                   M[, solve_LSAP(.cxdist(N, M, "manhattan"))]
+                   M[, solve_LSAP(.cxdist(N, M, "manhattan")),
+                     drop = FALSE]
                })
     ## Function for fitting M to (fixed) memberships \{ M_b P_b \}.
     ## As we use a common number of columns for all membership matrices
@@ -201,8 +205,8 @@ function(clusterings, weights, control,
                    M <- .weighted_sum_of_matrices(memberships, w, nrow(M))
                    ## And compute a closest hard partition H(M) from
                    ## that, using the first k columns of M.
-                   .cl_membership_from_class_ids(max.col(M[ , seq_len(k)]),
-                                                 ncol(M))
+                   ids <- max.col(M[ , seq_len(k), drop = FALSE])
+                   .cl_membership_from_class_ids(ids, ncol(M))
                },
                SM = .l1_fit_M)
 
@@ -245,16 +249,13 @@ function(clusterings, weights, control,
             message(gettextf("Minimum: %g", V_opt))
     }
 
-    ## Ensure that a stochastic matrix is returned.
-    M <- pmax(M_opt, 0)
-    M <- M / rowSums(M)
-    rownames(M) <- rownames(memberships[[1L]])    
-    M <- cl_membership(as.cl_membership(M[, seq_len(k)]), k)
-
-    ## Add these attributes here, as the above would not preserve them.
-    attr(M, "converged") <- converged
-    attr(M, "value") <- V_opt
-
+    M <- .stochastify(M_opt)
+    rownames(M) <- rownames(memberships[[1L]])
+    meta <- list(objval = value(M, memberships, w),
+                 converged = converged)
+    M <- .cl_membership_from_memberships(M[, seq_len(k), drop = FALSE],
+                                         k, meta)
+    
     as.cl_partition(M)
 }
 
@@ -692,16 +693,16 @@ function(clusterings, weights, control, type = c("GV1"))
             message(gettextf("Minimum: %g", V_opt))
     }
 
-    ## Ensure that a stochastic matrix is returned.
-    M <- pmax(M_opt, 0)
-    M <- M / rowSums(M)
-    rownames(M) <- rownames(memberships[[1L]])    
-    M <- cl_membership(as.cl_membership(M[, seq_len(k)]), k)
-
-    ## Add these attributes here, as the above would not preserve them.
-    attr(M, "converged") <- converged
-    attr(M, "value") <- V_opt
-
+    M <- .stochastify(M_opt)
+    ## Seems that M is always kept a k columns ... if not, use
+    ##   M <- .stochastify(M_opt[, seq_len(k), drop = FALSE])
+    rownames(M) <- rownames(memberships[[1L]])
+    ## Recompute the value, just making sure ...
+    permutations <- lapply(memberships, fit_P, M)
+    meta <- list(objval = value(M, permutations, memberships, w),
+                 converged = converged)
+    M <- .cl_membership_from_memberships(M, k, meta)
+    
     as.cl_partition(M)
 }
 
@@ -758,7 +759,7 @@ function(clusterings, weights, control)
         e <- eigen(Y, symmetric = TRUE)
         ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
         ## thereof.
-        M <- e$vectors[, seq_len(k)] *
+        M <- e$vectors[, seq_len(k), drop = FALSE] *
             rep(sqrt(e$values[seq_len(k)]), each = n)
         m <- c(M)
         start <- c(list(m),
@@ -777,16 +778,17 @@ function(clusterings, weights, control)
     }
     grad_P <- .make_penalty_gradient_membership(n, k)
 
-    m <- sumt(start, L, P, grad_L, grad_P,
-              method = control$method, eps = control$eps,
-              q = control$q, verbose = control$verbose,
-              control = as.list(control$control))
+    out <- sumt(start, L, P, grad_L, grad_P,
+                method = control$method, eps = control$eps,
+                q = control$q, verbose = control$verbose,
+                control = as.list(control$control))
 
-    ## Ensure that a stochastic matrix is returned.
-    M <- matrix(pmax(m, 0), n)
-    M <- M / rowSums(M)
+    M <- .stochastify(matrix(out$x, n))
     rownames(M) <- rownames(cl_membership(clusterings[[1L]]))
-    as.cl_partition(cl_membership(as.cl_membership(M), k))
+    meta <- list(objval = L(c(M)))
+    M <- .cl_membership_from_memberships(M, k, meta)
+
+    as.cl_partition(M)
 }
 
 ### * .cl_consensus_partition_soft_symdiff
@@ -855,7 +857,7 @@ function(clusterings, weights, control)
         e <- eigen(Y, symmetric = TRUE)
         ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
         ## thereof.
-        M <- e$vectors[, seq_len(k)] *
+        M <- e$vectors[, seq_len(k), drop = FALSE] *
             rep(sqrt(e$values[seq_len(k)]), each = n)
         m <- c(M)
         start <- c(list(m),
@@ -885,16 +887,17 @@ function(clusterings, weights, control)
     else
         grad_L <- grad_P <- NULL
 
-    m <- sumt(start, L, P, grad_L, grad_P,
-              method = control$method, eps = control$eps,
-              q = control$q, verbose = control$verbose,
-              control = as.list(control$control))
+    out <- sumt(start, L, P, grad_L, grad_P,
+                method = control$method, eps = control$eps,
+                q = control$q, verbose = control$verbose,
+                control = as.list(control$control))
 
-    ## Ensure that a stochastic matrix is returned.
-    M <- matrix(pmax(m, 0), n)
-    M <- M / rowSums(M)
+    M <- .stochastify(matrix(out$x, n))
     rownames(M) <- rownames(cl_membership(clusterings[[1L]]))
-    as.cl_partition(cl_membership(as.cl_membership(M), k))
+    meta <- list(objval = L(c(M)))
+    M <- .cl_membership_from_memberships(M, k, meta)
+
+    as.cl_partition(M)
 }
 
 ### * .cl_consensus_partition_hard_symdiff
@@ -1183,15 +1186,15 @@ function(clusterings, weights, control)
                            simplify = FALSE)
     }
 
-    d <- sumt(start, L, P, grad_L, grad_P,
-              method = control$method, eps = control$eps,
-              q = control$q, verbose = control$verbose,
-              control = as.list(control$control))
+    out <- sumt(start, L, P, grad_L, grad_P,
+                method = control$method, eps = control$eps,
+                q = control$q, verbose = control$verbose,
+                control = as.list(control$control))
 
-    ## Round to enforce ultrametricity, and hope for the best ...
-    d <- .cl_ultrametric_from_ultrametric_approximation(d, size = n,
-                                                        labels = labels)
-
+    d <- .ultrametrify(out$x)
+    meta <- list(objval = L(d))
+    d <- .cl_ultrametric_from_veclh(d, n, labels, meta)
+    
     as.cl_dendrogram(d)
 }
 
@@ -1213,6 +1216,8 @@ function(clusterings, weights, control)
     gamma <- double(length = length(all_classes))
     for(i in seq_along(classes))
         gamma <- gamma + w[i] * !is.na(match(all_classes, classes[[i]]))
+    ## Rescale to [0, 1].
+    gamma <- gamma / max(gamma)
 
     maj_classes <- if(p == 1) {
         ## Strict consensus tree.
@@ -1247,7 +1252,7 @@ function(x, k)
     ## For a given matrix stochastic matrix x, return the stochastic
     ## matrix y which has columns from k+1 on all zero which is closest
     ## to x in the Frobenius distance.
-    y <- x[, seq_len(k)]
+    y <- x[, seq_len(k), drop = FALSE]
     y <- cbind(pmax(y + (1 - rowSums(y)) / k, 0),
                matrix(0, nrow(y), ncol(x) - k))
     ## (Use the pmax to ensure that entries remain nonnegative.)

@@ -1,6 +1,6 @@
 Package: clue
-Version: 0.3-20
-Date: 2007-09-21
+Version: 0.3-21
+Date: 2008-01-19
 Title: Cluster ensembles
 Description: CLUster Ensembles
 Author: Kurt Hornik, with contributions from Walter Boehm
@@ -9,6 +9,6 @@ License: GPL-2
 Depends: R (>= 2.5.0)
 Imports: stats, cluster, graphics, methods
 Suggests: e1071, lpSolve (>= 5.5.7), quadprog (>= 1.4-8)
-Enhances: RWeka, cba, cclust, flexmix, flexclust, kernlab, mclust,
+Enhances: RWeka, ape, cba, cclust, flexmix, flexclust, kernlab, mclust,
   relations, modeltools
-Packaged: Tue Oct  2 13:50:42 2007; hornik
+Packaged: Sat Jan 19 12:38:29 2008; hornik

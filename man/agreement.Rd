@@ -126,7 +126,7 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   (non-symmetric agreement) object of class \code{"cl_cross_agreement"}.
 }
 \references{
-  E. Dimitriadou and A. Weingessel and K. Hornik (2002).
+  E. Dimitriadou, A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
     Intelligence}, \bold{16}, 901--912.

@@ -27,7 +27,7 @@ as.cl_ultrametric(x)
   \code{\link[stats]{cophenetic}} to obtain the ultrametric (also known
   as cophenetic) distances from the hierarchy, which in turn by default
   calls the S3 generic \code{\link[stats]{as.hclust}} on the hierarchy.
-  Support for classes which represent hierarchies can thus be added by 
+  Support for a class which represents hierarchies can thus be added by 
   providing \code{as.hclust} methods for this class.  In R 2.1.0 or
   better, \code{cophenetic} is an S3 generic as well, and one can also
   more directly provide methods for this if necessary.

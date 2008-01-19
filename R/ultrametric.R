@@ -29,12 +29,15 @@ function(x, size = NULL, labels = NULL)
 }
 
 .cl_ultrametric_from_veclh <-
-function(x, size = NULL, labels = NULL)
+function(x, size = NULL, labels = NULL, meta = NULL)
 {
-    cl_proximity(x, "Ultrametric distances",
-                 labels = labels, size = size,
-                 class = c("cl_ultrametric", "cl_dissimilarity",
-                 "cl_proximity", "dist"))
+    u <- cl_proximity(x, "Ultrametric distances",
+                      labels = labels, size = size,
+                      class = c("cl_ultrametric", "cl_dissimilarity",
+                      "cl_proximity", "dist"))
+    if(!is.null(meta))
+        attr(u, "meta") <- meta
+    u
 }
 
 ### * as.cl_ultrametric
@@ -95,7 +98,7 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
          control = list())
 {
     if(inherits(x, "cl_ultrametric")) {
-        return(x)
+        return(.cl_ultrametric_with_meta_added(x, list(objval = 0)))
     } else if(is.cl_ensemble(x) || is.list(x)) {
         ## Might be given a list/ensemble of object dissimilarities.
         ## In this case, compute the suitably weighted average and
@@ -113,9 +116,11 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
 
     ## Catch some special cases right away.
     if(attr(x, "Size") <= 2L)
-        return(as.cl_ultrametric(x))
+        return(.cl_ultrametric_with_meta_added(as.cl_ultrametric(x),
+                                               list(objval = 0)))
     if(.non_ultrametricity(x, max = TRUE) == 0)
-        return(as.cl_ultrametric(x))
+        return(.cl_ultrametric_with_meta_added(as.cl_ultrametric(x),
+                                               list(objval = 0)))
 
     ## Handle weights.
     ## This is somewhat tricky ...
@@ -184,7 +189,8 @@ function(x, weights = 1, control = list())
     ## constraints, return it.
     if(inherits(x, "cl_ultrametric")
        || (.non_ultrametricity(x, max = TRUE) == 0))
-        return(as.cl_ultrametric(x))
+        return(.cl_ultrametric_with_meta_added(as.cl_ultrametric(x),
+                                               list(objval = 0)))
 
     ## For the time being, use a simple minimizer.
 
@@ -217,16 +223,15 @@ function(x, weights = 1, control = list())
     }
     
     ## And now ...
-    d <- sumt(start, L, P, grad_L, grad_P,
-              method = control$method, eps = control$eps,
-              q = control$q, verbose = control$verbose,
-              control = as.list(control$control))
-    
-    ## Round to enforce ultrametricity, and hope for the best ...
-    ## Alternatively, we could try running one more optimization step
-    ## with just the penalty function.
-    .cl_ultrametric_from_ultrametric_approximation(d, size = n,
-                                                   labels = labels)
+    out <- sumt(start, L, P, grad_L, grad_P,
+                method = control$method, eps = control$eps,
+                q = control$q, verbose = control$verbose,
+                control = as.list(control$control))
+
+    d <- .ultrametrify(out$x)
+    meta <- list(objval = L(d))
+
+    .cl_ultrametric_from_veclh(d, n, labels, meta)
 }
 
 .make_penalty_function_ultrametric <-
@@ -264,12 +269,13 @@ function(n)
 .ls_fit_ultrametric_by_iterative_projection <-
 function(x, weights = 1, control = list())
 {
-    if(any(diff(weights)))
+    if(any(diff(weights) != 0))
         warning("Non-identical weights currently not supported.")
 
     labels <- attr(x, "Labels")
+    n <- attr(x, "Size")
+
     x <- as.matrix(x)
-    n <- nrow(x)
 
     ## Control parameters:
     ## maxiter,
@@ -303,7 +309,10 @@ function(x, weights = 1, control = list())
         order <- replicate(nruns, sample(n), simplify = FALSE)
     }
 
-    L <- function(d) sum(weights * (x - d) ^ 2)
+    ## <NOTE>
+    ## Adjust in case support for non-identical weights is added.
+    L <- function(d) sum((x - d) ^ 2)
+    ## </NOTE>
 
     d_opt <- NULL
     v_opt <- Inf
@@ -311,7 +320,7 @@ function(x, weights = 1, control = list())
         if(verbose)
             message(gettextf("Iterative projection run: %d", run))
         d <- .C("ls_fit_ultrametric_by_iterative_projection",
-                as.double(as.matrix(x)),
+                as.double(x),
                 as.integer(n),
                 as.integer(order[[run]] - 1L),
                 as.integer(maxiter),
@@ -325,8 +334,10 @@ function(x, weights = 1, control = list())
         }
     }
         
-    d <- as.dist(matrix(d_opt, n))
-    .cl_ultrametric_from_ultrametric_approximation(d, n, labels)
+    d <- .ultrametrify(as.dist(matrix(d_opt, n)))
+    meta <- list(objval = L(d))
+    
+    .cl_ultrametric_from_veclh(d, n, labels, meta)
 }
 
 ### ** .ls_fit_ultrametric_by_iterative_reduction
@@ -334,12 +345,13 @@ function(x, weights = 1, control = list())
 .ls_fit_ultrametric_by_iterative_reduction <-
 function(x, weights = 1, control = list())
 {
-    if(any(diff(weights)))
+    if(any(diff(weights) != 0))
         warning("Non-identical weights currently not supported.")
 
     labels <- attr(x, "Labels")
+    n <- attr(x, "Size")
+
     x <- as.matrix(x)
-    n <- nrow(x)
 
     ## Control parameters:
     ## maxiter,
@@ -373,7 +385,10 @@ function(x, weights = 1, control = list())
         order <- replicate(nruns, sample(n), simplify = FALSE)
     }
 
-    L <- function(d) sum(weights * (x - d) ^ 2)
+    ## <NOTE>
+    ## Adjust in case support for non-identical weights is added.
+    L <- function(d) sum((x - d) ^ 2)
+    ## </NOTE>
 
     d_opt <- NULL
     v_opt <- Inf
@@ -395,13 +410,11 @@ function(x, weights = 1, control = list())
             d_opt <- d
         }
     }
-        
-    d <- as.dist(matrix(d_opt, n))
-    ## <NOTE>
-    ## If we want to add an attribute with the convergence info, we need
-    ## to do this after using as.cl_ultrametric().
-    ## </NOTE>
-    .cl_ultrametric_from_ultrametric_approximation(d, n, labels)
+
+    d <- .ultrametrify(as.dist(matrix(d_opt, n)))
+    meta <- list(objval = L(d))
+    
+    .cl_ultrametric_from_veclh(d, n, labels, meta)
 }
 
 ### * Ultrametric Target Fitters.
@@ -415,7 +428,8 @@ function(x, y, weights = 1)
         function(x, w) mean(x)
     else
         function(x, w) weighted.mean(x, w)
-    .fit_ultrametric_target(x, y, weights, fitter)
+    distfun <- function(x, u, w) sqrt(sum(w * (x - u) ^ 2))
+    .fit_ultrametric_target(x, y, weights, fitter, distfun)
 }
 
 ### ** l1_fit_ultrametric_target
@@ -427,13 +441,14 @@ function(x, y, weights = 1)
         function(x, w) median(x)
     else
         function(x, w) weighted_median(x, w)
-    .fit_ultrametric_target(x, y, weights, fitter)
+    distfun <- function(x, u, w) sum(w * abs(x - u))
+    .fit_ultrametric_target(x, y, weights, fitter, distfun)
 }
 
 ### ** .fit_ultrametric_target    
 
 .fit_ultrametric_target <-
-function(x, y, w, fitter)
+function(x, y, w, fitter, distfun = NULL)
 {
     w <- .handle_weights_for_ultrametric_target_fitters(w, x)
     ## The documentation says that x should inherit from dist, so coerce
@@ -446,15 +461,27 @@ function(x, y, w, fitter)
     n <- length(y$order)
     ilist <- vector("list", n)
     out <- matrix(0, n, n)
-    for(i in seq_len(n - 1)) {
+    mat <- xlist <- wlist <- vector("list", n - 1L)
+    for(i in seq_len(n - 1L)) {
         inds <- y$merge[i, ]
         ids1 <- if(inds[1L] < 0) -inds[1L] else ilist[[inds[1L]]]
         ids2 <- if(inds[2L] < 0) -inds[2L] else ilist[[inds[2L]]]
         ilist[[i]] <- c(ids1, ids2)
-        out[ids1, ids2] <- fitter(x[ids1, ids2], w[ids1, ids2])
+        mat[[i]] <- cbind(rep.int(ids1,
+                                  rep.int(length(ids2), length(ids1))), 
+                          rep.int(ids2, length(ids1)))
+        xlist[[i]] <- x[mat[[i]]]
+        wlist[[i]] <- w[mat[[i]]]
     }
+    values <- pava(xlist, wlist, fitter)
+    for(i in seq_len(n - 1L))
+        out[mat[[i]]] <- values[i]
     rownames(out) <- y$labels
-    as.cl_ultrametric(out + t(out))
+    u <- as.cl_ultrametric(out + t(out))
+    if(!is.null(distfun))
+        attr(u, "meta") <-
+            list(objval = distfun(as.dist(x), u, as.dist(w)))
+    u
 }
 
 ### ** .handle_weights_for_ultrametric_target_fitters
@@ -469,8 +496,9 @@ function(weights, x)
             stop("Arguments 'weights' must be compatible with 'x'.")
     }
     else
-        weights <- as.matrix(.dist_from_vector(rep(weights, length =
-                                                   length(x)))) 
+        weights <-
+            as.matrix(.dist_from_vector(rep(weights,
+                                            length.out = length(x))))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
@@ -485,16 +513,18 @@ function(x, method = c("SUMT", "IRIP"), weights = 1,
          control = list())
 {
     if(inherits(x, "cl_ultrametric"))
-        return(x)
+        return(.cl_ultrametric_with_meta_added(x, list(objval = 0)))
 
     if(!inherits(x, "dist"))
         x <- as.dist(x)
 
     ## Catch some special cases right away.
     if(attr(x, "Size") <= 2L)
-        return(as.cl_ultrametric(x))
+        return(.cl_ultrametric_with_meta_added(as.cl_ultrametric(x),
+                                               list(objval = 0)))
     if(.non_ultrametricity(x, max = TRUE) == 0)
-        return(as.cl_ultrametric(x))
+        return(.cl_ultrametric_with_meta_added(as.cl_ultrametric(x),
+                                               list(objval = 0)))
 
     ## Handle weights.
     ## This is somewhat tricky ...
@@ -567,12 +597,15 @@ function(x, weights = 1, control = list())
     }
 
     ## And now ...
-    d <- sumt(start, L, P, grad_L, grad_P,
-              method = control$method, eps = control$eps,
-              q = control$q, verbose = control$verbose,
-              control = as.list(control$control))
+    out <- sumt(start, L, P, grad_L, grad_P,
+                method = control$method, eps = control$eps,
+                q = control$q, verbose = control$verbose,
+                control = as.list(control$control))
 
-    .cl_ultrametric_from_ultrametric_approximation(d, n, labels)
+    d <- .ultrametrify(out$x)
+    meta <- list(objval = L(d))
+
+    .cl_ultrametric_from_veclh(d, n, labels, meta)
 }
 
 ### ** .l1_fit_ultrametric_by_IRIP
@@ -580,41 +613,83 @@ function(x, weights = 1, control = list())
 .l1_fit_ultrametric_by_IRIP <-
 function(x, weights = 1, control = list())
 {
+    ## An attempt of implementing "Iteratively Reweighted Iterative
+    ## Projection" as described in Smith (2000, 2001), Journal of
+    ## Classification.  Note that this suggests using the Iterative
+    ## Projection of Hubert and Arabie (1995), which we cannot as we
+    ## have not (yet?) implemented this for the weighted case.  Hence,
+    ## we use our SUMT least squares ultrametric fitter instead.
+    ##
+    ## However, we never got this to converge properly ...
+    
+    w <- weights / sum(weights)
+    
+    ## Control parameters:
+    ## MIN,
+    MIN <- control$MIN
+    if(is.null(MIN))
+        MIN <- 1e-3
+    ## (A rather small cut-off which worked best in the cases we tried.)
+    ## eps,
+    eps <- control$eps
+    if(is.null(eps))
+        eps <- 1e-6
+    ## maxiter,
+    maxiter <- control$maxiter
+    if(is.null(maxiter))
+        maxiter <- 100L
+    ## reltol,
+    reltol <- control$reltol
+    if(is.null(reltol))
+        reltol <- 1e-6
+    ## start,
+    start <- control$start
+    ## verbose.
     verbose <- control$verbose
     if(is.null(verbose))
         verbose <- getOption("verbose")
-    
-    eps <- 1e-6                         # Make settable later.
+
+    n <- attr(x, "Size")
+    labels <- attr(x, "Labels")
+
+    L <- function(d) sum(w * abs(x - d))
 
     ## Initialize by "random shaking" as for the L2 SUMT, but perhaps we
     ## should not do this?  [Or do it differently?]
-    u <- x + rnorm(length(x), sd = sd(x) / 3)
-    ## u <- x
+    u <- if(is.null(start))
+        x + rnorm(length(x), sd = sd(x) / 3)
+    else
+        start
+    ## (No multiple runs for the time being.)
+    L_new <- L(u)
 
     iter <- 1L
-
-    repeat {
+    while(iter <= maxiter) {
         if(verbose)
             message(gettextf("Outer iteration: %d", iter))
+        L_old <- L_new
         u_old <- u
-        w <- weights / pmax(abs(u - x), 0.000001)
-        ## u <- ls_fit_ultrametric(x, weights = w)
-        u <- .ls_fit_ultrametric_by_SUMT(x, weights = w,
+        weights <- w / pmax(abs(u - x), MIN)
+        u <- .ls_fit_ultrametric_by_SUMT(x,
+                                         weights = weights,
                                          control = as.list(control$control))
         ## Use some control arguments lateron ...
-        D <- sum(abs(u - u_old))
+        L_new <- L(u)
+        delta_L <- L_old - L_new
+        delta_u <- max(abs(u_old - u))
         if(verbose)
-            message(gettextf("Change: %g", D))
-        if(D < eps) break
+            message(gettextf("Change: u: %g L: %g", delta_u, delta_L))
+        if((delta_u < eps) ||
+           ((delta_L >= 0) &&
+            (delta_L <= reltol * (abs(L_old) + reltol))))
+            break
         iter <- iter + 1L
     }
 
-    ## <FIXME>
-    ## Use
-    ##   .cl_ultrametric_from_ultrametric_approximation(u)
-    ## eventually ...
-    as.cl_ultrametric(u)
-    ## </FIXME>
+    d <- .ultrametrify(u)
+    meta <- list(objval = L(d), status = as.integer(iter == maxiter))
+
+    .cl_ultrametric_from_veclh(d, n, labels, meta)
 }
 
 ## * ls_fit_sum_of_ultrametrics
@@ -633,11 +708,19 @@ function(x, nterms = 1, weights = 1, control = list())
     ## eps,
     eps <- control$eps
     if(is.null(eps))
-        eps <- 1e-8
+        eps <- 1e-6
+    ## maxiter,
+    maxiter <- control$maxiter
+    if(is.null(maxiter))
+        maxiter <- 100L
     ## method,
     method <- control$method
     if(is.null(method))
         method <- "SUMT"
+    ## reltol,
+    reltol <- control$reltol
+    if(is.null(reltol))
+        reltol <- 1e-6
     ## verbose.
     verbose <- control$verbose
     if(is.null(verbose))
@@ -646,39 +729,49 @@ function(x, nterms = 1, weights = 1, control = list())
     control <- as.list(control$control)
     ## And be nice ...
     if(identical(method, "SUMT") && is.null(control$nruns))
-        control$nruns <- 10
+        control$nruns <- 10L
+
+    L <- function(u)
+        sum((x - rowSums(matrix(unlist(u), ncol = nterms))) ^ 2)
     
     ## Init.
     u <- rep.int(list(as.cl_ultrametric(0 * x)), nterms)
+    L_new <- L(u)
 
     ## Loop.
     iter <- 1L
-    repeat {
+    while(iter <= maxiter) {
         if(verbose)
             message(gettextf("Iteration: %d", iter))
-        delta <- 0
+        L_old <- L_new
+        delta_u <- 0
         for(i in seq_len(nterms)) {
             if(verbose)
                 message(gettextf("Term: %d", i))
             u_old <- u[[i]]
             ## Compute residual r = x - \sum_{j: j \ne i} u(j)
-            r <- x - rowSums(matrix(unlist(u[-i]), ncol = nterms - 1))
+            r <- x - rowSums(matrix(unlist(u[-i]), ncol = nterms - 1L))
             ## Fit residual.
             u[[i]] <- ls_fit_ultrametric(r, method, weights, control)
             ## Accumulate change.
-            change <- sum((u[[i]] - u_old) ^ 2)
+            change <- max(abs(u[[i]] - u_old))
             if(verbose)
                 message(gettextf("Change: %g", change))
-            delta <- delta + change
+            delta_u <- max(delta_u, change)
         }
+        L_new <- L(u)
+        delta_L <- L_old - L_new
         if(verbose)
-            message(gettextf("Total change: %g\n", delta))
-        if(delta < eps)
+            message(gettextf("Overall change: u: %g L: %g\n",
+                             delta_u, delta_L))
+        if((delta_u < eps) ||
+           ((delta_L >= 0) &&
+            (delta_L <= reltol * (abs(L_old) + reltol))))
             break
         iter <- iter + 1L
     }
-
-    u
+    
+    structure(u, objval = L_new, status = as.integer(iter == maxiter))
 }
 
 ### * .non_ultrametricity
@@ -696,26 +789,15 @@ function(x, max = FALSE)
        PACKAGE = "clue")$fn
 }
 
-### * .cl_ultrametric_from_ultrametric_approximation
-
-.cl_ultrametric_from_ultrametric_approximation <-
-function(x, size = NULL, labels = NULL)
-{
-    ## Turn x into an ultrametric after possibly rounding to
-    ## non-ultrametric significance.
-    mnum <- .non_ultrametricity(x, max = TRUE)
-    cl_ultrametric(as.cl_ultrametric(round(x, floor(abs(log10(mnum))))), 
-                   size = size, labels = labels)
-}
-
 ### * .cl_ultrametric_from_classes
 
 .cl_ultrametric_from_classes <-
 function(x)
 {
-
     ## Compute an ultrametric from a hierarchy of classes (i.e., an
     ## n-tree).
+
+    labels <- attr(x, "labels")
 
     ## Ensure we have no duplicates.
     x <- x[!duplicated(x)]
@@ -748,12 +830,38 @@ function(x)
     for(i in objects)
         d[i, ] <- heights[apply((rep(incidences[i, ], each = n)
                                  & incidences),
-                                1, which.max)]
-    dimnames(d) <- rep(list(attr(x, "labels")), 2)
+                                1L, which.max)]
+    dimnames(d) <- rep.int(list(labels), 2L)
 
     as.cl_ultrametric(d)
 }
 
+### * .cl_ultrametric_with_meta_added
+
+.cl_ultrametric_with_meta_added <-
+function(x, meta = NULL)
+{
+    ## An alternative to adding a 'meta' argument to cl_ultrametric().
+    attr(x, "meta") <- meta
+    x
+}
+
+### .ultrametrify
+
+.ultrametrify <-
+function(x)
+{
+    ## Ensure ultrametricity.
+    ## In earlier versions, function
+    ## .cl_ultrametric_from_ultrametric_approximation() tried rounding
+    ## to non-ultrametric significance, using
+    ##   round(x, floor(abs(log10(.non_ultrametricity(x, max = TRUE)))))
+    ## which is nice but does not guarantee ultrametricity (and may
+    ## result in poorer approximations than what we use now).
+    ## Hence, let us use single linkage hierarchical clustering which
+    ## gives the best dominated ultrametric approximation.
+    cophenetic(hclust(.dist_from_vector(x), "single"))
+}
 
 ### Local variables: ***
 ### mode: outline-minor ***

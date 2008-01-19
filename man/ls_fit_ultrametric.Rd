@@ -3,7 +3,7 @@
 \alias{ls_fit_ultrametric}
 \title{Least Squares Fit of Ultrametrics to Dissimilarities}
 \description{
-  Find the ultrametric minimizing least squares distance (Euclidean
+  Find the ultrametric with minimal square distance (Euclidean
   dissimilarity) to given dissimilarity objects.
 }
 \usage{
@@ -25,17 +25,18 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
 }
 \value{
   An object of class \code{"\link{cl_ultrametric}"} containing the
-  optimal ultrametric distances.
+  fitted ultrametric distances.
 }
 \details{
   For a single dissimilarity object \code{x}, the problem to be solved
-  is minimizing \eqn{L(u) = \sum_{i,j} w_{ij} (x_{ij} - u_{ij})^2} over
-  all \eqn{u} satisfying the ultrametric constraints (i.e., for all
+  is minimizing
+  \deqn{L(u) = \sum_{i,j} w_{ij} (x_{ij} - u_{ij})^2}
+  over all \eqn{u} satisfying the ultrametric constraints (i.e., for all
   \eqn{i, j, k}, \eqn{u_{ij} \le \max(u_{ik}, u_{jk})}).  This problem
   is known to be NP hard (Krivanek and Moravek, 1986).
 
   For an ensemble of dissimilarity objects, the criterion function is
-  \eqn{L(u) = \sum_b w_b \sum_{i,j} w_{ij} (x_{ij}(b) - u_{ij})^2},
+  \deqn{L(u) = \sum_b w_b \sum_{i,j} w_{ij} (x_{ij}(b) - u_{ij})^2,}
   where \eqn{w_b} is the weight given to element \eqn{x_b} of the
   ensemble and can be specified via control parameter \code{weights}
   (default: all ones).  This problem reduces to the above basic problem
@@ -47,14 +48,14 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   Minimization Technique, Fiacco and McCormick, 1968) approach of de
   Soete (1986) which in turn simplifies the suggestions in Carroll and
   Pruzansky (1980).  (See \code{\link{sumt}} for more information on the
-  SUMT approach.)  We then use a final rounding step to ensure that the
-  returned object exactly satisfies the ultrametric constraints.  The
-  starting value \eqn{u_0} is obtained by \dQuote{random shaking} of the
-  given dissimilarity object (if not given).  If there are missing
-  values in \code{x}, i.e., the given dissimilarities are
-  \emph{incomplete}, we follow a suggestion of de Soete (1984), imputing
-  the missing values by the weighted mean of the non-missing ones, and
-  setting the corresponding weights to zero.
+  SUMT approach.)  We then use a final single linkage hierarchical
+  clustering step to ensure that the returned object exactly satisfies
+  the ultrametric constraints.  The starting value \eqn{u_0} is obtained
+  by \dQuote{random shaking} of the given dissimilarity object (if not
+  given).  If there are missing values in \code{x}, i.e., the given
+  dissimilarities are \emph{incomplete}, we follow a suggestion of de
+  Soete (1984), imputing the missing values by the weighted mean of the
+  non-missing ones, and setting the corresponding weights to zero.
 
   Availabe control parameters are \code{method}, \code{control},
   \code{eps}, \code{q}, and \code{verbose}, which have the same roles as
@@ -168,9 +169,10 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   \emph{Pattern Recognition Letters}, \bold{2}, 133--137.
 }
 \seealso{
-  \code{\link{cl_consensus}} for computing least squares consensus
-  hierarchies by least squares fitting of average ultrametric
-  distances.
+  \code{\link{cl_consensus}} for computing least squares (Euclidean)
+  consensus hierarchies by least squares fitting of average ultrametric
+  distances;
+  \code{\link{l1_fit_ultrametric}}.
 }
 \examples{
 ## Least squares fit of an ultrametric to the Miller-Nicely consonant

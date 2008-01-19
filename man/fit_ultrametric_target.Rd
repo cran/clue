@@ -35,14 +35,17 @@ l1_fit_ultrametric_target(x, y, weights = 1)
   \eqn{p = 2} in the Euclidean and \eqn{p = 1} in the Manhattan case,
   respectively.
 
-  The optimum can be computed as follows.  Suppose a split joins object
-  classes \eqn{A} and \eqn{B}.  As the ultrametric dissimilarities of
-  all objects in \eqn{A} to all objects in \eqn{B} must be the same
-  value, say, \eqn{u_{A,B}}, the contribution from the split to the
-  criterion function is of the form \eqn{\sum_{i \in A, j \in B} w_{ij}
-  |x_{ij} - u_{A,B}|^p}, and can be minimized by taking \eqn{u_{A,B}} as
-  the (weighted) mean (\eqn{p = 2}) or (weighted) median (\eqn{p = 1})
-  of the cross-dissimilarities of the objects in \eqn{A} and \eqn{B}.
+  The optimum can be computed as follows.  Suppose split \eqn{s} joins
+  object classes \eqn{A} and \eqn{B}.  As the ultrametric
+  dissimilarities of all objects in \eqn{A} to all objects in \eqn{B}
+  must be the same value, say, \eqn{u_{A,B} = u_s}, the contribution
+  from the split to the criterion function is of the form
+  \eqn{f_s(u_s) = \sum_{i \in A, j \in B} w_{ij} |x_{ij} - u_s|^p}.
+  We need to minimize \eqn{\sum_s f_s(u_s)} under the constraint that
+  the \eqn{u_s} form a non-decreasing sequence, which is accomplished by
+  using the Pool Adjacent Violator Algorithm (PAVA) using the weighted
+  mean (\eqn{p = 2}) or weighted median (\eqn{p = 1}) for solving the
+  blockwise optimization problems.
 }
 \seealso{
   \code{\link{ls_fit_ultrametric}} for finding the ultrametric

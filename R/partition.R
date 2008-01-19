@@ -448,7 +448,7 @@ is.cl_hard_partition.kmeans <- .true
 is.cl_hard_partition.fanny <-
 function(x)
 {
-    all(rowSums(cl_membership(x), na.rm = TRUE) == 1)
+    all(rowSums(cl_membership(x) == 1, na.rm = TRUE) > 0)
 }
 ## </NOTE>
 is.cl_hard_partition.partition <- .true

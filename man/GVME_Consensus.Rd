@@ -40,7 +40,7 @@ data("GVME_Consensus")
 GVME_Consensus_2 <- GVME_Consensus[1 : 4]
 ## Fuzziness using the Partition Coefficient.
 cl_fuzziness(GVME_Consensus_2)
-## (Correponds to 1 - F in the source.)
+## (Corresponds to 1 - F in the source.)
 ## Dissimilarities:
 cl_dissimilarity(GVME_Consensus_2)
 cl_dissimilarity(GVME_Consensus_2, method = "comem")

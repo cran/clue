@@ -240,15 +240,16 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       where \eqn{d} is the symmetric difference dissimilarity.  The
       unweighted \eqn{p}-majority tree is the \eqn{n}-tree (hierarchy in
       the strict sense) consisting of all subsets of objects contained
-      in more than \eqn{p} of the \eqn{n}-trees \eqn{T_b} induced by the
-      dendrograms, where \eqn{1/2 \le p < 1} and \eqn{p = 1/2} (default)
-      corresponds to the standard majority tree.  In the weighted case,
-      it consists of all subsets \eqn{A} for which \eqn{\sum_{b: A \in
-      T_b} w_b > W p}, where \eqn{W = \sum_b w_b}.  We also allow for
-      \eqn{p = 1}, which gives the \emph{strict consensus tree}
-      consisting of all subsets contained in each of the \eqn{n}-trees.
-      The majority dendrogram returned is a representation of the
-      majority tree where all splits have height one.
+      in more than \eqn{100 p} percent of the \eqn{n}-trees \eqn{T_b}
+      induced by the dendrograms, where \eqn{1/2 \le p < 1} and
+      \eqn{p = 1/2} (default) corresponds to the standard majority tree.
+      In the weighted case, it consists of all subsets \eqn{A} for which
+      \eqn{\sum_{b: A \in T_b} w_b > W p}, where \eqn{W = \sum_b w_b}.
+      We also allow for \eqn{p = 1}, which gives the \emph{strict
+	consensus tree} consisting of all subsets contained in each of
+      the \eqn{n}-trees.  The majority dendrogram returned is a
+      representation of the majority tree where all splits have height
+      one.
 
       The fraction \eqn{p} can be specified via the control parameter
       \code{p}.
@@ -263,13 +264,13 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   control parameters as its arguments, with formals named \code{x},
   \code{weights}, and \code{control}, respectively.
 
-  All built-in methods use heuristics for solving hard optimization
+  Most built-in methods use heuristics for solving hard optimization
   problems, and cannot be guaranteed to find a global minimum.  Standard
   practice would recommend to use the best solution found in
   \dQuote{sufficiently many} replications of the methods.
 }
 \references{
-  E. Dimitriadou and A. Weingessel and K. Hornik (2002).
+  E. Dimitriadou, A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
     Intelligence}, \bold{16}, 901--912.
@@ -287,7 +288,8 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   \emph{Bulletin of Mathematical Biology}, \bold{43}, 239--244.
 }
 \seealso{
-  \code{\link{cl_medoid}}
+  \code{\link{cl_medoid}},
+  \code{\link[ape]{consensus}}
 }
 \examples{
 ## Consensus partition for the Rosenberg-Kim kinship terms partition

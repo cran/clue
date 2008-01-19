@@ -83,10 +83,24 @@ cl_membership.cl_partition <-
 function(x, k = n_of_classes(x))
     cl_membership(.get_representation(x), k)
 
+### * .make_cl_membership
+
+## A low-level common creator.
+
+.make_cl_membership <-
+function(x, n_of_classes, is_cl_hard_partition, meta = NULL)
+{
+    attr(x, "n_of_classes") <- n_of_classes
+    attr(x, "is_cl_hard_partition") <- is_cl_hard_partition
+    attr(x, "meta") <- meta
+    class(x) <- "cl_membership"
+    x
+}
+
 ### * .cl_membership_from_class_ids
 
 .cl_membership_from_class_ids <-
-function(x, k = NULL)
+function(x, k = NULL, meta = NULL)
 {
     x <- factor(x)
     n_of_objects <- length(x)
@@ -108,17 +122,20 @@ function(x, k = NULL)
         colnames(M) <- levels(x)
     if(!is.null(nm <- names(x)))
         rownames(M) <- nm
-    attr(M, "n_of_classes") <- n_of_classes
-    attr(M, "is_cl_hard_partition") <- TRUE
-    class(M) <- "cl_membership"
-    M
+    .make_cl_membership(M, n_of_classes, TRUE, meta)
 }
 
 ### * .cl_membership_from_memberships
 
 .cl_membership_from_memberships <-
-function(x, k = NULL)
+function(x, k = NULL, meta = NULL)
 {
+    ## <NOTE>
+    ## Dropping and re-filling of ## zero columns in case k is given may
+    ## seem unnecessary, but really canonicalizes by moving zero columns
+    ## last ...
+    ## </NOTE>
+    
     x <- x[ , colSums(x, na.rm = TRUE) > 0, drop = FALSE]
     n_of_classes <- ncol(x)
     if(!is.null(k)) {
@@ -131,10 +148,9 @@ function(x, k = NULL)
             x[apply(is.na(x), 1, any), ] <- NA
         }
     }
-    attr(x, "n_of_classes") <- n_of_classes
-    attr(x, "is_cl_hard_partition") <- all(rowSums(x == 1), na.rm = TRUE)
-    class(x) <- "cl_membership"
-    x
+    .make_cl_membership(x, n_of_classes,
+                        all(rowSums(x == 1, na.rm = TRUE) > 0),
+                        meta)
 }
 
 ### * as.cl_membership
@@ -213,6 +229,15 @@ function(x)
      || inherits(x, "cl_membership")
      || inherits(x, "cl_class_ids"))
 
+### * .stochastify
+
+.stochastify <-
+function(x)
+{
+    ## Try to ensure that a stochastic matrix is returned.
+    x <- pmax(x, 0)
+    x / rowSums(x)
+}
 
 ### Local variables: ***
 ### mode: outline-minor ***

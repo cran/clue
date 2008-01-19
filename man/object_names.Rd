@@ -20,7 +20,7 @@ cl_object_names(x)
 
   The methods provided in package \pkg{clue} handle the partitions and
   hierarchies obtained from clustering functions in the base R
-  distribution, as well as packages \pkg{RWeka}, \pkg{cba},
+  distribution, as well as packages \pkg{RWeka}, \pkg{ape}, \pkg{cba},
   \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, \pkg{flexclust},
   \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and of course,
   \pkg{clue} itself), in as much as possible.

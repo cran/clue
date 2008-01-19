@@ -37,7 +37,7 @@
 data("Kinship82_Consensus")
 ## Fuzziness using the Partition Coefficient.
 cl_fuzziness(Kinship82_Consensus)
-## (Correponds to 1 - F in the source.)
+## (Corresponds to 1 - F in the source.)
 ## Dissimilarities:
 cl_dissimilarity(Kinship82_Consensus)
 cl_dissimilarity(Kinship82_Consensus, method = "comem")

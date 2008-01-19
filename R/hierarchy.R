@@ -27,6 +27,11 @@ is.cl_hierarchy.twins <- .true
 ## Package cluster: mona().
 is.cl_hierarchy.mona <- .true
 
+## Package ape: class "phylo".
+is.cl_hierarchy.phylo <-
+function(x)
+    ape::is.ultrametric(x)
+
 ## Package clue: (virtual) class "cl_hierarchy".
 ## Note that "raw" cl_ultrametric objects are *not* hierarchies, as
 ## these are meant for numeric computations.
@@ -160,6 +165,12 @@ is.cl_dendrogram.hclust <- .true
 is.cl_dendrogram.twins <- .true
 ## Package cluster: mona().
 is.cl_dendrogram.mona <- .true
+## Package ape: class "phylo".
+is.cl_dendrogram.phylo <-
+function(x)
+    ape::is.ultrametric(x)
+## (We could also support ape's class "matching" via coercion to class
+## "phylo".)
 ## Package clue: (virtual) class "cl_dendrogram".
 is.cl_dendrogram.cl_dendrogram <- .true
 

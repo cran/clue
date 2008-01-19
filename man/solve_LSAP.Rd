@@ -33,7 +33,7 @@ solve_LSAP(x, maximum = FALSE)
   rows to columns.
 }
 \references{
-  C. Papadimitriou and K. Steiglitz (1982)
+  C. Papadimitriou and K. Steiglitz (1982),
   \emph{Combinatorial Optimization: Algorithms and Complexity}.
   Englewood Cliffs: Prentice Hall.
 }
