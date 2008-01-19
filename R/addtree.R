@@ -100,7 +100,7 @@ function(x, weights = 1, control = list())
     d <- sumt(start, L, P, grad_L, grad_P,
               method = control$method, eps = control$eps,
               q = control$q, verbose = control$verbose,
-              control = as.list(control$control))
+              control = as.list(control$control))$x
 
     ## Round to enforce additivity, and hope for the best ...
     .cl_addtree_from_addtree_approximation(d, n, labels)    
@@ -342,6 +342,10 @@ function(g)
 
 as.cl_addtree <-
 function(x)
+    UseMethod("as.cl_addtree")
+
+as.cl_addtree.default <-
+function(x)    
 {
     if(inherits(x, "cl_addtree"))
         x
@@ -357,6 +361,12 @@ function(x)
     else
         stop("Cannot coerce to 'cl_addtree'.")
 }
+
+as.cl_addtree.phylo <-
+function(x)
+    .cl_addtree_from_veclh(as.dist(cophenetic(x)))
+## Phylogenetic trees with edge/branch lengths yield additive tree
+## dissimilarities.
 
 ### * .cl_addtree_from_veclh
 
@@ -375,7 +385,7 @@ function(x, size = NULL, labels = NULL)
 function(x, size = NULL, labels = NULL)
 {
     ## Turn x into an addtree after possibly rounding to non-additivity
-    ## significance.
+    ## significance (note that this is not guaranteed to work ...).
     mnum <- .non_additivity(x, max = TRUE)
     x <- round(x, floor(abs(log10(mnum))))
     .cl_addtree_from_veclh(x, size = size, labels = labels)

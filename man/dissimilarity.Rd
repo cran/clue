@@ -210,7 +210,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   Metrics on spaces of finite trees.
   \emph{Journal of Mathematical Psychology}, \bold{10}, 26--59.
   
-  I. Charon and L. Denoeud and A. Guénoche and O. Hudry (2005).
+  I. Charon, L. Denoeud, A. Guénoche and O. Hudry (2005).
   \emph{Maximum Transfer Distance Between Partitions}.
   Technical Report 2005D003, Ecole Nationale Supérieure des
   Télécommunications --- Paris.
@@ -220,7 +220,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   The complexity of computing metric distances between partitions.
   \emph{Mathematical Social Sciences}, \bold{1}, 269--287.
   
-  E. Dimitriadou and A. Weingessel and K. Hornik (2002).
+  E. Dimitriadou, A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
     Intelligence}, \bold{16}, 901--912.

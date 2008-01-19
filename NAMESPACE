@@ -25,8 +25,10 @@ export("cl_agreement",
        "cl_ultrametric", "as.cl_ultrametric",
        "ls_fit_addtree",
        "ls_fit_centroid",
-       "ls_fit_ultrametric",
+       "ls_fit_ultrametric",       
+       "ls_fit_sum_of_ultrametrics",
        "ls_fit_ultrametric_target",
+       "l1_fit_ultrametric",       
        "l1_fit_ultrametric_target",
        "cl_validity",
        "n_of_objects",
@@ -62,6 +64,9 @@ S3method("Ops", "cl_partition")
 S3method("Summary", "cl_hierarchy")
 S3method("Summary", "cl_partition")
 S3method("Summary", "cl_partition_ensemble")
+
+S3method("as.cl_addtree", "default")
+S3method("as.cl_addtree", "phylo")
 
 S3method("as.cl_membership", "default")
 S3method("as.cl_membership", "matrix")
@@ -131,6 +136,7 @@ S3method("cl_object_names", "default")
 S3method("cl_object_names", "dist")
 S3method("cl_object_names", "hclust")
 S3method("cl_object_names", "mona")
+S3method("cl_object_names", "phylo")
 S3method("cl_object_names", "twins")
 
 S3method("cl_predict", "Weka_clusterer")
@@ -177,6 +183,7 @@ S3method("is.cl_dendrogram", "cl_dendrogram")
 S3method("is.cl_dendrogram", "default")
 S3method("is.cl_dendrogram", "hclust")
 S3method("is.cl_dendrogram", "mona")
+S3method("is.cl_dendrogram", "phylo")
 S3method("is.cl_dendrogram", "twins")
 
 S3method("is.cl_hard_partition", "Mclust")
@@ -202,6 +209,7 @@ S3method("is.cl_hierarchy", "cl_hierarchy")
 S3method("is.cl_hierarchy", "default")
 S3method("is.cl_hierarchy", "hclust")
 S3method("is.cl_hierarchy", "mona")
+S3method("is.cl_hierarchy", "phylo")
 S3method("is.cl_hierarchy", "twins")
 
 S3method("is.cl_partition", "Mclust")
@@ -251,6 +259,7 @@ S3method("n_of_objects", "kmeans")
 S3method("n_of_objects", "mona")
 S3method("n_of_objects", "partition")
 S3method("n_of_objects", "pclust")
+S3method("n_of_objects", "phylo")
 S3method("n_of_objects", "twins")
 
 S3method("names", "cl_proximity")

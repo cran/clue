@@ -53,6 +53,11 @@ n_of_objects.twins <- n_of_objects.hclust
 ## Package cluster: mona().
 n_of_objects.mona <- n_of_objects.hclust
 
+## Package ape: class "phylo".
+n_of_objects.phylo <-
+function(x)
+    length(x$tip.label)
+
 ### ** Others.
 
 ## Package stats: class "dist".
@@ -133,6 +138,11 @@ function(x)
         NULL
 }
 cl_object_names.mona <- cl_object_names.twins
+
+## Package ape: class "phylo".
+cl_object_names.phylo <-
+function(x)
+    x$tip.label
 
 ## ** Others.
 

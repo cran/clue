@@ -37,7 +37,7 @@ function(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
                        description = description),
                   class = "cl_pam")
 
-    if(k == 1) {
+    if(k == 1L) {
         ## Simplify matters if a global medoid is sought.
         dissimilarities <-
             cl_dissimilarity(clusterings, method = method)

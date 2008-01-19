@@ -90,7 +90,7 @@ cl_join(x, y)
   partitions or dendrograms, respectively.
 }
 \references{
-  J.-P. Barthélémy and B. Leclerc and B. Monjardet (1981).
+  J.-P. Barthélémy, B. Leclerc and B. Monjardet (1981).
   On the use of ordered sets in problems of comparison and consensus of
   classification.
   \emph{Journal of Classification}, \bold{3}, 187--224.

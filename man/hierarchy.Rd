@@ -33,7 +33,7 @@ as.cl_dendrogram(x)
 
   The methods provided in package \pkg{clue} handle the partitions and
   hierarchies obtained from clustering functions in the base R
-  distribution, as well as packages \pkg{RWeka}, \pkg{cba},
+  distribution, as well as packages \pkg{RWeka}, \pkg{ape}, \pkg{cba},
   \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, \pkg{flexclust},
   \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and of course,
   \pkg{clue} itself).
@@ -58,9 +58,16 @@ as.cl_dendrogram(x)
   The classes of a hierarchy can be obtained by
   \code{\link{cl_classes}}.
 
-  Dendrograms correspond to dissimilarities on \eqn{X} which satisfy the
-  ultrametric (3-point) conditions \eqn{u_{ij} \le \max(u_{ik}, u_{jk})}
-  for all triples \eqn{(i, j, k)} of objects.
+  Dendrograms are \eqn{n}-trees where additionally a height \eqn{h} is
+  associated with each of the classes, so that for two classes \eqn{A}
+  and \eqn{B} with non-empty intersection we have \eqn{h(A) \le h(B)}
+  iff \eqn{A} is a subset of \eqn{B}.  For each pair of objects one can
+  then define \eqn{u_{ij}} as the height of the smallest class
+  containing both \eqn{i} and \eqn{j}: this results in a dissimilarity
+  on \eqn{X} which satisfies the ultrametric (3-point) conditions
+  \eqn{u_{ij} \le \max(u_{ik}, u_{jk})} for all triples \eqn{(i, j, k)}
+  of objects.  Conversely, an ultrametric dissimilarity induces a unique
+  dendrogram.
 
   The ultrametric dissimilarities of a dendrogram can be obtained by
   \code{\link{cl_ultrametric}}.

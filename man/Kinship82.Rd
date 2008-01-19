@@ -28,7 +28,7 @@
   \dQuote{niece} columns interchanged.
 }
 \references{
-  P. Arabie and J. D. Carroll and W. S. de Sarbo (1987).
+  P. Arabie, J. D. Carroll and W. S. de Sarbo (1987).
   \emph{Three-way scaling and clustering}.
   Newbury Park, CA: Sage.
   

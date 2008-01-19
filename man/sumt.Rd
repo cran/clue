@@ -23,8 +23,9 @@ sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
     carried out using \code{\link[stats]{nlm}}.  Otherwise,
     \code{\link[stats]{optim}} is used with \code{method} as the given
     method.}
-  \item{eps}{the absolute convergence tolerance.
-    Defaults to \code{sqrt(.Machine$double.eps)}.}
+  \item{eps}{the absolute convergence tolerance.  The algorithm stops if
+    the (maximum) distance between successive \code{x} values is
+    less than \code{eps}.  Defaults to \code{sqrt(.Machine$double.eps)}.}
   \item{q}{a double greater than one controlling the growth of the
     \eqn{\rho_k} as described in \bold{Details}.
     Defaults to 10.}
@@ -59,6 +60,13 @@ sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
   If more than one starting value is given, the solution with the
   minimal augmented criterion function value is returned.
 }
+\value{
+  A list inheriting from class \code{"sumt"}, with components \code{x},
+  \code{L}, \code{P}, and \code{rho} giving the solution obtained, the
+  value of the criterion and penalty function at \code{x}, and the final
+  \eqn{\rho} value used in the augmented criterion function. 
+}
+
 \references{
   A. V. Fiacco and G. P. McCormick (1968).
   \emph{Nonlinear programming: Sequential unconstrained minimization

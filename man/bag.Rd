@@ -34,7 +34,7 @@ cl_bag(x, B, k = NULL, algorithm = "kmeans", parameters = NULL,
   than a specific algorithm.  If the primary partitions generated in the
   bootstrap stage form a cluster ensemble (so that class memberships of
   the objects in \code{x} can be obtained), consensus methods for
-  cluster ensembles (as e.g. implemented in \code{\link{cl_consensus}}
+  cluster ensembles (as implemented, e.g., in \code{\link{cl_consensus}}
   and \code{\link{cl_medoid}}) can be employed for the aggregation
   stage.  In particular, (possibly new) bagging algorithms can easily be
   realized by directly running \code{\link{cl_consensus}} on the results
@@ -53,11 +53,11 @@ cl_bag(x, B, k = NULL, algorithm = "kmeans", parameters = NULL,
   \pkg{e1071}.
 }
 \references{
-  S. Dudoit and J. Fridlyand (2003),
+  S. Dudoit and J. Fridlyand (2003).
   Bagging to improve the accuracy of a clustering procedure.
   \emph{Bioinformatics}, \bold{19}/9, 1090--1099.
   
-  F. Leisch (1999),
+  F. Leisch (1999).
   \emph{Bagged Clustering}.
   Working Paper 51, SFB \dQuote{Adaptive Information Systems and
     Modeling in Economics and Management Science}.

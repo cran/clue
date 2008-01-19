@@ -44,11 +44,11 @@ kmedoids(x, k)
   it may not be possible to obtain a solution.
 }
 \references{
-  Kaufman, L. and Rousseeuw, P.J. (1990),
+  L. Kaufman and P. J. Rousseeuw (1990).
   \emph{Finding Groups in Data: An Introduction to Cluster Analysis}.
   Wiley, New York.
 
-  A. D. Gordon and M. Vichi (1998),
+  A. D. Gordon and M. Vichi (1998).
   Partitions of partitions.
   \emph{Journal of Classification}, \bold{15}, 265--285.
 }  

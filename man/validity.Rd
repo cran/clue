@@ -62,7 +62,7 @@ cl_validity(x, ...)
   coefficients are provided in addition to the default ones.
 }
 \references{
-  L. Hubert and P. Arabie and J. Meulman (2006).
+  L. Hubert, P. Arabie and J. Meulman (2006).
   \emph{The structural representation of proximity matrices with
     MATLAB}.
   Philadelphia, PA: SIAM.
