@@ -182,7 +182,7 @@ function(x, weights = 1, control = list())
         }
     } else if(is.null(nruns)) {
         ## Use nruns only if start is not given.
-        nruns <- 1
+        nruns <- 1L
     }
 
     ## If x is an ultrametric, or satisfies the ultrametricity
@@ -305,7 +305,7 @@ function(x, weights = 1, control = list())
     }
     else {
         if(is.null(nruns))
-            nruns <- 1
+            nruns <- 1L
         order <- replicate(nruns, sample(n), simplify = FALSE)
     }
 
@@ -381,7 +381,7 @@ function(x, weights = 1, control = list())
     }
     else {
         if(is.null(nruns))
-            nruns <- 1
+            nruns <- 1L
         order <- replicate(nruns, sample(n), simplify = FALSE)
     }
 
@@ -573,7 +573,7 @@ function(x, weights = 1, control = list())
         }
     } else if(is.null(nruns)) {
         ## Use nruns only if start is not given.
-        nruns <- 1
+        nruns <- 1L
     }
 
     ## For the time being, use a simple minimizer.

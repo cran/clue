@@ -62,7 +62,18 @@ function(x, k, method = NULL, m = 1, weights = 1, control = list())
                                        dmatrix = dissimilarities),
                             validity =
                             cl_validity(out$membership,
-                                        dissimilarities))),
+                                        dissimilarities),
+                            ## <NOTE>
+                            ## Information about d and e is also in the
+                            ## family returned, of course.  Trying to be
+                            ## nice to users by "directly" providing d
+                            ## and e is currently of limited usefulness
+                            ## as the pclust representation is not
+                            ## directly available to users.
+                            d = d,
+                            e = e
+                            ## </NOTE>
+                            )),
                      class = unique(c("cl_pclust", class(out))))
 
     as.cl_partition(out)
@@ -92,14 +103,31 @@ function(x, k, family, m = 1, weights = 1, control = list())
     ## prototype-based partitioning.
     
     ## For now, assume family specifies three functions:
-    ## * A dissimilarity function D() for data and a LIST of prototypes.
+    ## * A dissimilarity function D() for data and prototypes.
     ## * A consensus function C() for data, weights and control.
-    ## * An init function init() of data and k giving an initial LIST of
-    ##   k prototypes.
-
-    ## <NOTE>
+    ## * An init function init() of data and k giving an initial object
+    ##   of k prototypes.
+    ##
     ## We use k as the second argument as this seems to be common
     ## practice for partitioning algorithms.
+
+    ## <NOTE>
+    ## We assume that consensus functions can all handle WEIGHTS
+    ## (formals: x, weights, control; only used positionally).
+    ## <NOTE>
+    
+    ## <NOTE>
+    ## We now allow for arbitrary representations/objects of prototypes.
+    ## What is needed are functions to modify a *single* prototype and
+    ## subset the prototypes.  By default, list and matrix (with the
+    ## usual convention that rows are "objects") representations are
+    ## supported.  Otherwise, the family needs to provide suitable
+    ## .modify() and .subset() functions.
+    ## The approach relies on having the initializer of the family
+    ## (init()) return an appropriate object of prototypes.
+    ## It would be possible to have default initializers as well to
+    ## randomly subset the data (i.e., select elements of lists or rows
+    ## of matrices, respectively).
     ## </NOTE>
 
     ## <NOTE>
@@ -123,14 +151,6 @@ function(x, k, family, m = 1, weights = 1, control = list())
     ## </NOTE>
 
     ## <NOTE>
-    ## We use a LIST of prototypes as we eventually need to be able to
-    ## modify the i-th prototype (and it seems awkward to handle matrix
-    ## representations).  Similarly, we assume that consensus functions
-    ## can all handle WEIGHTS (formals: x, weights, control; only used
-    ## positionally).
-    ## <NOTE>
-
-    ## <NOTE>
     ## If people have code for computing cross-dissimilarities for the
     ## data and a *single* prototype (say, xd()), they can easily wrap
     ## into what is needed using
@@ -144,6 +164,8 @@ function(x, k, family, m = 1, weights = 1, control = list())
     D <- family$D
     C <- family$C
     e <- family$e
+    .modify <- family$.modify
+    .subset <- family$.subset
 
     maxiter <- control$maxiter
     if(is.null(maxiter))
@@ -168,7 +190,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
     } else {
         if(is.null(nruns)) {
             ## Use nruns only if start is not given.
-            nruns <- 1
+            nruns <- 1L
         }
         start <- replicate(nruns, family$init(x, k), simplify = FALSE)
     }
@@ -180,6 +202,33 @@ function(x, k, family, m = 1, weights = 1, control = list())
     prototypes <- start[[1L]]
     dissimilarities <- D(x, prototypes) ^ e
     B <- NROW(dissimilarities)
+    ## Also try to figure out (if necessary) how to modify a single
+    ## prototype and to subset the prototypes.
+    if(is.null(.modify)) {
+        if(is.list(prototypes))
+            .modify <- function(x, i, value) {
+                x[[i]] <- value
+                x
+            }
+        else if(is.matrix(prototypes))
+            .modify <- function(x, i, value) {
+                x[i, ] <- value
+                x
+            }
+        else stop("Cannot determine how to modify prototypes.")
+    } else if(!is.function(.modify) ||
+            !identical(formals(args(.modify)), c("x", "i", "value")))
+        stop("Invalid function to modify prototypes.")
+    if(is.null(.subset)) {
+        if(is.list(prototypes))
+            .subset <- `[`
+        else if(is.matrix(prototypes))                 
+            .subset <- function(x, i)
+                x[i, , drop = FALSE]
+        else stop("Cannot determine how to subset prototypes.")
+    } else if(!is.function(.subset) ||
+            !identical(formals(args(.subset)), c("x", "i")))
+        stop("Invalid function to subset prototypes.")
 
     weights <- rep(weights, length.out = B)
     if(any(weights < 0))
@@ -210,8 +259,10 @@ function(x, k, family, m = 1, weights = 1, control = list())
             while(iter <= maxiter) {
                 class_ids_used <- unique(class_ids)
                 for(j in class_ids_used)
-                    prototypes[[j]] <-
-                        C(x, weights * (class_ids %in% j), control)
+                    prototypes <-
+                        .modify(prototypes, j, 
+                                C(x, weights * (class_ids %in% j),
+                                  control))
                 dissimilarities <- D(x, prototypes) ^ e
                 class_ids <- max.col( - dissimilarities )
                 ## Try avoiding degenerate solutions.
@@ -224,10 +275,12 @@ function(x, k, family, m = 1, weights = 1, control = list())
                     ## Find and recompute unused prototypes.
                     unused <- setdiff(seq_len(k), class_ids_used)
                     for(j in seq_along(unused))
-                        prototypes[[unused[j]]] <-
-                            C(x, .make_unit_weights(B, o[j]), control)
+                        prototypes <-
+                            .modify(prototypes, unused[j],
+                                    C(x, .make_unit_weights(B, o[j]),
+                                      control))
                     dissimilarities[, unused] <-
-                        D(x, prototypes[unused]) ^ e
+                        D(x, .subset(prototypes, unused)) ^ e
                     class_ids <- max.col( - dissimilarities )
                     ## For the time being, do not retry in case the
                     ## solution is still degenerate.
@@ -281,7 +334,9 @@ function(x, k, family, m = 1, weights = 1, control = list())
                 ## I.e., p_j is the *weighted* consensus of the x_b with
                 ## corresponding weights u_{bj}^m.
                 for(j in seq_len(k)) {
-                    prototypes[[j]] <- C(x, weights * u[, j] ^ m, control)
+                    prototypes <-
+                        .modify(prototypes, j,
+                                C(x, weights * u[, j] ^ m, control))
                 }
                 ## Update u.
                 dissimilarities <- D(x, prototypes) ^ e
@@ -362,7 +417,8 @@ function(x, header = TRUE, ...)
 ### * pclust_family
 
 pclust_family <-
-function(D, C, init = NULL, description = NULL, e = 1)
+function(D, C, init = NULL, description = NULL, e = 1,
+         .modify = NULL, .subset = NULL)
 {
     ## Add checking formals (lengths) eventually ...
     if(is.null(init)) {
@@ -370,7 +426,8 @@ function(D, C, init = NULL, description = NULL, e = 1)
         init <- function(x, k) sample(x, k)
     }
     structure(list(description = description,
-                   D = D, C = C, init = init, e = e),
+                   D = D, C = C, init = init, e = e,
+                   .modify = .modify, .subset = .subset),
               class = "pclust_family")
 }
 
