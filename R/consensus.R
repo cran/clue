@@ -222,7 +222,8 @@ function(clusterings, weights, control,
             M <- cbind(M, matrix(0, nrow(M), k_all - k))
         memberships <- lapply(memberships, match_memberships, M)
         old_value <- value(M, memberships, w)
-        message(gettextf("Iteration: 0 *** value: %g", old_value))
+        if(verbose)
+            message(gettextf("Iteration: 0 *** value: %g", old_value))
         iter <- 1L
         while(iter <= maxiter) {
             ## Fit M to the M_b P_b.
@@ -754,7 +755,7 @@ function(clusterings, weights, control)
     } else {
         if(is.null(nruns)) {
             ## Use nruns only if start is not given.
-            nruns <- 1
+            nruns <- 1L
         }
         e <- eigen(Y, symmetric = TRUE)
         ## Use M <- U_k \lambda_k^{1/2}, or random perturbations
@@ -763,7 +764,7 @@ function(clusterings, weights, control)
             rep(sqrt(e$values[seq_len(k)]), each = n)
         m <- c(M)
         start <- c(list(m),
-                   replicate(nruns - 1,
+                   replicate(nruns - 1L,
                              m + rnorm(length(m), sd = sd(m) / sqrt(3)),
                              simplify = FALSE))
     }
@@ -821,7 +822,7 @@ function(clusterings, weights, control)
         }
     } else if(is.null(nruns)) {
         ## Use nruns only if start is not given.
-        nruns <- 1
+        nruns <- 1L
     }
     
     max_n_of_classes <- max(sapply(clusterings, n_of_classes))
@@ -848,7 +849,7 @@ function(clusterings, weights, control)
     } else {
         if(is.null(nruns)) {
             ## Use nruns only if start is not given.
-            nruns <- 1
+            nruns <- 1L
         }
         ## Try using a rank k "root" of the weighted median of the
         ## comemberships as starting value.
@@ -861,7 +862,7 @@ function(clusterings, weights, control)
             rep(sqrt(e$values[seq_len(k)]), each = n)
         m <- c(M)
         start <- c(list(m),
-                   replicate(nruns - 1,
+                   replicate(nruns - 1L,
                              m + rnorm(length(m), sd = sd(m) / sqrt(3)),
                              simplify = FALSE))
     }
@@ -1135,14 +1136,14 @@ function(clusterings, weights, control)
         }
     } else if(is.null(nruns)) {
         ## Use nruns only if start is not given.
-        nruns <- 1
+        nruns <- 1L
     }
     
     w <- weights / sum(weights)
     B <- length(clusterings)
     ultrametrics <- lapply(clusterings, cl_ultrametric)
     
-    if(B == 1)
+    if(B == 1L)
         return(as.cl_dendrogram(ultrametrics[[1L]]))
 
     n <- n_of_objects(ultrametrics[[1L]])

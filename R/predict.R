@@ -240,7 +240,7 @@ function(object, newdata = NULL,
     if(is.null(newdata))
         return(.cl_class_ids_or_membership(object, type))
 
-    d <- object$family$d(newdata, object$prototypes)
+    d <- object$family$D(newdata, object$prototypes)
     power <- c(object$m, object$family$e)
     M <- .memberships_from_cross_dissimilarities(d, power)
     .as_cl_class_ids_or_membership(M, type)
@@ -271,8 +271,14 @@ function(x, type = c("class_ids", "memberships"))
 {
     type <- match.arg(type)
 
-    if(type == "class_ids")
-        as.cl_class_ids(x)
+    if(type == "class_ids") {
+        if(is.matrix(x)) {
+            ## Same as for cl_class_ids.cl_membership().
+            as.cl_class_ids(structure(max.col(x), names = rownames(x)))
+        }
+        else
+            as.cl_class_ids(x)
+    }
     else
         as.cl_membership(x)
 }

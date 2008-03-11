@@ -32,7 +32,7 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
 \value{
   An object of class \code{"cl_partition"} representing the obtained 
   \dQuote{secondary} partition by an object of class \code{"cl_pclust"},
-  which is a list with the following components.
+  which is a list containing at least the following components.
   \item{prototypes}{a cluster ensemble with the \eqn{k} prototypes.}
   \item{membership}{an object of class \code{"\link{cl_membership}"}
     with the membership values \eqn{u_{bj}}.}

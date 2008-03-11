@@ -63,7 +63,7 @@ function(x, weights = 1, control = list())
         }
     } else if(is.null(nruns)) {
         ## Use nruns only if start is not given.
-        nruns <- 1
+        nruns <- 1L
     }
 
     w <- weights / sum(weights)
@@ -176,7 +176,7 @@ function(x, weights = 1, control = list())
     }
     else {
         if(is.null(nruns))
-            nruns <- 1
+            nruns <- 1L
         order <- replicate(nruns, sample(n), simplify = FALSE)
     }
 
@@ -249,7 +249,7 @@ function(x, weights = 1, control = list())
     }
     else {
         if(is.null(nruns))
-            nruns <- 1
+            nruns <- 1L
         order <- replicate(nruns, sample(n), simplify = FALSE)
     }
 
