@@ -4,5 +4,3 @@
 
 .false <- function(x) FALSE
 .true <- function(x) TRUE
-
-.identity <- function(x) x

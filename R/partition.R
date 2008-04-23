@@ -148,7 +148,7 @@ function(x)
     as.cl_class_ids(relations::relation_class_ids(x))
 
 ## Package clue: Class ids.
-cl_class_ids.cl_class_ids <- .identity
+cl_class_ids.cl_class_ids <- identity
 ## Package clue: Memberships.
 cl_class_ids.cl_membership <-
 function(x)
