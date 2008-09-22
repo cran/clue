@@ -127,7 +127,7 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
     if(is.matrix(weights)) {
         weights <- as.dist(weights)
         if(length(weights) != length(x))
-            stop("Arguments 'weights' must be compatible with 'x'.")
+            stop("Argument 'weights' must be compatible with 'x'.")
     }
     else
         weights <- rep(weights, length.out = length(x))
@@ -493,7 +493,7 @@ function(weights, x)
     ## This is somewhat tricky ...
     if(is.matrix(weights)) {
         if(any(dim(weights) != attr(x, "Size")))
-            stop("Arguments 'weights' must be compatible with 'x'.")
+            stop("Argument 'weights' must be compatible with 'x'.")
     }
     else
         weights <-
@@ -531,7 +531,7 @@ function(x, method = c("SUMT", "IRIP"), weights = 1,
     if(is.matrix(weights)) {
         weights <- as.dist(weights)
         if(length(weights) != length(x))
-            stop("Arguments 'weights' must be compatible with 'x'.")
+            stop("Argument 'weights' must be compatible with 'x'.")
     }
     else
         weights <- rep(weights, length.out = length(x))

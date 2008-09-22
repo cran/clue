@@ -109,7 +109,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       The reference provides some structure theory relating finding
       the consensus partition to an instance of the multiple assignment
       problem, which is known to be NP-hard, and suggests a simple
-      heuristic based on successively matching an individual partitions
+      heuristic based on successively matching an individual partition
       \eqn{x_b} to the current approximation to the consensus partition,
       and compute the memberships of the next approximation as a
       weighted average of those of the current one and of \eqn{x_b}
@@ -203,8 +203,10 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       with a given maximal number of classes as specified by the control
       parameter \code{k}), where \eqn{d} is symdiff partition
       dissimilarity (so that soft partitions in the ensemble are
-      replaced by their closest hard partitions).  The consensus
-      solution is found via mixed linear or quadratic programming.
+      replaced by their closest hard partitions), or equivalently, Rand
+      distance or pair-bonds (Boorman-Arabie \eqn{D}) distance.  The
+      consensus solution is found via mixed linear or quadratic
+      programming.
     }
   }
   

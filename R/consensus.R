@@ -870,6 +870,9 @@ function(clusterings, weights, control)
     L <- function(m) {
         M <- matrix(m, n)
         C_M <- tcrossprod(M)
+        ## Note that here (as opposed to hard/symdiff) we take soft
+        ## partitions as is without replacing them by their closest hard
+        ## partitions.
         sum(w * sapply(comemberships,
                        function(C) sum(abs(C_M - C))))
     }
@@ -915,190 +918,37 @@ function(clusterings, weights, control)
     comemberships <-
         lapply(clusterings,
                function(x) {
-                   ## (Simpler than using tcrossprod() on
-                   ## cl_membership().)
+                   ## Here, we always turn possibly soft partitions to
+                   ## their closest hard partitions.
                    ids <- cl_class_ids(x)
                    outer(ids, ids, "==")
+                   ## (Simpler than using tcrossprod() on
+                   ## cl_membership().)
                })
 
-    ## Cf. relations:::.make_fit_relation_symdiff_M().
-    M <- array(rowSums(mapply("*", comemberships, weights)),
-               dim = dim(comemberships[[1L]]))
-    M <- 2 * M - sum(weights)
+    ## Could also create a relation ensemble from the comemberships and
+    ## call relation_consensus().
 
+    M <- relations:::.make_fit_relation_symdiff_M(comemberships,
+                                                  weights)
     k <- control$k
+    control <- control$control
+    ## Note that currently we provide no support for finding *all*
+    ## consensus partitions (but allow for specifying the solver).
+    control$all <- FALSE
     I <- if(!is.null(k)) {
         ## <NOTE>
         ## We could actually get the memberships directly in this case.
-        .fit_relation_symdiff_E_k(M, k)
+        relations:::fit_relation_symdiff_E_k(M, k, control)
         ## </NOTE>
     }
     else
-        .fit_relation_symdiff_E(M)
+        relations:::fit_relation_symdiff(M, "E", control)
 
-    ids <- get_class_ids_from_incidence(I)
+    ids <- relations:::get_class_ids_from_incidence(I)
     names(ids) <- cl_object_names(clusterings)
 
     as.cl_hard_partition(ids)
-}
-
-## How can we get from the comemberships of a hard partition to the
-## corresponding memberships?  For the time being, duplicate
-## relations:::get_class_ids_from_incidence:
-
-get_class_ids_from_incidence <-
-function(x)
-{
-    ## Ugly ...
-    y <- integer(nrow(x))
-    c <- 1
-    pos <- seq_along(y)
-    while(length(pos)) {
-        ind <- x[pos[1L], pos] == 1
-        y[pos[ind]] <- c
-        pos <- pos[!ind]
-        c <- c + 1
-    }
-    y
-}
-
-## Copied "as is" from relations:
-
-.fit_relation_symdiff_E_k <-
-function(C, nc)
-{
-    ## Fit equivalence with at most nc classes.
-
-    ## Using the membership matrix M = [m_{ik}] corresponding to the
-    ## equivalence relation (partition), we have to maximize
-    ##   \sum_{i,j,k} c_{ij} m_{ik} m_{jk}
-    ## over all binary stochastic matrices M.  This is done by a simple
-    ## linearization of the quadratic integer program.
-    ##
-    ## Let
-    no <- nrow(C)
-    ## be the number of objects.  Then the membership matrix M is a
-    ## binary stochastic no x nc matrix.  There are no^2 x nc products
-    ## y_{ijk} = m_{ik} m_{jk}.  For each we have the constraints
-    ##    y_{ijk} - m_{ik} - m_{jk} >= -1,
-    ##    y_{ijk} - m_{ik}          <=  0
-    ##    y_{ijk}          - m_{jk} <=  0
-    ## and each y_{ijk} gets coefficient c_{ij} in the objective
-    ## function.
-
-    ## We put all decision variables into a matrix [c(Y), c(M)] (so that
-    ## the Y part has k "blocks" because k varies the slowest).
-
-    n_of_y_variables <- no ^ 2 * nc
-    n_of_m_variables <- no * nc
-    n_of_variables <- n_of_y_variables + n_of_m_variables
-
-    pos_m <- function(i, k) {
-        ## Position of variable m_{ik}.
-        n_of_y_variables + i + (k - 1) * no
-    }
-
-    ind_o <- seq_len(no)
-    ind_y <- seq_len(n_of_y_variables)
-    z <- as.matrix(expand.grid(ind_o, ind_o, seq_len(nc)))
-    
-    ## Build the three constraint objects:
-    constraint_mat <- matrix(0, 3 * n_of_y_variables, n_of_variables)
-    pos <- seq_len(n_of_y_variables)
-    constraint_mat[cbind(pos, ind_y)] <- 1    
-    constraint_mat[cbind(pos, pos_m(z[, 1L], z[, 3L]))] <- -1
-    constraint_mat[cbind(pos, pos_m(z[, 2L], z[, 3L]))] <- -1
-    pos <- pos + n_of_y_variables
-    constraint_mat[cbind(pos, ind_y)] <- 1
-    constraint_mat[cbind(pos, pos_m(z[, 1L], z[, 3L]))] <- -1
-    pos <- pos + n_of_y_variables
-    constraint_mat[cbind(pos, ind_y)] <- 1
-    constraint_mat[cbind(pos, pos_m(z[, 2L], z[, 3L]))] <- -1
-    constraint_dir <- c(rep.int(">=", n_of_y_variables),
-                        rep.int("<=", 2 * n_of_y_variables))
-    constraint_rhs <- c(rep.int(-1, n_of_y_variables),
-                        rep.int(0, 2 * n_of_y_variables))
-    ## (And don't forget that we need a binary stochastic matrix M.)
-    constraint_mat <-
-        rbind(constraint_mat,
-              cbind(matrix(0, no, n_of_y_variables),
-                    kronecker(rbind(rep.int(1, nc)), diag(1, no))))
-    constraint_dir <- c(constraint_dir, rep.int("=", no))
-    constraint_rhs <- c(constraint_rhs, rep.int(1, no))
-
-    ## Set up augmented target function.
-    objective_in <- c(rep.int(c(C), nc), double(n_of_m_variables))
-
-    integer_positions <- seq_len(n_of_m_variables) + n_of_y_variables
-
-    y <- lpSolve::lp("max",
-                     objective_in,
-                     constraint_mat,
-                     constraint_dir,
-                     constraint_rhs,
-                     int.vec = integer_positions)
-
-    M <- matrix(y$solution[integer_positions], ncol = nc)
-
-    ## Return incidences.
-    tcrossprod(M)
-    
-}
-               
-## Simplied from relations:::fit_relation_symdiff() for dealing with
-## equivalences only.
-
-.fit_relation_symdiff_E <-
-function(x)
-{
-    n <- nrow(x)
-
-    objective_in <- (x + t(x))[upper.tri(x)]
-
-    NP <- n * (n - 1) / 2
-    NC <- n * (n - 1) * (n - 2) / 2
-
-    .make_transitivity_constraint_matrix <- function() {
-        if(n <= 2) return(matrix(0, 0, NP))
-        pos <- function(i, j) i + (j - 1) * (j - 2) / 2
-        ind <- seq_len(n)
-        z <- as.matrix(expand.grid(ind, ind, ind))[, c(3L, 2L, 1L)]
-        z <- z[(z[, 1L] < z[, 2L]) & (z[, 2L] < z[, 3L]), , drop = FALSE]
-        p_ij <- pos(z[, 1L], z[, 2L])
-        p_ik <- pos(z[, 1L], z[, 3L])
-        p_jk <- pos(z[, 2L], z[, 3L])
-        ind <- seq_len(NC)
-        out <- matrix(0, NC, NP)
-        out[cbind(ind, c(p_ij, p_ij, p_ik))] <- 1
-        out[cbind(ind, c(p_jk, p_ik, p_jk))] <- 1
-        out[cbind(ind, c(p_ik, p_jk, p_ij))] <- -1
-        out
-    }
-
-    constr_mat <-
-        rbind(diag(1, NP),
-              diag(1, NP),
-              .make_transitivity_constraint_matrix())
-    constr_dir <- 
-        c(rep.int(">=", NP),
-          rep.int("<=", NP),
-          rep.int("<=", NC))
-    constr_rhs <-
-        c(rep.int(0, NP),
-          rep.int(1, NP),
-          rep.int(1, NC))
-
-    require("lpSolve")
-    out <- lpSolve::lp("max", 
-                       objective_in,
-                       constr_mat,
-                       constr_dir,
-                       constr_rhs,
-                       int.vec = seq_len(NP))
-    
-    I <- diag(1 / 2, n, n)
-    I[upper.tri(I)] <- round(out$solution)
-    I <- I + t(I)
 }
     
 ### * .cl_consensus_hierarchy_cophenetic
