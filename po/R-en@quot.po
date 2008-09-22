@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: clue\n"
-"Report-Msgid-Bugs-To: Kurt.Hornik@R-project.org\n"
-"POT-Creation-Date: 2008-01-19 12:25\n"
-"PO-Revision-Date: 2008-01-19 12:33+0100\n"
+"Report-Msgid-Bugs-To: bugs@r-project.org\n"
+"POT-Creation-Date: 2008-08-27 08:06\n"
+"PO-Revision-Date: 2008-08-27 08:07+0200\n"
 "Last-Translator: Kurt Hornik <Kurt.Hornik@R-project.org>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -11,8 +11,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Arguments 'weights' must be compatible with 'x'."
-msgstr "Arguments ‘weights’ must be compatible with ‘x’."
+msgid "Argument 'weights' must be compatible with 'x'."
+msgstr "Argument ‘weights’ must be compatible with ‘x’."
 
 msgid "Argument 'weights' has negative elements."
 msgstr "Argument ‘weights’ has negative elements."
@@ -116,8 +116,8 @@ msgstr "Argument ‘x’ must be a partition."
 msgid "Cannot compute medoid of empty ensemble."
 msgstr "Cannot compute medoid of empty ensemble."
 
-msgid "Cannot medoid partition of empty ensemble."
-msgstr "Cannot medoid partition of empty ensemble."
+msgid "Cannot compute medoid partition of empty ensemble."
+msgstr "Cannot compute medoid partition of empty ensemble."
 
 msgid "Class ids:"
 msgstr "Class ids:"
@@ -172,6 +172,18 @@ msgid ""
 msgstr ""
 "A soft partition (degree m = %f) of a cluster ensemble with %d elements into "
 "%d classes."
+
+msgid "Cannot determine how to modify prototypes."
+msgstr "Cannot determine how to modify prototypes."
+
+msgid "Invalid function to modify prototypes."
+msgstr "Invalid function to modify prototypes."
+
+msgid "Cannot determine how to subset prototypes."
+msgstr "Cannot determine how to subset prototypes."
+
+msgid "Invalid function to subset prototypes."
+msgstr "Invalid function to subset prototypes."
 
 msgid "Pclust run: %d"
 msgstr "Pclust run: %d"

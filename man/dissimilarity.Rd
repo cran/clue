@@ -58,8 +58,10 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       difference of the corresponding nearest hard partitions is used.}
     \item{\code{"Rand"}}{the Rand distance, i.e., the rate of distinct
       pairs of objects in the same class in exactly one of the
-      partitions.  For soft partitions, (currectly) the Rand distance of
-      the corresponding nearest hard partitions is used.}
+      partitions.  (Related to the Rand index \eqn{a} via the linear
+      transformation \eqn{d = (1 - a) / 2}.)  For soft partitions,
+      (currectly) the Rand distance of the corresponding nearest hard
+      partitions is used.}
     \item{\code{"GV1"}}{the square root of the dissimilarity
       \eqn{\Delta_1}{Delta_1} used for the first model in Gordon and
       Vichi (2001), i.e., the square root of the minimal sum of the
@@ -92,10 +94,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       where the \eqn{n_i} are the numbers of objects in the respective
       classes of the partition (such that \eqn{n_i (n_i - 1) / 2} are the
       numbers of pair bonds in the classes), and \eqn{n} the total
-      number of objects.  This is identical to Rand distance, and can
-      also be written as the Manhattan distance between the
-      co-membership matrices corresponding to \code{x} and \code{y},
-      normalized by \eqn{n (n - 1)}.
+      number of objects.
 
       \code{"BA/E"} is the normalized information distance, defined as
       \eqn{1 - I / H}, where \eqn{I} is the average mutual information
@@ -132,6 +131,12 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   objects needed to transform one partition into the other, and the
   \emph{partition-distance} in Gusfield (2002), and equals twice the
   number of single element moves distance of Boorman and Arabie.
+
+  For hard partitions, the pair-bonds (Boorman-Arabie \eqn{D}) distance
+  is identical to the Rand distance, and can also be written as the
+  Manhattan distance between the co-membership matrices corresponding to
+  the partitions, or equivalently, their symdiff distance, normalized by
+  \eqn{n (n - 1)}.
 
   If all components are hierarchies, available built-in methods for
   measuring dissimilarity between two hierarchies with respective

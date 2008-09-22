@@ -23,7 +23,7 @@ function(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
 
     clusterings <- as.cl_ensemble(x)
     if(!length(clusterings))
-        stop("Cannot medoid partition of empty ensemble.")
+        stop("Cannot compute medoid partition of empty ensemble.")
 
     ## Actually, we should have at least k distinct elements in the
     ## ensemble ...
