@@ -215,10 +215,10 @@ function(x, y, weights = 1)
     weights <- weights / sum(weights)
     M_x <- cl_membership(x)
     ## Weighted marginal distribution of x:
-    m_x <- rowSums(weights * M_x)
+    m_x <- colSums(weights * M_x)
     M_y <- cl_membership(y)
     ## Weighted marginal distribution of y:
-    m_y <- rowSums(weights * M_y)
+    m_y <- colSums(weights * M_y)
     gamma <- crossprod(weights * M_x, M_y)
     delta <- outer(m_x, m_y)
     ## Entropy of x:
