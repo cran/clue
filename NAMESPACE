@@ -179,6 +179,8 @@ S3method("cl_validity", "pclust")
 S3method("cophenetic", "cl_ultrametric")
 S3method("cophenetic", "mona")
 
+S3method("cut", "cl_dendrogram")
+
 S3method("is.cl_dendrogram", "cl_dendrogram")
 S3method("is.cl_dendrogram", "default")
 S3method("is.cl_dendrogram", "hclust")
