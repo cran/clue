@@ -272,6 +272,15 @@ function(e1, e2)
 ## function(x, ...)
 ##     as.hclust(.get_representation(x), ...)
 
+### ** cut.cl_dendrogram
+
+## Not perfect as this perhaps return something more "classed" in the
+## spirit of clue ...
+
+cut.cl_dendrogram <-
+function(x, ...)
+    cutree(as.hclust(x), ...)
+
 ### * Utilities
 
 ## To turn a mona object into a cl_dendrogram, we need to be able to
