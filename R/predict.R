@@ -225,9 +225,22 @@ function(object, newdata = NULL,
 cl_predict.bclust <- cl_predict.kmeans
 ## </NOTE>
 
-# Package flexclust: kcca() returns objects of S4 class "kcca" which
+## Package flexclust: kcca() returns objects of S4 class "kcca" which
 ## extends S4 class "flexclust".
 cl_predict.kcca <- cl_predict.default
+
+## Package flexmix: class "flexmix".
+cl_predict.flexmix <-
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
+{
+    if(is.null(newdata))
+        return(.cl_class_ids_or_membership(object, type))
+    .as_cl_class_ids_or_membership(modeltools::posterior(object,
+                                                         newdata,
+                                                         ...),
+                                   type)
+}
 
 ## Package mclust: Ron Wehrens will add a predict method for Mclust
 ## objects eventually (as suggested by us).

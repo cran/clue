@@ -14,12 +14,13 @@ citEntry(entry = "Manual",
          },
          year = year,
          note = note,
-         url = "http://CRAN.R-project.org/",
+         url = "http://CRAN.R-project.org/package=clue",
          textVersion = {
              paste("Kurt Hornik",
                    sprintf("(%s).", year),                         
                    "clue: Cluster ensembles.",
                    note,
+		   "URL http://CRAN.R-project.org/package=clue",
                    sep = "  ")
          })
 

@@ -111,22 +111,22 @@ cl_class_ids.bclust <- cl_class_ids.kmeans
 ## extends S4 class "flexclust".
 ## <NOTE>
 ## We used to be able to call flexclust::cluster(), but this now only
-## has S4 methods for modeltools::cluster() S4 generic.  Let's call this
+## has S4 methods for modeltools::clusters() S4 generic.  Let's call this
 ## one, and hope that flexclust has been loaded ...
 ## </NOTE>
 cl_class_ids.kcca <-
 function(x)
-    as.cl_class_ids(modeltools::cluster(x))
+    as.cl_class_ids(modeltools::clusters(x))
 
 ## Package flexmix: class "flexmix".
 ## <NOTE>
 ## We used to be able to call flexmix::cluster(), but this now only has
-## S4 methods for modeltools::cluster() S4 generic.  Let's call this
+## S4 methods for modeltools::clusters() S4 generic.  Let's call this
 ## one, and hope that flexmix has been loaded ...
 ## </NOTE>
 cl_class_ids.flexmix <-
 function(x)
-    as.cl_class_ids(modeltools::cluster(x))
+    as.cl_class_ids(modeltools::clusters(x))
 
 ## Package kernlab: specc() and kkmeans() return objects of S4 class
 ## "specc".
