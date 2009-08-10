@@ -89,7 +89,7 @@ as.cl_dendrogram(x)
 
   There are group methods for comparing dendrograms and computing their
   minimum, maximum, and range based on the meet and join operations, see
-  \code{\link{cl_meet}}.  There is also a plot method.
+  \code{\link{cl_meet}}.  There is also a \code{plot} method.
 }
 \examples{
 hcl <- hclust(dist(USArrests))

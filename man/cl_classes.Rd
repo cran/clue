@@ -1,4 +1,4 @@
-\name{classes}
+\name{cl_classes}
 \alias{cl_classes}
 \title{Cluster Classes}
 \description{

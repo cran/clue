@@ -1,4 +1,4 @@
-\name{dissimilarity}
+\name{cl_dissimilarity}
 \encoding{UTF-8}
 \alias{cl_dissimilarity}
 \title{Dissimilarity Between Partitions or Hierarchies}
@@ -60,7 +60,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       pairs of objects in the same class in exactly one of the
       partitions.  (Related to the Rand index \eqn{a} via the linear
       transformation \eqn{d = (1 - a) / 2}.)  For soft partitions,
-      (currectly) the Rand distance of the corresponding nearest hard
+      (currently) the Rand distance of the corresponding nearest hard
       partitions is used.}
     \item{\code{"GV1"}}{the square root of the dissimilarity
       \eqn{\Delta_1}{Delta_1} used for the first model in Gordon and
@@ -77,7 +77,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       from one class to another or a new one) needed to transform one
       partition into the other.  Introduced in Rubin (1967).
 
-      \code{"BA/C"} is the mininum number of lattice moves for
+      \code{"BA/C"} is the minimum number of lattice moves for
       transforming one partition into the other, where partitions are
       said to be connected by a lattice move if one is \emph{just} finer
       than the other (i.e., there is no other partition between them) in
@@ -120,6 +120,20 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       case, the Mallows distance coincides with the Manhattan
       dissimilarity), and can be specified via additional arguments
       named \code{p}, \code{alpha}, and \code{beta}, respectively.}
+    \item{\code{"CSSD"}}{the Cluster Similarity Sensitive Distance of
+      Zhou, Li and Zha (2005), which is given as the minimal value of
+      \eqn{\sum_{k,l} (1 - 2 w_{kl} / (\alpha_k + \beta_l)) L_{kl}},
+      where \eqn{L_{kl} = \sum_i u_{ik} v_{il} d(p_{x;k}, p_{y;l})} with
+      \eqn{p_{x;k}} and \eqn{p_{y;l}} the prototype of the \eqn{k}-th
+      class of \code{x} and the \eqn{l}-th class of \code{y},
+      respectively, \eqn{d} is the distance between these, and the
+      \eqn{w_{kl}} as for Mallows distance.  If prototypes are matrices,
+      the Euclidean distance between these is used as default.  Using
+      the additional argument \code{L}, one can give a matrix of
+      \eqn{L_{kl}} values, or the function \eqn{d}.  Parameters
+      \eqn{\alpha} and \eqn{\beta} all default to one, and can be
+      specified via additional arguments named \code{alpha} and
+      \code{beta}, respectively.}
   }
 
   For hard partitions, both Manhattan and squared Euclidean

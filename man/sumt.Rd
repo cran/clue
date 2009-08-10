@@ -39,7 +39,7 @@ sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
   The Sequential Unconstrained Minimization Technique is a heuristic for
   constrained optimization.  To minimize a function \eqn{L} subject to
   constraints, one employs a non-negative function \eqn{P} penalizing
-  violations of the constaints, such that \eqn{P(x)} is zero iff \eqn{x}
+  violations of the constraints, such that \eqn{P(x)} is zero iff \eqn{x}
   satisfies the constraints.  One iteratively minimizes \eqn{L(x) +
     \rho_k P(x)}, where the \eqn{\rho} values are increased according to
   the rule \eqn{\rho_{k+1} = q \rho_k} for some constant \eqn{q > 1},
@@ -47,7 +47,7 @@ sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
   between successive solutions \eqn{x_k} and \eqn{x_{k+1}} is small
   enough.  Note that the \dQuote{solution} \eqn{x} obtained does not
   necessarily satisfy the constraints, i.e., has zero \eqn{P(x)}.  Note
-  also that there is no guarantee that global (approximatily)
+  also that there is no guarantee that global (approximately)
   constrained optima are found.  Standard practice would recommend to
   use the best solution found in \dQuote{sufficiently many} replications
   of the algorithm.

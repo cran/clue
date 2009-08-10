@@ -1,4 +1,4 @@
-\name{boot}
+\name{cl_boot}
 \alias{cl_boot}
 \title{Bootstrap Resampling of Clustering Algorithms}
 \description{

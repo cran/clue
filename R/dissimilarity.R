@@ -265,6 +265,49 @@ function(x, y, p = 1, alpha = NULL, beta = NULL)
                           integers = NULL)$objval ^ (1 / p)
 }
 
+### ** .cl_dissimilarity_partition_CSSD
+
+.cl_dissimilarity_partition_CSSD <-
+function(x, y, L = NULL, alpha = NULL, beta = NULL, ...)
+{
+    ## Cluster Similarity Sensitive Distance.
+    ## Reference:  D. Zhou, J. Li and H. Zha (2005),
+    ##  A new Mallows distance based metric for comparing clusterings.
+    ## See .cl_dissimilarity_partition_Mallows() re solving cost flow
+    ## problems.
+
+    ## Dissimilarity is defined by minimizing
+    ##   \sum_{k,l} (1 - 2 w_{kl} / (alpha_k + beta_l)) L_{kl}
+    ## where
+    ##   L_{kl} = \sum_i m_{x;ik} m_{y;il} distance(p_{x;k}, p_{y;l})
+    ## with m and p the memberships and prototypes, respectively.
+    ## If we get matrices of prototypes, use .rxdist; otherwise, the
+    ## user needs to specify an L function or matrix.
+
+    k_x <- n_of_classes(x)
+    k_y <- n_of_classes(y)
+    M_x <- cl_membership(x, k_x)
+    M_y <- cl_membership(y, k_y)
+    if(!is.matrix(L)) {
+        p_x <- cl_prototypes(x)
+        p_y <- cl_prototypes(y)
+        if(is.matrix(p_x) && is.matrix(p_y) && is.null(L))
+            L <- .rxdist(p_x, p_y, ...)
+        else if(is.function(L))
+            L <- L(p_x, p_y)
+        else
+            stop("Cannot compute prototype distances.")
+    }
+    C <- crossprod(M_x, M_y) * L
+    if(is.null(alpha)) alpha <- rep.int(1, k_x)
+    if(is.null(beta)) beta <- rep.int(1, k_y)
+    sum(C) - 2 * lpSolve::lp.transport(C / outer(alpha, beta, "+"),
+                                       "max",
+                                       rep("==", k_x), alpha,
+                                       rep("==", k_y), beta,
+                                       integers = NULL)$objval
+}
+
 ### ** .cl_dissimilarity_hierarchy_euclidean
 
 .cl_dissimilarity_hierarchy_euclidean <-

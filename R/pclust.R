@@ -373,18 +373,15 @@ function(x, k, family, m = 1, weights = 1, control = list())
 
     names(opt_class_ids) <- rownames(opt_u) <- rownames(dissimilarities)
     opt_u <- cl_membership(as.cl_membership(opt_u), k)
-                                          
-    out <- list(prototypes = opt_prototypes,
-                membership = opt_u,
-                cluster = opt_class_ids,
-                family = family,
-                m = m,
-                value = opt_value,
-                call = match.call())
-    attr(out, "converged") <- converged
-    class(out) <- "pclust"
 
-    out
+    pclust_object(prototypes = opt_prototypes,
+                  membership = opt_u,
+                  cluster = opt_class_ids,
+                  family = family,
+                  m = m,
+                  value = opt_value,
+                  call = match.call(),
+                  attributes = list("converged" = converged))
 }
 
 print.pclust <-
@@ -429,6 +426,25 @@ function(D, C, init = NULL, description = NULL, e = 1,
                    D = D, C = C, init = init, e = e,
                    .modify = .modify, .subset = .subset),
               class = "pclust_family")
+}
+
+### * pclust_object
+
+pclust_object <-
+function(prototypes, membership, cluster, family, m = 1, value, ...,
+         classes = NULL, attributes = NULL)
+{
+    out <- c(list(prototypes = prototypes,
+                  membership = membership,
+                  cluster = cluster,
+                  family = family,
+                  m = m,
+                  value = value),
+             list(...))
+    attributes(out) <- c(attributes(out), attributes)
+    classes <- unique(as.character(classes))
+    class(out) <- c(classes[classes != "pclust"], "pclust")
+    out
 }
 
 ### Local variables: ***

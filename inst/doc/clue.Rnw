@@ -461,12 +461,12 @@ the underlying partitions.  For membership matrices~$M$, permuting class
 ids amounts to replacing $M$ by $M \Pi$, where $\Pi$ is a suitable
 permutation matrix.  We note that the co-membership matrix $C(M) = MM'$
 is unchanged by these transformations; hence, proximity measures based
-on co-occurences, such as the Katz-Powell
+on co-occurrences, such as the Katz-Powell
 \citep{cluster:Katz+Powell:1953} or Rand \citep{cluster:Rand:1971}
 indices, do not explicitly need to adjust for possible re-labeling.  The
 same is true for measures based on the ``confusion matrix'' $M'
 \tilde{M}$ of two membership matrices $M$ and $\tilde{M}$ which are
-invariant under permuations of rows and columns, such as the Normalized
+invariant under permutations of rows and columns, such as the Normalized
 Mutual Information (NMI) measure introduced in
 \cite{cluster:Strehl+Ghosh:2003a}.  Other proximity measures need to
 find permutations so that the classes are optimally matched, which of

@@ -39,7 +39,7 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   Minimization Technique, see \code{\link{sumt}}) approach using the
   sign function for the gradients of the absolute value function.
 
-  Availabe control parameters are \code{method}, \code{control},
+  Available control parameters are \code{method}, \code{control},
   \code{eps}, \code{q}, and \code{verbose}, which have the same roles as
   for \code{\link{sumt}}, and the following.
 

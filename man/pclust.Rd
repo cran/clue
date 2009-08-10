@@ -1,23 +1,29 @@
 \name{pclust}
-\alias{cl_pclust}
-\title{Prototype-Based Partitions of Clusterings}
+\alias{pclust}
+\alias{pclust_family}
+\alias{pclust_object}
+\title{Prototype-Based Partitioning}
 \description{
-  Compute prototype-based partitions of a cluster ensemble by minimizing
+  Obtain prototype-based partitions of objects by minimizing the criterion
   \eqn{\sum w_b u_{bj}^m d(x_b, p_j)^e}, the sum of the case-weighted and
   membership-weighted \eqn{e}-th powers of the dissimilarities between
-  the elements \eqn{x_b} of the ensemble and the prototypes \eqn{p_j},
-  for suitable dissimilarities \eqn{d} and exponents \eqn{e}.
+  the objects \eqn{x_b} and the prototypes \eqn{p_j}, for suitable
+  dissimilarities \eqn{d} and exponents \eqn{e}.
 }
 \usage{
-cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
+pclust(x, k, family, m = 1, weights = 1, control = list())
+pclust_family(D, C, init = NULL, description = NULL, e = 1,
+              .modify = NULL, .subset = NULL)
+pclust_object(prototypes, membership, cluster, family, m = 1, value, ...,
+              classes = NULL, attributes = NULL)
 }
 \arguments{
-  \item{x}{an ensemble of partitions or hierarchies, or something
-    coercible to that (see \code{\link{cl_ensemble}}).}
+  \item{x}{the object to be partitioned.}
   \item{k}{an integer giving the number of classes to be used in the
     partition.}
-  \item{method}{the consensus method to be employed, see
-    \code{\link{cl_consensus}}.}
+  \item{family}{an object of class \code{"pclust_family"} as generated
+    by \code{pclust_family}, containing the information about \eqn{d}
+    and \eqn{e}.}
   \item{m}{a number not less than 1 controlling the softness of the
     partition (as the \dQuote{fuzzification parameter} of the fuzzy
     \eqn{c}-means algorithm).  The default value of 1 corresponds to
@@ -25,34 +31,60 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
     values greater than one give partitions of increasing softness
     obtained from a generalized fuzzy \eqn{c}-means problem.}
   \item{weights}{a numeric vector of non-negative case weights.
-    Recycled to the number of elements in the ensemble given by \code{x}
-    if necessary.}
+    Recycled to the number of elements given by \code{x} if necessary.}
   \item{control}{a list of control parameters.  See \bold{Details}.}
-}
-\value{
-  An object of class \code{"cl_partition"} representing the obtained 
-  \dQuote{secondary} partition by an object of class \code{"cl_pclust"},
-  which is a list containing at least the following components.
-  \item{prototypes}{a cluster ensemble with the \eqn{k} prototypes.}
+  \item{D}{a function for computing dissimilarities \eqn{d} between
+    objects and prototypes.}
+  \item{C}{a \sQuote{consensus} function with formals \code{x},
+    \code{weights} and \code{control} for computing a consensus
+    prototype \eqn{p} minimizing \eqn{\sum_b w_b d(x_b, p) ^ e}.}
+  \item{init}{a function with formals \code{x} and \code{k} initializing
+    an object with \eqn{k} prototypes from the object \code{x} to be
+    partitioned.}
+  \item{description}{a character string describing the family.}
+  \item{e}{a number giving the exponent \eqn{e} of the criterion.}
+  \item{.modify}{a function with formals \code{x}, \code{i} and
+    \code{value} for modifying a single prototype,
+    or \code{NULL} (default).}
+  \item{.subset}{a function with formals \code{x} and \code{i} for
+    subsetting prototypes,
+    or \code{NULL} (default).}
+  \item{prototypes}{an object representing the prototypes of the
+    partition.}
   \item{membership}{an object of class \code{"\link{cl_membership}"}
     with the membership values \eqn{u_{bj}}.}
   \item{cluster}{the class ids of the nearest hard partition.}
-  \item{silhouette}{Silhouette information for the partition, see
-    \code{\link[cluster]{silhouette}}.} 
-  \item{validity}{precomputed validity measures for the partition.}
-  \item{m}{the softness control argument.}
-  \item{call}{the matched call.}
-  \item{d}{the dissimilarity function \eqn{d = d(x, p)} employed.}
-  \item{e}{the exponent \eqn{e} employed.}
+  \item{value}{the value of the criterion to be minimized.}
+  \item{...}{further elements to be included in the generated pclust
+    object.}
+  \item{classes}{a character vector giving further classes to be given
+    to the generated pclust object in addition to \code{"pclust"}, or
+    \code{NULL} (default).}
+  \item{attributes}{a list of attributes, or \code{NULL} (default).}
+}
+\value{
+  \code{pclust} returns the partition found as an object of class
+  \code{"pclust"} (as obtained by calling \code{pclust_object}) which in
+  addition to the \emph{default} components contains \code{call} (the 
+  matched call) and a \code{converged} attribute indicating convergence
+  status (i.e., whether the maximal number of iterations was reached).
+
+  \code{pclust_family} returns an object of class
+  \code{"pclust_family"}, which is a list with components corresponding
+  to the formals of \code{pclust_family}.
+
+  \code{pclust_object} returns an object inheriting from class
+  \code{"pclust"}, which is a list with components corresponding
+  to the formals (up to and including \code{...}) of
+  \code{pclust_object}, and additional classes and attributes specified
+  by \code{classes} and \code{attributes}, respectively.
 }
 \details{
   For \eqn{m = 1}, a generalization of the Lloyd-Forgy variant of the
   \eqn{k}-means algorithm is used, which iterates between reclassifying
-  objects to their closest prototypes, and computing new prototypes as
-  consensus clusterings for the classes.  Gaul und Schader (1988)
-  introduced this procedure for \dQuote{Clusterwise Aggregation of
-    Relations} (with the same domains), containing equivalence
-  relations, i.e., hard partitions, as a special case.
+  objects to their closest prototypes (according to the dissimilarities
+  given by \code{D}), and computing new prototypes as the consensus for
+  the classes (using \code{C}).
 
   For \eqn{m > 1}, a generalization of the fuzzy \eqn{c}-means recipe
   (e.g., Bezdek (1981)) is used, which alternates between computing
@@ -62,7 +94,19 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
   This procedure is repeated until convergence occurs, or the maximal
   number of iterations is reached.
 
-  Consensus clusterings are computed using \code{\link{cl_consensus}}.
+  Currently, no local improvement heuristics are provided.
+
+  The dissimilarity and consensus functions as well as the exponent
+  \eqn{e} are specified via \code{family}.  In principle, arbitrary
+  representations of objects to be partitioned and prototypes (which do
+  not necessarily have to be \dQuote{of the same kind}) can be employed.
+  In addition to \code{D} and \code{C}, what is needed are means to
+  obtain an initial collection of \eqn{k} prototypes (\code{init}), to
+  modify a single prototype (\code{.modify}), and subset the prototypes
+  (\code{.subset}).  By default, list and (currently, only dense) matrix
+  (with the usual convention that the rows correspond to the objects)
+  are supported.  Otherwise, the family has to provide the functions
+  needed. 
 
   Available control parameters are as follows.
   \describe{
@@ -74,49 +118,18 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
       \code{\link{cl_consensus}}.}
   }
 
-  The dissimilarities \eqn{d} and exponent \eqn{e} are implied by the
-  consensus method employed, and inferred via a registration mechanism
-  currently only made available to built-in consensus methods.  The
-  default methods compute Least Squares Euclidean consensus clusterings,
-  i.e., use Euclidean dissimilarity \eqn{d} and \eqn{e = 2}.
-
   The fixed point approach employed is a heuristic which cannot be
-  guaranteed to find the global minimum (as this is already true for the
-  computation of consensus clusterings).  Standard practice would
-  recommend to use the best solution found in \dQuote{sufficiently many}
-  replications of the base algorithm.
+  guaranteed to find the global minimum, in particular if \code{C} is
+  not an exact minimizer.  Standard practice would recommend to use the
+  best solution found in \dQuote{sufficiently many} replications of the
+  base algorithm.
 }
 \references{
   J. C. Bezdek (1981).
   \emph{Pattern recognition with fuzzy objective function algorithms}.
   New York: Plenum.
-
-  W. Gaul and M. Schader (1988).
-  Clusterwise aggregation of relations.
-  \emph{Applied Stochastic Models and Data Analysis}, \bold{4}:273--282.
 }
-
 \seealso{
   \code{\link[stats]{kmeans}},
   \code{\link[e1071]{cmeans}}.
 }  
-\examples{
-## Use a precomputed ensemble of 50 k-means partitions of the
-## Cassini data.
-data("CKME")
-CKME <- CKME[1 : 30]		# for saving precious time ...
-diss <- cl_dissimilarity(CKME)
-hc <- hclust(diss)
-plot(hc)
-## This suggests using a partition with three classes, which can be
-## obtained using cutree(hc, 3).  Could use cl_consensus() to compute
-## prototypes as the least squares consensus clusterings of the classes,
-## or alternatively:
-set.seed(123)
-x1 <- cl_pclust(CKME, 3, m = 1)
-x2 <- cl_pclust(CKME, 3, m = 2)
-## Agreement of solutions.
-cl_dissimilarity(x1, x2)
-table(cl_class_ids(x1), cl_class_ids(x2))
-}
-\keyword{cluster}

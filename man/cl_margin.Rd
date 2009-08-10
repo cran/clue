@@ -1,8 +1,8 @@
-\name{margin}
+\name{cl_margin}
 \alias{cl_margin}
 \title{Membership Margins}
 \description{
-  Compute the \emph{margin} of the memberhips of a partition, i.e., the
+  Compute the \emph{margin} of the memberships of a partition, i.e., the
   difference between the largest and second largest membership values of
   the respective objects.
 }

@@ -20,7 +20,7 @@ citEntry(entry = "Manual",
                    sprintf("(%s).", year),                         
                    "clue: Cluster ensembles.",
                    note,
-		   "URL http://CRAN.R-project.org/package=clue",
+		   "URL http://CRAN.R-project.org/package=clue.",
                    sep = "  ")
          })
 
@@ -40,7 +40,7 @@ citEntry(entry = "Article",
              paste("Kurt Hornik (2005).",
                    "A CLUE for CLUster Ensembles.",
                    "Journal of Statistical Software 14/12.",
-                   "URL: http://www.jstatsoft.org/v14/i12/.",
+                   "URL http://www.jstatsoft.org/v14/i12/.",
                    sep = "  ")
          })
 

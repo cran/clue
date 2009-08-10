@@ -1,4 +1,4 @@
-\name{bag}
+\name{cl_bag}
 \alias{cl_bag}
 \title{Bagging for Clustering}
 \description{

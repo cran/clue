@@ -1,4 +1,4 @@
-\name{tabulate}
+\name{cl_tabulate}
 \alias{cl_tabulate}
 \title{Tabulate Vector Objects}
 \description{Tabulate the unique values in vector objects.}

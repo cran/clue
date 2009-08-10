@@ -1,4 +1,4 @@
-\name{pam}
+\name{cl_pam}
 \alias{cl_pam}
 \title{K-Medoids Partitions of Clusterings}
 \description{

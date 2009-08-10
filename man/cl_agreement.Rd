@@ -1,4 +1,4 @@
-\name{agreement}
+\name{cl_agreement}
 \alias{cl_agreement}
 \title{Agreement Between Partitions or Hierarchies}
 \description{Compute the agreement between (ensembles) of partitions or

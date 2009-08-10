@@ -1,4 +1,4 @@
-\name{medoid}
+\name{cl_medoid}
 \alias{cl_medoid}
 \title{Medoid Partitions and Hierarchies}
 \description{
