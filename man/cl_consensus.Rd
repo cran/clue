@@ -1,4 +1,4 @@
-\name{consensus}
+\name{cl_consensus}
 \alias{cl_consensus}
 \title{Consensus Partitions and Hierarchies}
 \description{
@@ -89,7 +89,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       }
       In the case of multiple runs, the first optimum found is returned.
 
-      Can also be referred to as \code{"soft/euclidean"}.
+      This method can also be referred to as \code{"soft/euclidean"}.
     }
 
     \item{\code{"GV1"}}{the fixed-point algorithm for the \dQuote{first
@@ -137,7 +137,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
       Available control parameters are the same as for \code{"SE"}.
 
-      Can also be referred to as \code{"hard/euclidean"}.
+      This method can also be referred to as \code{"hard/euclidean"}.
     }
     
     \item{\code{"SM"}}{a fixed-point algorithm for obtaining \emph{soft}
@@ -147,7 +147,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
       Available control parameters are the same as for \code{"SE"}.
 
-      Can also be referred to as \code{"soft/manhattan"}.
+      This method can also be referred to as \code{"soft/manhattan"}.
     }
 
     \item{\code{"SM"}}{a fixed-point algorithm for obtaining \emph{hard}
@@ -157,7 +157,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
       Available control parameters are the same as for \code{"SE"}.
 
-      Can also be referred to as \code{"hard/manhattan"}.
+      This method can also be referred to as \code{"hard/manhattan"}.
     }
 
     \item{\code{"GV3"}}{a SUMT algorithm for the \dQuote{third model} in
@@ -169,7 +169,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       between \eqn{C(m) = m m'} and the weighted average co-membership
       matrix \eqn{\sum_b w_b C(m_b)} of the partitions is minimal.
 
-      Availabe control parameters are \code{method}, \code{control},
+      Available control parameters are \code{method}, \code{control},
       \code{eps}, \code{q}, and \code{verbose}, which have the same
       roles as for \code{\link{sumt}}, and the following.
       
@@ -225,7 +225,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       \code{\link{ls_fit_ultrametric}} on \eqn{d} with appropriate
       control parameters.
 
-      Can also be referred to as \code{"cophenetic"}.
+      This method can also be referred to as \code{"cophenetic"}.
     }
 
     \item{\code{"manhattan"}}{a SUMT for minimizing \eqn{L = \sum w_b

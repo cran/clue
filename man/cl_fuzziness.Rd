@@ -1,4 +1,4 @@
-\name{fuzziness}
+\name{cl_fuzziness}
 \alias{cl_fuzziness}
 \title{Partition Fuzziness}
 \description{

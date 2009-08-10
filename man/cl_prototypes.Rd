@@ -1,4 +1,4 @@
-\name{prototypes}
+\name{cl_prototypes}
 \alias{cl_prototypes}
 \title{Partition Prototypes}
 \description{

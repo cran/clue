@@ -1,4 +1,4 @@
-\name{validity}
+\name{cl_validity}
 \alias{cl_validity}
 \alias{cl_validity.default}
 \title{Validity Measures for Partitions and Hierarchies}

@@ -57,7 +57,7 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   Soete (1984), imputing the missing values by the weighted mean of the
   non-missing ones, and setting the corresponding weights to zero.
 
-  Availabe control parameters are \code{method}, \code{control},
+  Available control parameters are \code{method}, \code{control},
   \code{eps}, \code{q}, and \code{verbose}, which have the same roles as
   for \code{\link{sumt}}, and the following.
   

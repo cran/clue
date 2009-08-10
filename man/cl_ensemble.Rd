@@ -1,4 +1,4 @@
-\name{ensemble}
+\name{cl_ensemble}
 \alias{cl_ensemble}
 \alias{as.cl_ensemble}
 \alias{is.cl_ensemble}

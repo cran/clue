@@ -41,6 +41,7 @@ export("cl_agreement",
        "as.cl_dendrogram",
        "is.cl_hierarchy", "as.cl_hierarchy",
        "kmedoids",
+       "pclust", "pclust_family", "pclust_object",
        "solve_LSAP",
        "sumt")
 

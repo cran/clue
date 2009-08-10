@@ -1,4 +1,4 @@
-\name{ultrametric}
+\name{cl_ultrametric}
 \alias{cl_ultrametric}
 \alias{as.cl_ultrametric}
 \title{Ultrametrics of Hierarchies}

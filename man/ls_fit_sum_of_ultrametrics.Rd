@@ -52,7 +52,7 @@ ls_fit_sum_of_ultrametrics(x, nterms = 1, weights = 1, control = list())
       method to be employed by the individual least squares fits.}
     \item{\code{control}}{a list of control parameters to be used by the
       method of \code{\link{ls_fit_ultrametric}} employed.  By default,
-      if the SUMT method method is ised, 10 inner SUMT runs are
+      if the SUMT method method is used, 10 inner SUMT runs are
       performed for each refitting.}
   }
 

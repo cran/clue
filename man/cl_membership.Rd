@@ -1,4 +1,4 @@
-\name{membership}
+\name{cl_membership}
 \alias{cl_membership}
 \alias{as.cl_membership}
 \title{Memberships of Partitions}

@@ -191,6 +191,9 @@ set_cl_dissimilarity_method("VI", "partition",
 set_cl_dissimilarity_method("Mallows", "partition",
                             .cl_dissimilarity_partition_Mallows,
                             "Mallows dissimilarity")
+set_cl_dissimilarity_method("CSSD", "partition",
+                            .cl_dissimilarity_partition_CSSD,
+                            "Cluster Similarity Sensitive Distance")
 
 set_cl_dissimilarity_method("euclidean", "hierarchy",
                             .cl_dissimilarity_hierarchy_euclidean,

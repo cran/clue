@@ -1,4 +1,4 @@
-\name{predict}
+\name{cl_predict}
 \alias{cl_predict}
 \title{Predict Memberships}
 \description{
