@@ -96,6 +96,11 @@ pclust_object(prototypes, membership, cluster, family, m = 1, value, ...,
 
   Currently, no local improvement heuristics are provided.
 
+  It is possible to perform several runs of the procedure via control
+  arguments \code{nruns} or \code{start} (the default is to perform a
+  single run), in which case the first partition with the smallest
+  value of the criterion is returned.
+
   The dissimilarity and consensus functions as well as the exponent
   \eqn{e} are specified via \code{family}.  In principle, arbitrary
   representations of objects to be partitioned and prototypes (which do
@@ -111,11 +116,20 @@ pclust_object(prototypes, membership, cluster, family, m = 1, value, ...,
   Available control parameters are as follows.
   \describe{
     \item{\code{maxiter}}{an integer giving the maximal number of
-      iterations to be performed.  Defaults to 100.}
-    \item{\code{reltol}}{the relative convergence tolerance.  Defaults
-      to \code{sqrt(.Machine$double.eps)}.}
-    \item{\code{control}}{control parameters to be used in
-      \code{\link{cl_consensus}}.}
+      iterations to be performed.
+      Defaults to 100.}
+    \item{\code{nruns}}{an integer giving the number of runs to be
+      performed.
+      Defaults to 1.} 
+    \item{\code{reltol}}{the relative convergence tolerance.
+      Defaults to \code{sqrt(.Machine$double.eps)}.}
+    \item{\code{start}}{a list of prototype objects to be used as
+      starting values.}
+    \item{\code{verbose}}{a logical indicating whether to provide
+      some output on minimization progress.
+      Defaults to \code{getOption("verbose")}.}
+    \item{\code{control}}{control parameters to be used in the consensus
+      function.}
   }
 
   The fixed point approach employed is a heuristic which cannot be

@@ -203,7 +203,9 @@ function(x, k, family, m = 1, weights = 1, control = list())
     dissimilarities <- D(x, prototypes) ^ e
     B <- NROW(dissimilarities)
     ## Also try to figure out (if necessary) how to modify a single
-    ## prototype and to subset the prototypes.
+    ## prototype and to subset the prototypes.  Note that we can only
+    ## check this *after* prototypes were obtained (and not when the
+    ## family object is created).
     if(is.null(.modify)) {
         if(is.list(prototypes))
             .modify <- function(x, i, value) {
