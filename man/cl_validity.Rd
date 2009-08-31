@@ -77,7 +77,7 @@ cl_validity(x, ...)
   cluster validation statistics;
   \code{\link[e1071]{fclustIndex}} in package \pkg{e1071} for several
   fuzzy cluster indexes;
-  \code{\link[cclust]{clustIndex}} in package \pkg{cclust};
+  \code{\link[cclust:Rindexes]{clustIndex}} in package \pkg{cclust};
   \code{\link[cluster]{silhouette}} in package \pkg{cluster}.
 }
 \keyword{cluster}
