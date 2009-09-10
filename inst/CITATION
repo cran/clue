@@ -9,7 +9,7 @@ note <- sprintf("R package version %s.", meta$Version)
 citEntry(entry = "Manual",
          title = "clue: Cluster ensembles",
          author = {
-             personList(person(first = "Kurt", last = "Hornik",
+             personList(person("Kurt", "Hornik",
                                email = "Kurt.Hornik@R-project.org"))
          },
          year = year,
@@ -27,7 +27,7 @@ citEntry(entry = "Manual",
 citEntry(entry = "Article",
          title = "A {CLUE} for {CLUster Ensembles}",
          author = {
-             personList(person(first = "Kurt", last = "Hornik",
+             personList(person("Kurt", "Hornik",
                                email = "Kurt.Hornik@R-project.org"))
          },
          year = 2005,
