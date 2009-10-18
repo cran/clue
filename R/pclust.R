@@ -187,6 +187,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
             ## Be nice to users.
             start <- list(start)
         }
+        nruns <- length(start)
     } else {
         if(is.null(nruns)) {
             ## Use nruns only if start is not given.

@@ -52,9 +52,10 @@ ls_fit_centroid(x)
 
   We provide three heuristics for solving this problem.
 
-  Method \code{"SUMT"} implements the SUMT (Sequential Unconstrained
-  Minimization Technique, Fiacco and McCormick, 1968) approach of de
-  Soete (1983).  Incomplete dissimilarities are currently not supported.
+  Method \code{"SUMT"} implements the \acronym{SUMT} (Sequential
+  Unconstrained Minimization Technique, Fiacco and McCormick, 1968)
+  approach of de Soete (1983).  Incomplete dissimilarities are currently
+  not supported.
 
   Methods \code{"IP"} and \code{"IR"} implement the Iterative
   Projection and Iterative Reduction approaches of Hubert and Arabie

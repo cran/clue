@@ -43,9 +43,9 @@ l1_fit_ultrametric_target(x, y, weights = 1)
   \eqn{f_s(u_s) = \sum_{i \in A, j \in B} w_{ij} |x_{ij} - u_s|^p}.
   We need to minimize \eqn{\sum_s f_s(u_s)} under the constraint that
   the \eqn{u_s} form a non-decreasing sequence, which is accomplished by
-  using the Pool Adjacent Violator Algorithm (PAVA) using the weighted
-  mean (\eqn{p = 2}) or weighted median (\eqn{p = 1}) for solving the
-  blockwise optimization problems.
+  using the Pool Adjacent Violator Algorithm (\acronym{PAVA}) using the
+  weighted mean (\eqn{p = 2}) or weighted median (\eqn{p = 1}) for
+  solving the blockwise optimization problems.
 }
 \seealso{
   \code{\link{ls_fit_ultrametric}} for finding the ultrametric

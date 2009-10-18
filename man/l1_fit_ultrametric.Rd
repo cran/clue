@@ -35,9 +35,10 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
 
   We provide two heuristics for solving this problem.
 
-  Method \code{"SUMT"} implements a SUMT (Sequential Unconstrained
-  Minimization Technique, see \code{\link{sumt}}) approach using the
-  sign function for the gradients of the absolute value function.
+  Method \code{"SUMT"} implements a \acronym{SUMT} (Sequential
+  Unconstrained Minimization Technique, see \code{\link{sumt}}) approach
+  using the sign function for the gradients of the absolute value
+  function.
 
   Available control parameters are \code{method}, \code{control},
   \code{eps}, \code{q}, and \code{verbose}, which have the same roles as
@@ -58,8 +59,8 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   \deqn{\sum_{i,j} w_{ij}
     (x_{ij} - u_{ij})^2 / \max(|x_{ij} - u_{ij}(t)|, m)}
   with \eqn{m} a \dQuote{small} non-zero value to avoid zero divisors.
-  We use the SUMT method of \code{\link{ls_fit_ultrametric}} for solving
-  the weighted least squares problems.
+  We use the \acronym{SUMT} method of \code{\link{ls_fit_ultrametric}}
+  for solving the weighted least squares problems.
 
   Available control parameters are as follows.
   \describe{

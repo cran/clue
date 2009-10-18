@@ -3,7 +3,7 @@
 \title{Sequential Unconstrained Minimization Technique}
 \description{
   Solve constrained optimization problems via the Sequential
-  Unconstrained Minimization Technique.
+  Unconstrained Minimization Technique (\acronym{SUMT}).
 }
 \usage{
 sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,

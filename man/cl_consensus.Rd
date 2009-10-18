@@ -160,14 +160,15 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       This method can also be referred to as \code{"hard/manhattan"}.
     }
 
-    \item{\code{"GV3"}}{a SUMT algorithm for the \dQuote{third model} in
-      Gordon and Vichi (2001) for minimizing \eqn{L} with \eqn{d} being
-      co-membership dissimilarity and \eqn{p = 2}.  (See
-      \code{\link{sumt}} for more information on the SUMT approach.)
-      This optimization problem is equivalent to finding the membership
-      matrix \eqn{m} for which the sum of the squared differences
-      between \eqn{C(m) = m m'} and the weighted average co-membership
-      matrix \eqn{\sum_b w_b C(m_b)} of the partitions is minimal.
+    \item{\code{"GV3"}}{a \acronym{SUMT} algorithm for the \dQuote{third
+      model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
+      \eqn{d} being co-membership dissimilarity and \eqn{p = 2}.  (See
+      \code{\link{sumt}} for more information on the \acronym{SUMT}
+      approach.)  This optimization problem is equivalent to finding the
+      membership matrix \eqn{m} for which the sum of the squared
+      differences between \eqn{C(m) = m m'} and the weighted average
+      co-membership matrix \eqn{\sum_b w_b C(m_b)} of the partitions is
+      minimal.
 
       Available control parameters are \code{method}, \code{control},
       \code{eps}, \code{q}, and \code{verbose}, which have the same
@@ -189,11 +190,12 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       
     }
 
-    \item{\code{"soft/symdiff"}}{a SUMT approach for minimizing
-      \eqn{L = \sum w_b d(x_b, x)} over all soft partitions with a given
-      maximal number of classes, where \eqn{d} is the Manhattan
-      dissimilarity of the co-membership matrices (coinciding with
-      symdiff partition dissimilarity in the case of hard partitions).
+    \item{\code{"soft/symdiff"}}{a \acronym{SUMT} approach for
+      minimizing \eqn{L = \sum w_b d(x_b, x)} over all soft partitions
+      with a given maximal number of classes, where \eqn{d} is the
+      Manhattan dissimilarity of the co-membership matrices (coinciding
+      with symdiff partition dissimilarity in the case of hard
+      partitions).
 
       Available control parameters are the same as for \code{"GV3"}.
     }
@@ -228,9 +230,9 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       This method can also be referred to as \code{"cophenetic"}.
     }
 
-    \item{\code{"manhattan"}}{a SUMT for minimizing \eqn{L = \sum w_b
-	d(x_b, x)} over all dendrograms, where \eqn{d} is Manhattan
-      dissimilarity.
+    \item{\code{"manhattan"}}{a \acronym{SUMT} for minimizing
+      \eqn{L = \sum w_b d(x_b, x)} over all dendrograms, where \eqn{d}
+      is Manhattan dissimilarity.
 
       Available control parameters are the same as for
       \code{"euclidean"}.
