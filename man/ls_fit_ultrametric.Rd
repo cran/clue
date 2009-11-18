@@ -44,18 +44,19 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
 
   We provide three heuristics for solving the basic problem.
 
-  Method \code{"SUMT"} implements the SUMT (Sequential Unconstrained
-  Minimization Technique, Fiacco and McCormick, 1968) approach of de
-  Soete (1986) which in turn simplifies the suggestions in Carroll and
-  Pruzansky (1980).  (See \code{\link{sumt}} for more information on the
-  SUMT approach.)  We then use a final single linkage hierarchical
-  clustering step to ensure that the returned object exactly satisfies
-  the ultrametric constraints.  The starting value \eqn{u_0} is obtained
-  by \dQuote{random shaking} of the given dissimilarity object (if not
-  given).  If there are missing values in \code{x}, i.e., the given
-  dissimilarities are \emph{incomplete}, we follow a suggestion of de
-  Soete (1984), imputing the missing values by the weighted mean of the
-  non-missing ones, and setting the corresponding weights to zero.
+  Method \code{"SUMT"} implements the \acronym{SUMT} (Sequential
+  Unconstrained Minimization Technique, Fiacco and McCormick, 1968)
+  approach of de Soete (1986) which in turn simplifies the suggestions
+  in Carroll and Pruzansky (1980).  (See \code{\link{sumt}} for more
+  information on the \acronym{SUMT} approach.)  We then use a final
+  single linkage hierarchical clustering step to ensure that the
+  returned object exactly satisfies the ultrametric constraints.  The
+  starting value \eqn{u_0} is obtained by \dQuote{random shaking} of the
+  given dissimilarity object (if not given).  If there are missing
+  values in \code{x}, i.e., the given dissimilarities are
+  \emph{incomplete}, we follow a suggestion of de Soete (1984), imputing
+  the missing values by the weighted mean of the non-missing ones, and
+  setting the corresponding weights to zero.
 
   Available control parameters are \code{method}, \code{control},
   \code{eps}, \code{q}, and \code{verbose}, which have the same roles as
@@ -73,14 +74,15 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   ones, using \code{nlm} is usually faster.  Note that the number of
   ultrametric constraints is of the order \eqn{n^3}, where \eqn{n} is
   the number of objects in the dissimilarity object, suggesting to use
-  the SUMT approach in favor of \code{\link[stats]{constrOptim}}.
+  the \acronym{SUMT} approach in favor of
+  \code{\link[stats]{constrOptim}}.
 
-  If starting values for the SUMT are provided via \code{start}, the
-  number of starting values gives the number of runs to be performed,
-  and control option \code{nruns} is ignored.  Otherwise, \code{nruns}
-  starting values are obtained by random shaking of the dissimilarity to
-  be fitted.  In the case of multiple SUMT runs, the (first) best
-  solution found is returned.
+  If starting values for the \acronym{SUMT} are provided via
+  \code{start}, the number of starting values gives the number of runs
+  to be performed, and control option \code{nruns} is ignored.
+  Otherwise, \code{nruns} starting values are obtained by random shaking
+  of the dissimilarity to be fitted.  In the case of multiple
+  \acronym{SUMT} runs, the (first) best solution found is returned.
 
   Method \code{"IP"} implements the Iterative Projection approach of
   Hubert and Arabie (1995).  This iteratively projects the current

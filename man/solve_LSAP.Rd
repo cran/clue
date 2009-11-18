@@ -42,8 +42,11 @@ solve_LSAP(x, maximum = FALSE)
   implementing the Hungarian method.
 }
 \examples{
-x <- matrix(c(5, 1, 4, 3, 5, 2, 2, 4, 4), nr = 3)
+x <- matrix(c(5, 1, 4, 3, 5, 2, 2, 4, 4), nrow = 3)
 solve_LSAP(x)
-solve_LSAP(x, max = TRUE)
+solve_LSAP(x, maximum = TRUE)
+## To get the optimal value (for now):
+y <- solve_LSAP(x)
+sum(x[cbind(seq_along(y), y)])
 }
 \keyword{optimize}
