@@ -56,25 +56,25 @@ function(x, k, method = NULL, m = 1, weights = 1, control = list())
     ## Massage the results a bit.
     dissimilarities <- as.matrix(d(clusterings) ^ e)
     out$call <- match.call()
-    out <- structure(c(out,
-                       list(silhouette =
-                            silhouette(out$cluster,
-                                       dmatrix = dissimilarities),
-                            validity =
-                            cl_validity(out$membership,
-                                        dissimilarities),
-                            ## <NOTE>
-                            ## Information about d and e is also in the
-                            ## family returned, of course.  Trying to be
-                            ## nice to users by "directly" providing d
-                            ## and e is currently of limited usefulness
-                            ## as the pclust representation is not
-                            ## directly available to users.
-                            d = d,
-                            e = e
-                            ## </NOTE>
-                            )),
-                     class = unique(c("cl_pclust", class(out))))
+    out <- .structure(c(out,
+                        list(silhouette =
+                             silhouette(out$cluster,
+                                        dmatrix = dissimilarities),
+                             validity =
+                             cl_validity(out$membership,
+                                         dissimilarities),
+                             ## <NOTE>
+                             ## Information about d and e is also in the
+                             ## family returned, of course.  Trying to be
+                             ## nice to users by "directly" providing d
+                             ## and e is currently of limited usefulness
+                             ## as the pclust representation is not
+                             ## directly available to users.
+                             d = d,
+                             e = e
+                             ## </NOTE>
+                             )),
+                      class = unique(c("cl_pclust", class(out))))
 
     as.cl_partition(out)
 }
@@ -425,10 +425,10 @@ function(D, C, init = NULL, description = NULL, e = 1,
         ## Works for list representations ...
         init <- function(x, k) sample(x, k)
     }
-    structure(list(description = description,
-                   D = D, C = C, init = init, e = e,
-                   .modify = .modify, .subset = .subset),
-              class = "pclust_family")
+    .structure(list(description = description,
+                    D = D, C = C, init = init, e = e,
+                    .modify = .modify, .subset = .subset),
+               class = "pclust_family")
 }
 
 ### * pclust_object

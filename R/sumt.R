@@ -20,7 +20,7 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
         make_Phi <- if(method == "nlm") {
             function(rho) {
                 function(x)
-                structure(Phi(rho, x), gradient = grad_Phi(rho, x))
+                .structure(Phi(rho, x), gradient = grad_Phi(rho, x))
             }
         }
         else
@@ -100,8 +100,7 @@ function(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
             message(gettextf("Minimum: %g", v_opt))
     }
 
-    structure(list(x = x_opt, L = L(x_opt), P = P(x_opt), rho = rho_opt,
-                   call = match.call()),
-              class = "sumt")
-
+    .structure(list(x = x_opt, L = L(x_opt), P = P(x_opt), rho = rho_opt,
+                    call = match.call()),
+               class = "sumt")
 }

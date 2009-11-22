@@ -334,8 +334,6 @@ function(memberships, w, k)
 
     memberships <- array(unlist(memberships), c(nr, nc, B))
 
-    require("lpSolve")
-
     for(i in seq_len(nr)) {
         out <- lpSolve::lp("min",
                            objective_in,
@@ -643,7 +641,6 @@ function(clusterings, weights, control, type = c("GV1"))
         ## Take care of those rows with row sums > 1.
         ind <- (S > 1)
         if(any(ind)) {
-            require("quadprog")
             ## Argh.  Call solve.QP() for each such i.  Alternatively,
             ## could set up on very large QP, but is this any better?
             Dmat <- diag(alpha, nc_M)

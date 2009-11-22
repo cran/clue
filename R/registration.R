@@ -62,9 +62,9 @@ function(name, type, definition, ...)
     ## for methods minimizing \sum_b d(x_b, x) ^ e.
 
     put_method_into_db(cl_consensus_methods_db, type, name,
-                       structure(c(list(definition = definition),
-                                   list(...)),
-                                 class = "cl_consensus_method"))
+                       .structure(c(list(definition = definition),
+                                    list(...)),
+                                  class = "cl_consensus_method"))
 }
 
 set_cl_consensus_method("DWH", "partition",
@@ -150,10 +150,10 @@ get_cl_dissimilarity_method <- function(name, type)
 set_cl_dissimilarity_method <-
     function(name, type, definition, description, ...)
     put_method_into_db(cl_dissimilarity_methods_db, type, name,
-                       structure(c(list(definition = definition,
-                                        description = description),
-                                   list(...)),
-                                 class = "cl_dissimilarity_method"))
+                       .structure(c(list(definition = definition,
+                                         description = description),
+                                    list(...)),
+                                  class = "cl_dissimilarity_method"))
 
 set_cl_dissimilarity_method("euclidean", "partition",
                             .cl_dissimilarity_partition_euclidean,
@@ -234,10 +234,10 @@ function(name, type)
 set_cl_agreement_method <-
 function(name, type, definition, description, ...)
     put_method_into_db(cl_agreement_methods_db, type, name,
-                       structure(c(list(definition = definition,
-                                        description = description),
-                                   list(...)),
-                                 class = "cl_agreement_method"))
+                       .structure(c(list(definition = definition,
+                                         description = description),
+                                    list(...)),
+                                  class = "cl_agreement_method"))
 
 set_cl_agreement_method("euclidean", "partition",
                         .cl_agreement_partition_euclidean,

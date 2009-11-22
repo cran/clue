@@ -134,7 +134,7 @@ cl_class_ids.specc <-
 function(x)
 {
     tmp <- unclass(x)
-    as.cl_class_ids(structure(as.vector(tmp), names = names(tmp)))
+    as.cl_class_ids(.structure(as.vector(tmp), names = names(tmp)))
 }
 
 ## Package mclust: Mclust().
@@ -152,7 +152,7 @@ cl_class_ids.cl_class_ids <- identity
 ## Package clue: Memberships.
 cl_class_ids.cl_membership <-
 function(x)
-    as.cl_class_ids(structure(max.col(x), names = rownames(x)))
+    as.cl_class_ids(.structure(max.col(x), names = rownames(x)))
 ## (Cannot do cl_class_ids.cl_membership <- max.col for generic/method
 ## consistency.)
 ## Package clue: cl_pam().
@@ -181,7 +181,7 @@ function(x)
     ## using someting like
     ##   match(ids, unique(ids))
     ## </NOTE>
-    structure(unclass(x), class = "cl_class_ids")
+    .structure(unclass(x), class = "cl_class_ids")
 }
 
 ### * print.cl_class_ids

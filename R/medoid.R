@@ -30,12 +30,12 @@ function(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
 
     make_cl_pam <- function(class_ids, medoid_ids, medoids, criterion,
                             description)
-        structure(list(cluster = class_ids,
-                       medoid_ids = medoid_ids,
-                       prototypes = medoids,
-                       criterion = criterion,
-                       description = description),
-                  class = "cl_pam")
+        .structure(list(cluster = class_ids,
+                        medoid_ids = medoid_ids,
+                        prototypes = medoids,
+                        criterion = criterion,
+                        description = description),
+                   class = "cl_pam")
 
     if(k == 1L) {
         ## Simplify matters if a global medoid is sought.
@@ -188,10 +188,10 @@ function(x, k)
     class_ids <- seq_len(n)
     class_ids[ind[, 1L]] <- match(ind[, 2L], medoid_ids)
 
-    structure(list(cluster = class_ids,
-                   medoid_ids = medoid_ids,
-                   criterion = y$objval),
-              class = "kmedoids")
+    .structure(list(cluster = class_ids,
+                    medoid_ids = medoid_ids,
+                    criterion = y$objval),
+               class = "kmedoids")
 }
 
 print.kmedoids <-
