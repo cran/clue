@@ -287,7 +287,7 @@ function(x, type = c("class_ids", "memberships"))
     if(type == "class_ids") {
         if(is.matrix(x)) {
             ## Same as for cl_class_ids.cl_membership().
-            as.cl_class_ids(structure(max.col(x), names = rownames(x)))
+            as.cl_class_ids(.structure(max.col(x), names = rownames(x)))
         }
         else
             as.cl_class_ids(x)

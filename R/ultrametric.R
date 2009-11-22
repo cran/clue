@@ -771,7 +771,7 @@ function(x, nterms = 1, weights = 1, control = list())
         iter <- iter + 1L
     }
     
-    structure(u, objval = L_new, status = as.integer(iter == maxiter))
+    .structure(u, objval = L_new, status = as.integer(iter == maxiter))
 }
 
 ### * .non_ultrametricity

@@ -108,12 +108,17 @@ function(x, w = NULL)
 ### * Containers
 
 ## Creator.
+
 .make_container <-
 function(x, classes, properties = NULL)
-    structure(list(.Data = x, .Meta = properties),
-              class = unique(classes))
-
+{
+    out <- list(.Data = x, .Meta = properties)
+    class(out) <- unique(classes)
+    out
+}
+          
 ## Getters.
+
 .get_representation <-
 function(x)
     x$.Data
@@ -138,6 +143,7 @@ function(x, which, getter)
 }
 
 ## Methods (sort of).
+
 .print_container <-
 function(x, cls, ...)
 {
