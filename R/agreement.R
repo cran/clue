@@ -261,11 +261,30 @@ function(x, y)
     ## (At least, for the time being.)
     x <- table(cl_class_ids(x), cl_class_ids(y))
 
-    Z <- sum(x ^ 2) - n
+    Z <- sum(x ^ 2)
 
-    Z / (sum(rowSums(x) ^ 2) + sum(colSums(x) ^ 2) - Z)
+    (Z - n) / (sum(rowSums(x) ^ 2) + sum(colSums(x) ^ 2) - n - Z)
     
 }
+
+### ** .cl_agreement_partition_purity
+
+.cl_agreement_partition_purity <-
+function(x, y)
+{
+    ## Purity of classes of x with respect to those of y: relative
+    ## fraction of "optimally matched and collapsed" joint class
+    ## frequencies, i.e., \sum_i \max_j c_{ij} / n.
+
+    n <- n_of_objects(x)    
+
+    ## Handle soft partitions using the corresponding hard ones.
+    ## (At least, for the time being.)
+    x <- table(cl_class_ids(x), cl_class_ids(y))
+
+    sum(apply(x, 1L, max)) / n
+}
+    
 
 ## Some computations useful for interpreting some of the above.
 ##
