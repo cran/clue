@@ -72,7 +72,7 @@ function(x)
 ## Package clue: Memberships.
 n_of_objects.cl_membership <- nrow
 ## Package clue: pclust().
-n_of_objects.pclust <- n_of_objects.fclust
+n_of_objects.pclust <- n_of_objects.default
 ## Package clue: Ultrametrics.
 n_of_objects.cl_ultrametric <- n_of_objects.dist
 ## Package clue: (virtual) class "cl_partition".

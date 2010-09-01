@@ -61,7 +61,7 @@ function(x, k, method = NULL, m = 1, weights = 1, control = list())
                              silhouette(out$cluster,
                                         dmatrix = dissimilarities),
                              validity =
-                             cl_validity(out$membership,
+                             cl_validity(cl_membership(out),
                                          dissimilarities),
                              ## <NOTE>
                              ## Information about d and e is also in the
@@ -312,8 +312,11 @@ function(x, k, family, m = 1, weights = 1, control = list())
             prototypes <- start[[run]]
             dissimilarities <- D(x, prototypes) ^ e
         }
-        opt_u <- matrix(0, B, k)
-        opt_u[cbind(seq_len(B), opt_class_ids)] <- 1
+        ## We should really have a suitable "sparse matrix" class for
+        ## representing the memberships of hard partitions.  For now:
+        opt_u <- NULL
+        ## opt_u <- matrix(0, B, k)
+        ## opt_u[cbind(seq_len(B), opt_class_ids)] <- 1
     }
     else {
         ## Soft partitions.
@@ -372,10 +375,11 @@ function(x, k, family, m = 1, weights = 1, control = list())
         ## Ensure that opt_u is a stochastic matrix.
         opt_u <- pmax(opt_u, 0)
         opt_u <- opt_u / rowSums(opt_u)
+        rownames(opt_u) <- rownames(dissimilarities)
+        opt_u <- cl_membership(as.cl_membership(opt_u), k)
     }
 
-    names(opt_class_ids) <- rownames(opt_u) <- rownames(dissimilarities)
-    opt_u <- cl_membership(as.cl_membership(opt_u), k)
+    names(opt_class_ids) <- rownames(dissimilarities)
 
     pclust_object(prototypes = opt_prototypes,
                   membership = opt_u,

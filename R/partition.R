@@ -46,7 +46,14 @@ n_of_classes.cl_membership <-
 function(x)
     attr(x, "n_of_classes")
 ## Package clue: pclust().
-n_of_classes.pclust <- n_of_classes.fanny
+n_of_classes.pclust <-
+function(x)
+{
+    if(is.null(m <- x$membership)) 
+        length(unique(cl_class_ids(x)))
+    else
+        sum(colSums(m, na.rm = TRUE) > 0)
+}
 ## Package clue: (virtual) class "cl_partition".
 n_of_classes.cl_partition <-
 function(x)

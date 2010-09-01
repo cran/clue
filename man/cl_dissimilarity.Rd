@@ -193,6 +193,9 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
 
       If \code{\dots} has an argument named \code{delta} it is taken to
       specify the partition dissimilarity \eqn{\delta} to be employed.}
+    \item{\code{"spectral"}}{the spectral norm (2-norm) of the
+      differences of the ultrametrics, suggested in Mérigot, Durbec, and
+      Gaertner (2010).}
   }
 
   The measures based on ultrametrics also allow computing dissimilarity
@@ -262,6 +265,11 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   In B. Schölkopf and M. K. Warmuth (eds.), \emph{Learning Theory and
     Kernel Machines}, pages 173--187.
   Springer-Verlag: Lecture Notes in Computer Science 2777.
+
+  B. Mérigot, J.-P. Durbec and J.-C. Gaertner (2010).
+  On goodness-of-fit measure for dendrogram-based analyses.
+  \emph{Ecology}, \bold{91}, 1850—-1859.
+  DOI: \url{http://doi.acm.org/10.1890/09-1387.1}
 
   C. Rajski (1961).
   A metric space of discrete probability distributions,
