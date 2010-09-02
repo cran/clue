@@ -219,6 +219,9 @@ set_cl_dissimilarity_method("Lyapunov", "hierarchy",
 set_cl_dissimilarity_method("BO", "hierarchy",
                             .cl_dissimilarity_hierarchy_BO,
                             "Boorman/Olivier m_delta tree distance")
+set_cl_dissimilarity_method("spectral", "hierarchy",
+                            .cl_dissimilarity_hierarchy_spectral,
+                            "spectral ultrametric distance")
 
 ### * Agreement Method Registration.
 

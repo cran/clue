@@ -77,7 +77,18 @@ function(x, k = n_of_classes(x))
 ## because ncol(x) might be different.)
 
 ## Package clue: pclust().
-cl_membership.pclust <- cl_membership.fanny
+cl_membership.pclust <-
+function(x, k = n_of_classes(x))
+{
+    ## We should really have a suitable "sparse matrix" class for
+    ## representing the memberships of hard partitions.  In case we
+    ## decide not to fill the membership "slot" for such:
+    if(is.null(m <- x$membership))
+        .cl_membership_from_class_ids(x$cluster, k)
+    else
+        .cl_membership_from_memberships(m, k)
+}
+
 ## Package clue: (virtual) class "cl_partition".
 cl_membership.cl_partition <-
 function(x, k = n_of_classes(x))
@@ -192,7 +203,7 @@ function(d, power = 2)
         power[2L] / (power[1L] - 1)
     u <- matrix(0, nrow(d), ncol(d))
     FUN <- function(s, t) (s / t) ^ exponent
-    zero_incidences <- (d == 0)
+    zero_incidences <- !(d > 0)
     n_of_zeroes <- rowSums(zero_incidences)
     if(any(ind <- (n_of_zeroes > 0)))
         u[ind, ] <- zero_incidences[ind, ] / n_of_zeroes[ind]

@@ -14,8 +14,8 @@
 pclust(x, k, family, m = 1, weights = 1, control = list())
 pclust_family(D, C, init = NULL, description = NULL, e = 1,
               .modify = NULL, .subset = NULL)
-pclust_object(prototypes, membership, cluster, family, m = 1, value, ...,
-              classes = NULL, attributes = NULL)
+pclust_object(prototypes, membership, cluster, family, m = 1,
+              value, ..., classes = NULL, attributes = NULL)
 }
 \arguments{
   \item{x}{the object to be partitioned.}

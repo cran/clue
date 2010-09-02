@@ -463,6 +463,20 @@ function(x, y, delta, ...)
     sum(diff(alpha) * deltas[-length(deltas)])
 }
 
+### ** .cl_dissimilarity_hierarchy_spectral
+
+.cl_dissimilarity_hierarchy_spectral <-
+function(x, y)
+{
+    if(!.has_object_dissimilarities(x) ||
+       !.has_object_dissimilarities(y))
+        return(NA)
+    u <- cl_object_dissimilarities(x)
+    v <- cl_object_dissimilarities(y)
+    svd(as.matrix(u - v))$d[1L]
+}
+
+
 ### * as.dist.cl_dissimilarity
 
 as.dist.cl_dissimilarity <-
