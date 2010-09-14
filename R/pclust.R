@@ -248,14 +248,20 @@ function(x, k, family, m = 1, weights = 1, control = list())
 
     if(m == 1) {
         ## Hard partitions.
+        value <- if(all(weights == 1))
+            function(dissimilarities, ids)
+                sum(.one_entry_per_column(dissimilarities, ids))
+        else
+            function(dissimilarities, ids)
+                sum(weights *
+                    .one_entry_per_column(dissimilarities, ids))
         opt_value <- Inf
         run <- 1L
         if(verbose && (nruns > 1L))
             message(gettextf("Pclust run: %d", run))
         repeat {
             class_ids <- max.col( - dissimilarities )
-            old_value <-
-                sum(.one_entry_per_column(dissimilarities, class_ids))
+            old_value <- value(dissimilarities, class_ids)
             if(verbose)
                 message(gettextf("Iteration: 0 *** value: %g", old_value))
             iter <- 1L
@@ -288,8 +294,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
                     ## For the time being, do not retry in case the
                     ## solution is still degenerate.
                 }
-                new_value <-
-                    sum(.one_entry_per_column(dissimilarities, class_ids))
+                new_value <- value(dissimilarities, class_ids)
                 if(verbose)
                     message(gettextf("Iteration: %d *** value: %g",
                                      iter, new_value))
@@ -320,8 +325,13 @@ function(x, k, family, m = 1, weights = 1, control = list())
     }
     else {
         ## Soft partitions.
-        value <- function(u, dissimilarities)
-            sum(u ^ m * dissimilarities)
+        value <- if(all(weights == 1))
+            function(dissimilarities, u)
+                sum(u ^ m * dissimilarities)
+        else
+            function(dissimilarities, u)
+                sum(weights *
+                    u ^ m * dissimilarities)
         opt_value <- Inf
         run <- 1L
         if(verbose && (nruns > 1L))
@@ -329,7 +339,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
         repeat {
             u <- .memberships_from_cross_dissimilarities(dissimilarities,
                                                          m)
-            old_value <- value(u, dissimilarities)
+            old_value <- value(dissimilarities, u)
             if(verbose)
                 message(gettextf("Iteration: 0 *** value: %g", old_value))
             iter <- 1L
@@ -348,7 +358,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
                 dissimilarities <- D(x, prototypes) ^ e
                 u <- .memberships_from_cross_dissimilarities(dissimilarities,
                                                              m)
-                new_value <- value(u, dissimilarities)
+                new_value <- value(dissimilarities, u)
                 if(verbose)
                     message(gettextf("Iteration: %d *** value: %g",
                                      iter, new_value))

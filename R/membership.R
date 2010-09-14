@@ -198,19 +198,18 @@ function(d, power = 2)
     ## dropping or re-introducing unused classes).
     ## </NOTE>
     exponent <- if(length(power) == 1L)
-        1 / (power - 1)
+        1 / (1 - power)
     else
-        power[2L] / (power[1L] - 1)
+        power[2L] / (1 - power[1L])
     u <- matrix(0, nrow(d), ncol(d))
-    FUN <- function(s, t) (s / t) ^ exponent
     zero_incidences <- !(d > 0)
     n_of_zeroes <- rowSums(zero_incidences)
     if(any(ind <- (n_of_zeroes > 0)))
-        u[ind, ] <- zero_incidences[ind, ] / n_of_zeroes[ind]
+        u[ind, ] <-
+            zero_incidences[ind, , drop = FALSE] / n_of_zeroes[ind]
     if(any(!ind)) {
-        u[!ind, ] <-
-            t(apply(d[!ind, ], 1,
-                    function(s) 1 / rowSums(outer(s, s, FUN))))
+        d <- d[!ind, , drop = FALSE] ^ exponent
+        u[!ind, ] <- d / rowSums(d)
     }
     u
 }
