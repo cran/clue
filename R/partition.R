@@ -168,6 +168,8 @@ cl_class_ids.cl_pam <- cl_class_ids.kmeans
 cl_class_ids.cl_partition_by_class_ids <-
 function(x)
     .get_representation(x)
+## Package clue: kmedoids().
+cl_class_ids.kmedoids <- cl_class_ids.kmeans
 ## Package clue: pclust().
 cl_class_ids.pclust <- cl_class_ids.kmeans
 ## Package clue: (virtual) class "cl_partition".
@@ -266,6 +268,8 @@ is.cl_partition.Mclust <- .true
 ## Note that "raw" cl_membership objects are *not* partitions, as they
 ## are meant for numeric computations.
 is.cl_partition.cl_partition <- .true
+## Package clue: kmedoids().
+is.cl_partition.kmedoids <- .true
 ## Package clue: pclust().
 is.cl_partition.pclust <- .true
 
@@ -517,6 +521,8 @@ function(x)
     else
         is.cl_hard_partition(y)
 }
+## Package clue: kmedoids().
+is.cl_hard_partition.kmedoids <- .true
 ## Package clue: pclust().
 is.cl_hard_partition.pclust <- is.cl_hard_partition.fanny
 
