@@ -450,6 +450,9 @@ function(x, y, delta, ...)
         t_y <- as.hclust(cl_ultrametric(y))
     else
         return(NA)
+
+    if(is.unsorted(t_x$height) || is.unsorted(t_y$height))
+        return(NA)
     
     alpha <- sort(unique(c(t_x$height, t_y$height)))
     cuts_x <- cutree(t_x, h = alpha)

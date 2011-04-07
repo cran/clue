@@ -29,13 +29,13 @@ function(x)
 cl_classes.cl_hierarchy <-
 function(x)
 {
+    ## Assume a valid hierarchy/dendrogram.
     x <- as.hclust(x)
     n <- n_of_objects(x)
     labels <- seq_len(n)
-    groups <- cutree(x, labels)
     ## Only use the "maximal" partitions for each height (relevant in
     ## case of non-binary trees).
-    groups <- groups[, c(which(diff(c(0, x$height)) > 0), n), drop = FALSE]
+    groups <- cutree(x, h = unique(c(0, x$height)))
     ## Give a list with the (unique) sets of numbers of the objects.
     out <- unique(unlist(sapply(split(groups, col(groups)),
                                 function(k) split(labels, k)),

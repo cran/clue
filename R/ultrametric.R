@@ -31,6 +31,8 @@ function(x, size = NULL, labels = NULL)
 .cl_ultrametric_from_veclh <-
 function(x, size = NULL, labels = NULL, meta = NULL)
 {
+    if(.non_ultrametricity(x) > 0)
+        stop("Not a valid ultrametric.")
     u <- cl_proximity(x, "Ultrametric distances",
                       labels = labels, size = size,
                       class = c("cl_ultrametric", "cl_dissimilarity",

@@ -12,7 +12,7 @@
 \newcommand{\file}[1]{\sQuote{\textsf{#1}}}
 \newcommand{\class}[1]{\code{"#1"}}
 
-\SweaveOpts{strip.white=TRUE}
+\SweaveOpts{strip.white=true}
 
 \AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
@@ -1139,16 +1139,17 @@ round(cl_dissimilarity(d, u), 4)
 @ %
 to $d$.  For the \code{hclust()} results, we get
 <<>>=
-hclust_methods <- c("ward", "single", "complete", "average", "mcquitty",
-                    "median", "centroid")
+hclust_methods <- c("ward", "single", "complete", "average", "mcquitty")
 hens <- cl_ensemble(list = lapply(hclust_methods,
                                   function(m) hclust(d, m)))
 names(hens) <- hclust_methods
 round(sapply(hens, cl_dissimilarity, d), 4)
 @ %
-which all exhibit greater Euclidean dissimilarity to $d$ than $u$.  We
-can also compare the ``structure'' of the different hierarchies, e.g.\
-by looking at the rate of inversions between them:
+which all exhibit greater Euclidean dissimilarity to $d$ than $u$.  (We
+exclude methods \code{"median"} and \code{"centroid"} as these do not
+yield valid hierarchies.)  We can also compare the ``structure'' of the
+different hierarchies, e.g.\ by looking at the rate of inversions
+between them:
 <<>>=
 ahens <- c(L2opt = cl_ensemble(u), hens)
 round(cl_dissimilarity(ahens, method = "gamma"), 2)

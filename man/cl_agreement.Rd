@@ -176,8 +176,8 @@ cl_agreement(pens, method = "NMI")[1:5, 6:7]
 
 ## An ensemble of hierarchies.
 d <- dist(USArrests)
-hclust_methods <- c("ward", "single", "complete", "average",
-                    "mcquitty", "median", "centroid")
+hclust_methods <-
+    c("ward", "single", "complete", "average", "mcquitty")
 hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
 names(hclust_results) <- hclust_methods 
 hens <- cl_ensemble(list = hclust_results)

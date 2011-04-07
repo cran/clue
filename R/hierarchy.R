@@ -19,7 +19,9 @@ function(x)
 is.cl_hierarchy.default <- .false
 
 ## Package stats: hclust().
-is.cl_hierarchy.hclust <- .true
+is.cl_hierarchy.hclust <-
+function(x)
+    !is.unsorted(x$height)
 
 ## Package cluster: agnes() and diana() give objects inheriting from
 ## class "twins".
@@ -159,7 +161,9 @@ function(x)
 ## Default method.
 is.cl_dendrogram.default <- .false
 ## Package stats: hclust().
-is.cl_dendrogram.hclust <- .true
+is.cl_dendrogram.hclust <-
+function(x)
+    !is.unsorted(x$height)
 ## Package cluster: agnes() and diana() give objects inheriting from
 ## class "twins".
 is.cl_dendrogram.twins <- .true
