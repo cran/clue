@@ -177,6 +177,11 @@ cl_class_ids.cl_partition <-
 function(x)
     cl_class_ids(.get_representation(x))
 
+## Package movMF: class "movMF".
+cl_class_ids.movMF <-
+function(x)
+    as.cl_class_ids(max.col(x$P))
+
 ### * as.cl_class_ids
 
 as.cl_class_ids <-
@@ -272,6 +277,9 @@ is.cl_partition.cl_partition <- .true
 is.cl_partition.kmedoids <- .true
 ## Package clue: pclust().
 is.cl_partition.pclust <- .true
+
+## Package movMF: class "movMF".
+is.cl_partition.movMF <- .true
 
 ### * as.cl_partition
 
@@ -525,6 +533,9 @@ function(x)
 is.cl_hard_partition.kmedoids <- .true
 ## Package clue: pclust().
 is.cl_hard_partition.pclust <- is.cl_hard_partition.fanny
+
+## Package movMF: class "movMF".
+is.cl_hard_partition.movMF <- is.cl_hard_partition.fanny
 
 ### * as.cl_hard_partition
 

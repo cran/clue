@@ -94,6 +94,11 @@ cl_membership.cl_partition <-
 function(x, k = n_of_classes(x))
     cl_membership(.get_representation(x), k)
 
+## Package movMF: class "movMF".
+cl_membership.movMF <-
+function(x, k = n_of_classes(x))
+    .cl_membership_from_memberships(x$P, k)
+
 ### * .make_cl_membership
 
 ## A low-level common creator.

@@ -40,16 +40,18 @@ as.cl_membership(x)
 \examples{
 ## Getting the memberships of a single soft partition.
 d <- dist(USArrests)
-hclust_methods <- c("ward", "single", "complete", "average",
-                    "mcquitty", "median", "centroid")
+hclust_methods <-
+    c("ward", "single", "complete", "average", "mcquitty")
 hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
 names(hclust_results) <- hclust_methods 
 ## Now create an ensemble from the results.
 hens <- cl_ensemble(list = hclust_results)
+## And add the results of agnes and diana.
+require("cluster")
+hens <- c(hens, list(agnes = agnes(d), diana = diana(d)))
 ## Create a dissimilarity object from this.
 d1 <- cl_dissimilarity(hens)
 ## And compute a soft partition.
-require("cluster")
 party <- fanny(d1, 2)
 round(cl_membership(party), 5)
 ## The "nearest" hard partition to this:

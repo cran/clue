@@ -49,8 +49,8 @@ is.cl_ensemble(x)
 }
 \examples{
 d <- dist(USArrests)
-hclust_methods <- c("ward", "single", "complete", "average",
-                    "mcquitty", "median", "centroid")
+hclust_methods <-
+    c("ward", "single", "complete", "average", "mcquitty")
 hclust_results <- lapply(hclust_methods, function(m) hclust(d, m))
 names(hclust_results) <- hclust_methods 
 ## Now create an ensemble from the results.
