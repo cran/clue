@@ -101,17 +101,30 @@ function(x)
     ids <- ids[order(n)]
 
     ## And now incrementally build the join.
-    jcids <- ids[[1L]]                   # Class ids of the current join.
+    jcids <- ids[[1L]]                  # Class ids of the current join.
     jnc <- length(unique(jcids))        # Number of classes of this.
     for(b in seq.int(from = 2, to = length(x))) {
         z <- table(jcids, ids[[b]])
         ## It is faster to work on the smaller partition, but this
         ## should be ensured by the reordering ...
+        ## We need to "join all elements in the same class in at least
+        ## one of the partitions".  In the matrix
+        ##   C <- (tcrossprod(z) > 0)
+        ## entry i,j is true/one iff z_{ik} z_{jk} > 0 for classes
+        ## i and j in the current join (ids jcids) and some class k in
+        ## the partition with ids[[b]], so that i and j must be joined.
+        ## I.e., C indicates which classes need to be joined directly.
+        ## We need to determine the transitive closure of this relation,
+        ## which can be performed by repeating
+        ##   C_{t+1} <- ((C_t %*% C) > 0)
+        ## with C_1 = C until C_t does not change.
         C_new <- C_old <- C <- (tcrossprod(z) > 0)
         repeat {
             C_new <- (C_old %*% C) > 0
             if(all(C_new == C_old)) break
+            C_old <- C_new
         }
+        C <- C_new
         ## This should now have the connected components.
         ## Next, compute the map of the join class ids to the ids of
         ## these components. 
