@@ -1,4 +1,4 @@
-1acf3fc89d6ff4d8057e83c71851bc7d *DESCRIPTION
+da3fc63af47f8432cfe98a350507f066 *DESCRIPTION
 2e8c24929e100bec526083a0ae53cec2 *NAMESPACE
 281c7577f564a5acbecf046c5d1b8e64 *R/AAA.R
 dee24fcc897bcdb23cccdbc7773c8e3d *R/addtree.R
@@ -15,7 +15,7 @@ d99c4d7ef53f90306b013a7a1ba7a861 *R/fuzziness.R
 24f0123ca4dcbc011191a15d92f62a7c *R/lsap.R
 d10944e1875825af11bcea65571432fc *R/margin.R
 6197a2bae482c876b955d9a418e2720a *R/medoid.R
-6acabe6dc67da67eb96e84d71b102145 *R/membership.R
+a3dccf831a311ed068578f817f38161e *R/membership.R
 50b22669820e9cf396de40f809547f43 *R/objects.R
 b0ef84e9280ca265733abd960f877e17 *R/partition.R
 ac7e7c712fd82c8d728a89d5543dbc1c *R/pava.R
@@ -38,7 +38,7 @@ e403e7b0bd9e8d594db79b64af5faebe *data/GVME_Consensus.rda
 0439a0d99608c02747a450a115c2c95e *data/Phonemes.rda
 601f4431c9a70826c314edff7c29e316 *inst/CITATION
 2ead8333d4e3429749c00471932f75bd *inst/doc/clue.Rnw
-49c4c36de092960e60ff11e9b54424c1 *inst/doc/clue.pdf
+d189ba51f9774e936d47a45da124d07f *inst/doc/clue.pdf
 3a88c7850a41deea7e46d848ada7134c *inst/doc/cluster.bib
 26e7ea18427ce073cf0108406d2d240c *inst/po/en@quot/LC_MESSAGES/R-clue.mo
 6b382525256a1a059e58ce576eff7106 *man/CKME.Rd

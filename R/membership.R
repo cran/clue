@@ -213,7 +213,10 @@ function(d, power = 2)
         u[ind, ] <-
             zero_incidences[ind, , drop = FALSE] / n_of_zeroes[ind]
     if(any(!ind)) {
-        d <- d[!ind, , drop = FALSE] ^ exponent
+        ## Compute d_{bj}^e / \sum_k d_{bk}^e without overflow from very
+        ## small d_{bj} values.
+        d <- exponent * log(d[!ind, , drop = FALSE])
+        d <- exp(d - d[cbind(seq_len(nrow(d)), max.col(d))])
         u[!ind, ] <- d / rowSums(d)
     }
     u
