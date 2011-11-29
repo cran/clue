@@ -84,6 +84,7 @@ S3method("as.hclust", "cl_ultrametric")
 S3method("as.hclust", "mona")
 
 S3method("as.matrix", "cl_proximity")
+S3method("as.matrix", "hclust")
 
 S3method("c", "cl_ensemble")
 
