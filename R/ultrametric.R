@@ -776,6 +776,20 @@ function(x, nterms = 1, weights = 1, control = list())
     .structure(u, objval = L_new, status = as.integer(iter == maxiter))
 }
 
+### * as.dist.hclust
+
+## Using hclust() with methods 'median' or 'centroid' typically gives
+## reversals and hence not valid hierarchies, i.e., distances which do
+## not satisfy the ultrametricity conditions.  The distances can be
+## obtained via cophenetic(), but ls_fit_ultrametric() prefers using
+## as.dist() [as arguably more appropriate] which in turn can be made to
+## "work" by providing as.matrix() methods [bypassing the need to handle
+## the extra arguments 'diag' and 'upper' for as.dist()].
+
+as.matrix.hclust <-
+function(x, ...)
+    as.matrix(cophenetic(x))
+
 ### * .non_ultrametricity
 
 .non_ultrametricity <-

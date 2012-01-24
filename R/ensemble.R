@@ -164,7 +164,7 @@ function(x, ..., main = NULL, layout = NULL)
                   inherits(e, c("cl_addtree", "cl_ultrametric"))))
     if(!all(ok))
         stop(gettextf("Plotting not available for elements %s of the ensemble.",
-                      paste(which[!ok], collapse = " ")))
+                      paste(which(!ok), collapse = " ")))
 
     ## Prefer dendrogram plot methods to those for hclust objects.
     ind <- sapply(x, is.cl_dendrogram)
