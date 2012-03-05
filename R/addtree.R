@@ -426,8 +426,11 @@ function(x, const = NULL)
     }
     u <- x - .make_centroid_matrix(g)
 
-    dimnames(u) <- dimnames(x)
     names(g) <- rownames(x)
+
+    ## Ensure a valid ultrametric.
+    d <- .ultrametrify(as.dist(u))
+    u <- .cl_ultrametric_from_veclh(d, nrow(x), rownames(x))
 
     ## Note that we return the centroid distances to the root, and not
     ## between the objects (as.dist(.make_centroid_matrix(g))) ...
