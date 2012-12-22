@@ -14,8 +14,10 @@ function(x, maximum = FALSE)
     if(maximum) x <- max(x) - x
 
     storage.mode(x) <- "double"
-    out <- .C("solve_LSAP", x, nc, p = integer(nc),
-              PACKAGE = "clue")$p + 1
+    out <- .C(C_solve_LSAP,
+              x,
+              as.integer(nc),
+              p = integer(nc))$p + 1
     out <- out[seq_len(nr)]
     class(out) <- "solve_LSAP"
     out

@@ -1,4 +1,4 @@
-useDynLib("clue")
+useDynLib("clue", .registration = TRUE, .fixes = "C_")
 
 import("stats")
 importFrom("graphics", "plot")
@@ -40,6 +40,7 @@ export("cl_agreement",
        "is.cl_soft_partition", "is.cl_dendrogram",
        "as.cl_dendrogram",
        "is.cl_hierarchy", "as.cl_hierarchy",
+       "as.cl_addtree",
        "kmedoids",
        "pclust", "pclust_family", "pclust_object",
        "solve_LSAP",

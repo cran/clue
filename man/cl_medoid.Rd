@@ -34,7 +34,7 @@ cl_medoid(x, method = "euclidean")
 \references{
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
-  Boca Raton, FL: Chapman \& Hall/CRC.
+  Boca Raton, FL: Chapman & Hall/CRC.
 }  
 \seealso{
   \code{\link{cl_consensus}}

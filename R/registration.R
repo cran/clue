@@ -275,6 +275,9 @@ set_cl_agreement_method("Jaccard", "partition",
 set_cl_agreement_method("purity", "partition",
                         .cl_agreement_partition_purity,
                         "purity")
+set_cl_agreement_method("PS", "partition",
+                        .cl_agreement_partition_PS,
+                        "Prediction Strength")
 
 set_cl_agreement_method("euclidean", "hierarchy",
                         .cl_agreement_hierarchy_euclidean,

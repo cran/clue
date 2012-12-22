@@ -248,11 +248,10 @@ function(n)
 .make_penalty_gradient_ultrametric <-
 function(n)
     function(d) {
-        gr <- matrix(.C("deviation_from_ultrametricity_gradient",
+        gr <- matrix(.C(C_deviation_from_ultrametricity_gradient,
                         as.double(.symmetric_matrix_from_veclh(d, n)),
-                        n,
-                        gr = double(n * n),
-                        PACKAGE = "clue")$gr,
+                        as.integer(n),
+                        gr = double(n * n))$gr,
                      n, n)
         gr[row(gr) > col(gr)] + 2 * sum(pmin(d, 0))
     }
@@ -321,7 +320,7 @@ function(x, weights = 1, control = list())
     for(run in seq_along(order)) {
         if(verbose)
             message(gettextf("Iterative projection run: %d", run))
-        d <- .C("ls_fit_ultrametric_by_iterative_projection",
+        d <- .C(C_ls_fit_ultrametric_by_iterative_projection,
                 as.double(x),
                 as.integer(n),
                 as.integer(order[[run]] - 1L),
@@ -397,15 +396,14 @@ function(x, weights = 1, control = list())
     for(run in seq_along(order)) {
         if(verbose)
             message(gettextf("Iterative reduction run: %d", run))
-        d <- .C("ls_fit_ultrametric_by_iterative_reduction",
+        d <- .C(C_ls_fit_ultrametric_by_iterative_reduction,
                 as.double(x),
                 as.integer(n),
                 as.integer(order[[run]] - 1L),
                 as.integer(maxiter),
                 iter = integer(1L),
                 as.double(tol),
-                as.logical(verbose),
-                PACKAGE = "clue")[[1L]]
+                as.logical(verbose))[[1L]]
         v <- L(d)
         if(v < v_opt) {
             v_opt <- v
@@ -797,12 +795,11 @@ function(x, max = FALSE)
 {
     if(!is.matrix(x))
         x <- .symmetric_matrix_from_veclh(x)
-    .C("deviation_from_ultrametricity",
+    .C(C_deviation_from_ultrametricity,
        as.double(x),
-       nrow(x),
+       as.integer(nrow(x)),
        fn = double(1L),
-       as.logical(max),
-       PACKAGE = "clue")$fn
+       as.logical(max))$fn
 }
 
 ### * .cl_ultrametric_from_classes

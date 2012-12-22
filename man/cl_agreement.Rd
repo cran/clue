@@ -72,11 +72,6 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
     \item{\code{"diag"}}{the maximal co-classification rate, i.e., the
       maximal rate of objects with the same class ids in both
       partitions after arbitrarily permuting the ids.}
-    \item{\code{"Jaccard"}}{the Jaccard index, i.e., the ratio of the
-      numbers of distinct pairs of objects in the same class in both
-      partitions and in at least one partition, respectively.
-      For soft partitions, (currently) the Jaccard index of the
-      corresponding nearest hard partitions is used.}
     \item{\code{"FM"}}{the index of Fowlkes and Mallows (1983), i.e.,
       the ratio \eqn{N_{xy} / \sqrt{N_x N_y}}{N_xy / sqrt(N_x N_y)} of
       the number \eqn{N_{xy}}{N_xy} of distinct pairs of objects in the
@@ -86,6 +81,21 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
       respectively.
       For soft partitions, (currently) the Fowlkes-Mallows index of the
       corresponding nearest hard partitions is used.}
+    \item{\code{"Jaccard"}}{the Jaccard index, i.e., the ratio of the
+      numbers of distinct pairs of objects in the same class in both
+      partitions and in at least one partition, respectively.
+      For soft partitions, (currently) the Jaccard index of the
+      corresponding nearest hard partitions is used.}
+    \item{\code{"purity"}}{the purity of the classes of \code{x} with
+      respect to those of \code{y}, i.e.,
+      \eqn{\sum_j \max_i n_{ij} / n},
+      where \eqn{n_{ij}} is the joint frequency of objects in class
+      \eqn{i} for \code{x} and in class \eqn{j} for \code{y}, and
+      \eqn{n} is the total number of objects.}
+    \item{\code{"PS"}}{Prediction Strength, see Tibshirani and Walter
+      (2005): the minimum, over all classes \eqn{j} of \code{y}, of the
+      maximal rate of objects in the same class for \code{x} and in
+      class \eqn{j} for \code{y}.}
   }
 
   If all components are hierarchies, available built-in methods for
@@ -138,7 +148,7 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
-  Boca Raton, FL: Chapman \& Hall/CRC.
+  Boca Raton, FL: Chapman & Hall/CRC.
   
   L. Hubert and P. Arabie (1985).
   Comparing partitions.
@@ -158,6 +168,11 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   Cluster ensembles --- A knowledge reuse framework for combining
   multiple partitions.
   \emph{Journal of Machine Learning Research}, \bold{3}, 583--617.
+
+  R. Tibshirani and G. Walter (2005).
+  Cluster validation by Prediction Strength.
+  \emph{Journal of Computational and Graphical Statistics}, \bold{14}/3,
+  511--528.
 }
 \seealso{
   \code{\link{cl_dissimilarity}};
