@@ -36,7 +36,7 @@ cl_validity(x, ...)
   classes.
 
   For hierarchies, the validity measures computed by default are
-  \dQuote{variance accounted for} (VAF, e.g., Hubert, Arabie \& Meulman,
+  \dQuote{variance accounted for} (VAF, e.g., Hubert, Arabie & Meulman,
   2006) and \dQuote{deviance accounted for} (DEV, e.g., Smith, 2001).
   If \code{u} is the ultrametric corresponding to the hierarchy \code{x}
   and \code{d} the dissimilarity \code{x} was obtained from, these

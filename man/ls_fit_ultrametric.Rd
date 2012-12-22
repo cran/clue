@@ -136,7 +136,7 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
 \references{
   J.-P. Barthélémy and A. Guénoche (1991).
   \emph{Trees and proximity representations}.
-  Chichester: John Wiley \& Sons.
+  Chichester: John Wiley & Sons.
   ISBN 0-471-92263-3.
   
   J. D. Carroll and S. Pruzansky (1980).

@@ -363,9 +363,11 @@ function(x, y)
     u <- cl_object_dissimilarities(x)
     v <- cl_object_dissimilarities(y)
     n <- length(u)
-    .C("clue_dissimilarity_count_inversions",
-       u, v, n, count = double(1L),
-       PACKAGE = "clue") $ count / choose(n, 2)
+    .C(C_clue_dissimilarity_count_inversions,
+       as.double(u),
+       as.double(v),
+       as.integer(n),
+       count = double(1L)) $ count / choose(n, 2)
 }
 
 ### ** .cl_dissimilarity_hierarchy_symdiff

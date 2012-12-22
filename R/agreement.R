@@ -284,7 +284,23 @@ function(x, y)
 
     sum(apply(x, 1L, max)) / n
 }
-    
+
+.cl_agreement_partition_PS <-
+function(x, y)
+{
+    ## Prediction Strength as used in Tibshirani and Walter (2005),
+    ## "Cluster Validation by Prediction Strength", JCGS.
+
+    ## See Eqn 2.1 in the reference: this is
+    ##   min_l rate of different objects in the same class in partition
+    ##         A and in class l in partition B,
+    ## where the min is taken over all classes l of partition B.
+
+    x <- table(cl_class_ids(x), cl_class_ids(y))
+    s <- rowSums(x)
+
+    min((rowSums(x ^ 2) - s) / (s * (s - 1)), na.rm = TRUE)
+}   
 
 ## Some computations useful for interpreting some of the above.
 ##

@@ -285,7 +285,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
 
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
-  Boca Raton, FL: Chapman \& Hall/CRC.
+  Boca Raton, FL: Chapman & Hall/CRC.
 
   T. Margush and F. R. McMorris (1981).
   Consensus \eqn{n}-trees.
