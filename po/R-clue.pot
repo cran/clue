@@ -1,8 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: R 2.3.0\n"
-"Report-Msgid-Bugs-To: bugs@r-project.org\n"
-"POT-Creation-Date: 2008-08-27 08:06\n"
+"Project-Id-Version: clue 0.3-45\n"
+"POT-Creation-Date: 2013-03-19 14:22\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,6 +65,9 @@ msgid "AOG run: %d"
 msgstr ""
 
 msgid "Parameter 'p' must be in [1/2, 1]."
+msgstr ""
+
+msgid "Cannot compute prototype distances."
 msgstr ""
 
 msgid "All elements must have the same number of objects."
@@ -215,6 +217,9 @@ msgstr ""
 msgid "Iteration: %d Rho: %g P: %g"
 msgstr ""
 
+msgid "Not a valid ultrametric."
+msgstr ""
+
 msgid "Given ensemble contains no dissimilarities."
 msgstr ""
 
@@ -234,9 +239,6 @@ msgid "Change: %g"
 msgstr ""
 
 msgid "Overall change: u: %g L: %g"
-msgstr ""
-
-msgid "Argument 'x' must be a matrix."
 msgstr ""
 
 msgid "An object of virtual class '%s', with representation:"

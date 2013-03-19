@@ -6,7 +6,8 @@
   (Euclidean dissimilarity) to a given dissimilarity object.
 }
 \usage{
-ls_fit_sum_of_ultrametrics(x, nterms = 1, weights = 1, control = list())
+ls_fit_sum_of_ultrametrics(x, nterms = 1, weights = 1,
+                           control = list())
 }
 \arguments{
   \item{x}{a dissimilarity object inheriting from or coercible to class

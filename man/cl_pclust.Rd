@@ -9,7 +9,8 @@
   for suitable dissimilarities \eqn{d} and exponents \eqn{e}.
 }
 \usage{
-cl_pclust(x, k, method = NULL, m = 1, weights = 1, control = list())
+cl_pclust(x, k, method = NULL, m = 1, weights = 1,
+          control = list())
 }
 \arguments{
   \item{x}{an ensemble of partitions or hierarchies, or something
