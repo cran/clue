@@ -35,8 +35,8 @@ as.cl_dendrogram(x)
   hierarchies obtained from clustering functions in the base R
   distribution, as well as packages \pkg{RWeka}, \pkg{ape}, \pkg{cba},
   \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, \pkg{flexclust},
-  \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and of course,
-  \pkg{clue} itself).
+  \pkg{flexmix}, \pkg{kernlab}, \pkg{mclust}, \pkg{movMF} and
+  \pkg{skmeans} (and of course, \pkg{clue} itself).
 
   The hierarchies considered by \pkg{clue} are \emph{\eqn{n}-trees}
   (hierarchies in the strict sense) and \emph{dendrograms} (also known

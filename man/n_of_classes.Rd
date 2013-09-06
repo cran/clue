@@ -28,10 +28,11 @@ as.cl_class_ids(x)
   These function are generic functions.
 
   The methods provided in package \pkg{clue} handle the partitions
-  obtained from clustering functions in the base R distribution, as
-  well as packages \pkg{RWeka}, \pkg{cba}, \pkg{cclust}, \pkg{cluster},
-  \pkg{e1071}, \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab}, and
-  \pkg{mclust} (and of course, \pkg{clue} itself).
+  obtained from clustering functions in the base R distribution, as well
+  as packages \pkg{RWeka}, \pkg{cba}, \pkg{cclust}, \pkg{cluster},
+  \pkg{e1071}, \pkg{flexclust}, \pkg{flexmix}, \pkg{kernlab},
+  \pkg{mclust}, \pkg{movMF} and \pkg{skmeans} (and of course, \pkg{clue}
+  itself).
 
   Note that the number of classes is taken as the number of distinct
   class ids actually used in the partition, and may differ from the

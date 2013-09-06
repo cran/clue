@@ -37,8 +37,8 @@ cl_predict(object, newdata = NULL,
   \pkg{clue} handle the partitions obtained from clustering functions in
   the base R distribution, as well as packages \pkg{RWeka}, \pkg{cba},
   \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, \pkg{flexclust},
-  \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and of course,
-  \pkg{clue} itself).
+  \pkg{flexmix}, \pkg{kernlab}, \pkg{mclust}, \pkg{movMF} and
+  \pkg{skmeans} (and of course, \pkg{clue} itself).
 }
 \examples{
 ## Run kmeans on a random subset of the Cassini data, and predict the

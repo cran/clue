@@ -568,7 +568,7 @@ the ``usual'' choice.  A similar point can be made for co-occurrences of
 soft memberships.  We are not aware of systematic investigations of
 these extension issues.
 
-\subsubsection{Hierachy proximities}
+\subsubsection{Hierarchy proximities}
 
 Available built-in dissimilarity measures for hierarchies include
 \emph{Euclidean} (again, the default measure used by
