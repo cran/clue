@@ -22,8 +22,9 @@ cl_object_names(x)
   hierarchies obtained from clustering functions in the base R
   distribution, as well as packages \pkg{RWeka}, \pkg{ape}, \pkg{cba},
   \pkg{cclust}, \pkg{cluster}, \pkg{e1071}, \pkg{flexclust},
-  \pkg{flexmix}, \pkg{kernlab}, and \pkg{mclust} (and of course,
-  \pkg{clue} itself), in as much as possible.
+  \pkg{flexmix}, \pkg{kernlab}, \pkg{mclust}, \pkg{movMF} and
+  \pkg{skmeans} (and of course, \pkg{clue} itself), in as much as
+  possible.
 
   There is also a method for object dissimilarities which inherit from
   class \code{"\link{dist}"}.

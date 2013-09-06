@@ -245,6 +245,9 @@ function(object, newdata = NULL,
 ## Package mclust: Ron Wehrens will add a predict method for Mclust
 ## objects eventually (as suggested by us).
 
+## Package movMF: movMF().
+cl_predict.movMF <- cl_predict.Weka_clusterer
+
 ## Package clue: pclust().
 cl_predict.pclust <-
 function(object, newdata = NULL,
