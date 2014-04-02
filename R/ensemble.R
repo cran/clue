@@ -96,7 +96,8 @@ function(..., na.rm = FALSE)
     ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
     if(!ok)
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
     args <- list(...)
     ## Combine the given partition ensembles.
     x <- do.call(c, args)
@@ -164,7 +165,8 @@ function(x, ..., main = NULL, layout = NULL)
                   inherits(e, c("cl_addtree", "cl_ultrametric"))))
     if(!all(ok))
         stop(gettextf("Plotting not available for elements %s of the ensemble.",
-                      paste(which(!ok), collapse = " ")))
+                      paste(which(!ok), collapse = " ")),
+             domain = NA)
 
     ## Prefer dendrogram plot methods to those for hclust objects.
     ind <- sapply(x, is.cl_dendrogram)

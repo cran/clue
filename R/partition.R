@@ -334,14 +334,16 @@ function(x, ...)
 Complex.cl_partition <-
 function(z)
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                  .Generic, .Class))
+                  .Generic, .Class),
+         domain = NA)
 
 ### * Math.cl_partition
 
 Math.cl_partition <-
 function(x, ...)
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                  .Generic, .Class))
+                  .Generic, .Class),
+         domain = NA)
 
 ### * Ops.cl_partition
 
@@ -350,13 +352,15 @@ function(e1, e2)
 {
     if(nargs() == 1L)
         stop(gettextf("Unary '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
 
     ## Only comparisons are supprorted.
     if(!(as.character(.Generic) %in% c("<", "<=", ">", ">=",
                                        "==", "!=")))
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
 
     ci1 <- cl_class_ids(e1)
     ci2 <- cl_class_ids(e2)
@@ -381,7 +385,8 @@ function(..., na.rm = FALSE)
     ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
     if(!ok)
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
     args <- list(...)
     switch(.Generic,
            "min" = cl_meet(cl_ensemble(list = args)),

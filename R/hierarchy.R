@@ -76,7 +76,8 @@ function(x, ...)
 Complex.cl_hierarchy <-
 function(z)
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                  .Generic, .Class))
+                  .Generic, .Class),
+         domain = NA)
 
 ### * Math.cl_hierarchy
 
@@ -84,7 +85,8 @@ function(z)
 Math.cl_hierarchy <-
 function(x, ...)
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                  .Generic, .Class))
+                  .Generic, .Class),
+         domain = NA)
 
 ### * Ops.cl_hierarchy
 
@@ -93,13 +95,15 @@ function(e1, e2)
 {
     if(nargs() == 1L)
         stop(gettextf("Unary '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
 
     ## Only comparisons are supprorted.
     if(!(as.character(.Generic) %in% c("<", "<=", ">", ">=",
                                        "==", "!=")))
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
 
     if(n_of_objects(e1) != n_of_objects(e2))
         stop("Hierarchies must have the same number of objects.")
@@ -128,7 +132,8 @@ function(..., na.rm = FALSE)
     ok <- switch(.Generic, max = , min = , range = TRUE, FALSE)
     if(!ok)
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
     args <- list(...)
     switch(.Generic,
            "min" = cl_meet(cl_ensemble(list = args)),
@@ -215,13 +220,15 @@ function(e1, e2)
 {
     if(nargs() == 1L)
         stop(gettextf("Unary '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
 
     ## Only comparisons are supprorted.
     if(!(as.character(.Generic) %in% c("<", "<=", ">", ">=",
                                        "==", "!=")))
         stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-                      .Generic, .Class))
+                      .Generic, .Class),
+             domain = NA)
 
     u1 <- cl_ultrametric(e1)
     u2 <- cl_ultrametric(e2)
