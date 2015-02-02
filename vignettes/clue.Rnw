@@ -1,6 +1,6 @@
 \documentclass[fleqn]{article}
 \usepackage[round,longnamesfirst]{natbib}
-\usepackage{graphicx,keyval,thumbpdf,url}
+\usepackage{graphicx,keyval,url}
 
 \newcommand\argmin{\mathop{\mathrm{arg min}}}
 \newcommand\trace{\mathop{\mathrm{tr}}}
@@ -532,7 +532,7 @@ $\tilde{M}$, and can again be computed efficiently by solving an LSAP.
 
 For hard partitions, both Manhattan and squared Euclidean dissimilarity
 give twice the \emph{transfer distance}
-\citep{cluster:Charon+Denoeud+Guenoche:2005}, which is the minimum
+\citep{cluster:Charon+Denoeud+Guenoche:2006}, which is the minimum
 number of objects that must be removed so that the implied partitions
 (restrictions to the remaining objects) are identical.  This is also
 known as the \emph{$R$-metric} in \cite{cluster:Day:1981}, i.e., the

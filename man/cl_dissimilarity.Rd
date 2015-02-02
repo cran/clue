@@ -232,11 +232,10 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   Metrics on spaces of finite trees.
   \emph{Journal of Mathematical Psychology}, \bold{10}, 26--59.
   
-  I. Charon, L. Denoeud, A. Guénoche and O. Hudry (2005).
+  I. Charon, L. Denoeud, A. Guénoche and O. Hudry (2006).
   \emph{Maximum Transfer Distance Between Partitions}.
-  Technical Report 2005D003, Ecole Nationale Supérieure des
-  Télécommunications --- Paris.
-  \url{http://www.enst.fr/_data/files/docs/id_515_1128675112_271.pdf}
+  \emph{Journal of Classification}, \bold{23}, 103--121.
+  doi: \href{http://doi.org/10.1007/s00357-006-0006-2}{10.1007/s00357-006-0006-2}.
   
   W. E. H. Day (1981).
   The complexity of computing metric distances between partitions.

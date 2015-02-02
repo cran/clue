@@ -61,7 +61,7 @@ cl_bag(x, B, k = NULL, algorithm = "kmeans", parameters = NULL,
   \emph{Bagged Clustering}.
   Working Paper 51, SFB \dQuote{Adaptive Information Systems and
     Modeling in Economics and Management Science}.
-  \url{http://www.ci.tuwien.ac.at/~leisch/papers/wp51.ps}.
+  \url{epub.wu.ac.at/1272/}.
 }
 \examples{
 set.seed(1234)
