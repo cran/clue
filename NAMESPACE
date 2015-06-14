@@ -145,6 +145,7 @@ S3method("cl_object_names", "mona")
 S3method("cl_object_names", "phylo")
 S3method("cl_object_names", "twins")
 
+S3method("cl_predict", "Mclust")
 S3method("cl_predict", "Weka_clusterer")
 S3method("cl_predict", "bclust")
 S3method("cl_predict", "cclust")

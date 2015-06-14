@@ -242,8 +242,22 @@ function(object, newdata = NULL,
                                    type)
 }
 
-## Package mclust: Ron Wehrens will add a predict method for Mclust
-## objects eventually (as suggested by us).
+## Package mclust: Mclust().
+cl_predict.Mclust <-
+function(object, newdata = NULL,
+         type = c("class_ids", "memberships"), ...)
+{
+    if(is.null(newdata))
+        return(.cl_class_ids_or_membership(object, type))
+
+    pred <- predict(object, newdata, ...)
+    type <- match.arg(type)
+    if(type == "class_ids")
+        as.cl_class_ids(pred$classification)
+    else
+        as.cl_membership(pred$z)
+}
+
 
 ## Package movMF: movMF().
 cl_predict.movMF <- cl_predict.Weka_clusterer
