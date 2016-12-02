@@ -27,11 +27,13 @@
   A. D. Gordon and M. Vichi (2001).
   Fuzzy partition models for fitting a set of partitions.
   \emph{Psychometrika}, \bold{66}, 229--248.
+  \doi{10.1007/BF02294837}.
 
   M. Sato and Y. Sato (1994).
   On a multicriteria fuzzy clustering method for 3-way data.
   \emph{International Journal of Uncertainty, Fuzziness and
-    Knowledge-Based Systems}, \bold{2}, 127--142.
+    Knowledge-Based Systems}, \bold{2}, 127--142. \cr
+  \doi{10.1142/S0218488594000122}.
 }
 \examples{
 ## Load the consensus partitions.

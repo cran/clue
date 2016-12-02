@@ -28,5 +28,6 @@
   An analysis of perceptual confusions among some English consonants.
   \emph{Journal of the Acoustical Society of America}, \bold{27},
   338--352.
+  \doi{10.1121/1.1907526}.
 }
 \keyword{datasets}

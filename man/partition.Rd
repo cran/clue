@@ -52,12 +52,12 @@ as.cl_hard_partition(x)
   \code{as.cl_hard_partition(x)} returns an object which has class
   \code{"cl_hard_partition"} and inherits from \code{"cl_partition"},
   and contains \code{x} if it already represents a hard partition (i.e.,
-  \code{is.cl_hard_partition(x)} is true), or the class ids obtained
-  from \code{x}, using \code{x} if this is an atomic vector of raw class 
-  ids, or, if \code{x} represents a soft partition or is a raw matrix of
-  membership values, using the class ids of the \emph{nearest hard
-    partition}, defined by taking the class ids of the (first) maximal
-  membership values.
+  provided that \code{is.cl_hard_partition(x)} is true), or the class
+  ids obtained from \code{x}, using \code{x} if this is an atomic vector
+  of raw class ids, or, if \code{x} represents a soft partition or is a
+  raw matrix of membership values, using the class ids of the
+  \emph{nearest hard partition}, defined by taking the class ids of the
+  (first) maximal membership values.
 
   Conceptually, partitions and hard partitions are \emph{virtual}
   classes, allowing for a variety of representations.

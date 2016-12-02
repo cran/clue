@@ -149,10 +149,12 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   structures to proximity data.
   \emph{British Journal of Mathematical and Statistical Psychology},
   \bold{48}, 281--317.
+  \doi{10.1111/j.2044-8317.1995.tb01065.x}.
   
   M. Krivanek and J. Moravek (1986).
   NP-hard problems in hierarchical tree clustering.
   \emph{Acta Informatica}, \bold{23}, 311--323.
+  \doi{10.1007/BF00289116}.
   
   M. Roux (1988).
   Techniques of approximation for building two tree structures.
@@ -164,11 +166,13 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   G. de Soete (1984).
   Ultrametric tree representations of incomplete dissimilarity data.
   \emph{Journal of Classification}, \bold{1}, 235--242.
+  \doi{10.1007/BF01890124}.
 
   G. de Soete (1986).
   A least squares algorithm for fitting an ultrametric tree to a
   dissimilarity matrix.
   \emph{Pattern Recognition Letters}, \bold{2}, 133--137.
+  \doi{10.1016/0167-8655(84)90036-9}.
 }
 \seealso{
   \code{\link{cl_consensus}} for computing least squares (Euclidean)

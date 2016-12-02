@@ -51,6 +51,7 @@ kmedoids(x, k)
   A. D. Gordon and M. Vichi (1998).
   Partitions of partitions.
   \emph{Journal of Classification}, \bold{15}, 265--285.
+  \doi{10.1007/s003579900034}.
 }  
 \keyword{cluster}
 \keyword{optimize}

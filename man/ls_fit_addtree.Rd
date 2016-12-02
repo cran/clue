@@ -74,6 +74,7 @@ ls_fit_centroid(x)
   structures to proximity data.
   \emph{British Journal of Mathematical and Statistical Psychology},
   \bold{48}, 281--317.
+  \doi{10.1111/j.2044-8317.1995.tb01065.x}.
 
   M. Roux (1988).
   Techniques of approximation for building two tree structures.
@@ -86,6 +87,7 @@ ls_fit_centroid(x)
   A least squares algorithm for fitting additive trees to proximity
   data.
   \emph{Psychometrika}, \bold{48}, 621--626.
+  \doi{10.1007/BF02293884}.
 }
 \keyword{cluster}
 \keyword{optimize}

@@ -71,6 +71,7 @@ cl_validity(x, ...)
   Constructing ultrametric and additive trees based on the \eqn{L_1}
   norm.
   \emph{Journal of Classification}, \bold{18}/2, 185--207.
+  \doi{10.1007/s00357-001-0015-0}.
 }  
 \seealso{
   \code{\link[fpc]{cluster.stats}} in package \pkg{fpc} for a variety of

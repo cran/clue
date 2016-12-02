@@ -25,12 +25,16 @@ sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
     method.}
   \item{eps}{the absolute convergence tolerance.  The algorithm stops if
     the (maximum) distance between successive \code{x} values is
-    less than \code{eps}.  Defaults to \code{sqrt(.Machine$double.eps)}.}
+    less than \code{eps}.
+
+    Defaults to \code{sqrt(.Machine$double.eps)}.}
   \item{q}{a double greater than one controlling the growth of the
     \eqn{\rho_k} as described in \bold{Details}.
+    
     Defaults to 10.}
   \item{verbose}{a logical indicating whether to provide some output on
     minimization progress.
+    
     Defaults to \code{getOption("verbose")}.}
   \item{control}{a list of control parameters to be passed to the
     minimization routine in case \code{optim} is used.}

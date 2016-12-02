@@ -76,6 +76,7 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1,
   W. Gaul and M. Schader (1988).
   Clusterwise aggregation of relations.
   \emph{Applied Stochastic Models and Data Analysis}, \bold{4}:273--282.
+  \doi{10.1002/asm.3150040406}.
 }
 \examples{
 ## Use a precomputed ensemble of 50 k-means partitions of the

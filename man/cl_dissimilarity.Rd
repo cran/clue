@@ -231,29 +231,34 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   S. A. Boorman and D. C. Olivier (1973).
   Metrics on spaces of finite trees.
   \emph{Journal of Mathematical Psychology}, \bold{10}, 26--59.
+  \doi{10.1016/0022-2496(73)90003-5}.
   
   I. Charon, L. Denoeud, A. Guénoche and O. Hudry (2006).
   \emph{Maximum Transfer Distance Between Partitions}.
   \emph{Journal of Classification}, \bold{23}, 103--121.
-  doi: \href{http://doi.org/10.1007/s00357-006-0006-2}{10.1007/s00357-006-0006-2}.
+  \doi{10.1007/s00357-006-0006-2}.
   
   W. E. H. Day (1981).
   The complexity of computing metric distances between partitions.
   \emph{Mathematical Social Sciences}, \bold{1}, 269--287.
+  \doi{10.1016/0165-4896(81)90042-1}.
   
   E. Dimitriadou, A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
-    Intelligence}, \bold{16}, 901--912.
+    Intelligence}, \bold{16}, 901--912. \cr
+  \doi{10.1142/S0218001402002052}.
 
   A. D. Gordon and M. Vichi (2001).
   Fuzzy partition models for fitting a set of partitions.
   \emph{Psychometrika}, \bold{66}, 229--248.
+  \doi{10.1007/BF02294837}.
 
   D. Gusfield (2002).
   Partition-distance: A problem and class of perfect graphs arising in
   clustering.
   \emph{Information Processing Letters}, \bold{82}, 159--164.
+  \doi{10.1016/S0020-0190(01)00263-0}.
 
   N. Jardine and E. Sibson (1971).
   \emph{Mathematical Taxonomy}.
@@ -268,16 +273,18 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   B. Mérigot, J.-P. Durbec and J.-C. Gaertner (2010).
   On goodness-of-fit measure for dendrogram-based analyses.
   \emph{Ecology}, \bold{91}, 1850—-1859.
-  DOI: \url{http://doi.acm.org/10.1890/09-1387.1}
+  \doi{10.1890/09-1387.1}.
 
   C. Rajski (1961).
   A metric space of discrete probability distributions,
   \emph{Information and Control}, \bold{4}, 371--377.
+  \doi{10.1016/S0019-9958(61)80055-7}.
 
   J. Rubin (1967).
   Optimal classification into groups: An approach for solving the
   taxonomy problem.
   \emph{Journal of Theoretical Biology}, \bold{15}, 103--144.
+  \doi{10.1016/0022-5193(67)90046-X}.
 
   D. Zhou, J. Li and H. Zha (2005).
   A new Mallows distance based metric for comparing clusterings.
@@ -285,7 +292,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
     Learning} (Bonn, Germany, August 07--11, 2005), pages 1028--1035.
   ICML '05, volume 119.
   ACM Press, New York, NY.
-  DOI: \url{http://doi.acm.org/10.1145/1102351.1102481}
+  \doi{10.1145/1102351.1102481}.
 }  
 \seealso{
   \code{\link{cl_agreement}}

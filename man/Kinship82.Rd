@@ -35,7 +35,8 @@
   S. Rosenberg and M. P. Kim (1975).
   The method of sorting as a data-gathering procedure in multivariate
   research.
-  \emph{Multivariate Behavioral Research}, \bold{10}, 489--502.
+  \emph{Multivariate Behavioral Research}, \bold{10}, 489--502. \cr
+  \doi{10.1207/s15327906mbr1004_7}.
   
   S. Rosenberg (1982).
   The method of sorting in multivariate research with applications

@@ -94,6 +94,7 @@ cl_join(x, y)
   On the use of ordered sets in problems of comparison and consensus of
   classification.
   \emph{Journal of Classification}, \bold{3}, 187--224.
+  \doi{10.1007/BF01894188}.
 }
 \examples{
 ## Two simple partitions of 7 objects.

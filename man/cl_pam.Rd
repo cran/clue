@@ -55,6 +55,7 @@ cl_pam(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
   A. D. Gordon and M. Vichi (1998).
   Partitions of partitions.
   \emph{Journal of Classification}, \bold{15}, 265--285.
+  \doi{10.1007/s003579900034}.
 }
 \seealso{
   \code{\link{cl_pclust}} for more general prototype-based partitions of

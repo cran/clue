@@ -277,11 +277,13 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   E. Dimitriadou, A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
-    Intelligence}, \bold{16}, 901--912.
+    Intelligence}, \bold{16}, 901--912. \cr
+  \doi{10.1142/S0218001402002052}.
 
   A. D. Gordon and M. Vichi (2001).
   Fuzzy partition models for fitting a set of partitions.
   \emph{Psychometrika}, \bold{66}, 229--248.
+  \doi{10.1007/BF02294837}.
 
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
@@ -290,6 +292,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   T. Margush and F. R. McMorris (1981).
   Consensus \eqn{n}-trees.
   \emph{Bulletin of Mathematical Biology}, \bold{43}, 239--244.
+  \doi{10.1007/BF02459446}.
 }
 \seealso{
   \code{\link{cl_medoid}},

@@ -1,6 +1,6 @@
 \documentclass[fleqn]{article}
 \usepackage[round,longnamesfirst]{natbib}
-\usepackage{graphicx,keyval,url}
+\usepackage{graphicx,keyval,hyperref,doi}
 
 \newcommand\argmin{\mathop{\mathrm{arg min}}}
 \newcommand\trace{\mathop{\mathrm{tr}}}

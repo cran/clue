@@ -24,6 +24,7 @@
   A. D. Gordon and M. Vichi (2001).  
   Fuzzy partition models for fitting a set of partitions.
   \emph{Psychometrika}, \bold{66}, 229--248.
+  \doi{10.1007/BF02294837}.
 
   S. Rosenberg (1982).
   The method of sorting in multivariate research with applications

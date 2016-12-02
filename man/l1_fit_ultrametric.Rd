@@ -98,11 +98,13 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   M. Krivanek and J. Moravek (1986).
   NP-hard problems in hierarchical tree clustering.
   \emph{Acta Informatica}, \bold{23}, 311--323.
+  \doi{10.1007/BF00289116}.
 
   T. J. Smith (2001).
   Constructing ultrametric and additive trees based on the \eqn{L_1}
   norm.
   \emph{Journal of Classification}, \bold{18}, 185--207.
+  \doi{10.1007/s00357-001-0015-0}.
 }  
 \keyword{cluster}
 \keyword{optimize}

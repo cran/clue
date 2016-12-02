@@ -139,12 +139,14 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   E. Dimitriadou, A. Weingessel and K. Hornik (2002).
   A combination scheme for fuzzy clustering.
   \emph{International Journal of Pattern Recognition and Artificial
-    Intelligence}, \bold{16}, 901--912.
+    Intelligence}, \bold{16}, 901--912. \cr
+  \doi{10.1142/S0218001402002052}.
 
   E. B. Fowlkes and C. L. Mallows (1983).
   A method for comparing two hierarchical clusterings.
   \emph{Journal of the American Statistical Association}, \bold{78},
-  553--569.
+  553--569. \cr
+  \doi{10.1080/01621459.1983.10478008}.
   
   A. D. Gordon (1999).
   \emph{Classification} (2nd edition).
@@ -153,26 +155,31 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   L. Hubert and P. Arabie (1985).
   Comparing partitions.
   \emph{Journal of Classification}, \bold{2}, 193--218.
+  \doi{10.1007/bf01908075}.
 
   W. M. Rand (1971).
   Objective criteria for the evaluation of clustering methods.
   \emph{Journal of the American Statistical Association}, \bold{66},
   846--850.
+  \doi{10.2307/2284239}.
 
   L. Katz and J. H. Powell (1953).
   A proposed index of the conformity of one sociometric measurement to
   another.
   \emph{Psychometrika}, \bold{18}, 249--256.
+  \doi{10.1007/BF02289063}.
 
   A. Strehl and J. Ghosh (2002).
   Cluster ensembles --- A knowledge reuse framework for combining
   multiple partitions.
-  \emph{Journal of Machine Learning Research}, \bold{3}, 583--617.
+  \emph{Journal of Machine Learning Research}, \bold{3}, 583--617. \cr
+  \url{http://www.jmlr.org/papers/volume3/strehl02a/strehl02a.pdf}.
 
   R. Tibshirani and G. Walter (2005).
   Cluster validation by Prediction Strength.
   \emph{Journal of Computational and Graphical Statistics}, \bold{14}/3,
   511--528.
+  \doi{10.1198/106186005X59243}.
 }
 \seealso{
   \code{\link{cl_dissimilarity}};

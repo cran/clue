@@ -56,6 +56,7 @@ cl_bag(x, B, k = NULL, algorithm = "kmeans", parameters = NULL,
   S. Dudoit and J. Fridlyand (2003).
   Bagging to improve the accuracy of a clustering procedure.
   \emph{Bioinformatics}, \bold{19}/9, 1090--1099.
+  \doi{10.1093/bioinformatics/btg038}.
   
   F. Leisch (1999).
   \emph{Bagged Clustering}.
