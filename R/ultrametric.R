@@ -132,7 +132,7 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
             stop("Argument 'weights' must be compatible with 'x'.")
     }
     else
-        weights <- rep(weights, length.out = length(x))
+        weights <- rep_len(weights, length(x))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
@@ -497,8 +497,7 @@ function(weights, x)
     }
     else
         weights <-
-            as.matrix(.dist_from_vector(rep(weights,
-                                            length.out = length(x))))
+            as.matrix(.dist_from_vector(rep_len(weights, length(x))))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
@@ -534,7 +533,7 @@ function(x, method = c("SUMT", "IRIP"), weights = 1,
             stop("Argument 'weights' must be compatible with 'x'.")
     }
     else
-        weights <- rep(weights, length.out = length(x))
+        weights <- rep_len(weights, length(x))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
@@ -817,7 +816,7 @@ function(x)
     
     ## .get_classes_in_hierarchy() orders according to cardinality, but
     ## a consensus method may forget to ...
-    x[] <- x[order(sapply(x, length))]
+    x[] <- x[order(lengths(x))]
 
     ## Get the objects (unique codes in the classes).
     objects <- sort(unique(unlist(x)))
@@ -825,7 +824,7 @@ function(x)
 
     ## Recursively compute the heights of the classes.
     heights <- double(length = length(x))
-    for(i in which(sapply(x, length) > 1)) {
+    for(i in which(lengths(x) > 1L)) {
         ## Find the relevant classes.
         j <- sapply(x[seq_len(i - 1L)],
                     function(s) all(s %in% x[[i]]))

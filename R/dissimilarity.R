@@ -211,7 +211,7 @@ function(x, y, weights = 1)
 {
     ## Variation of information for general "soft clusterings", cf
     ## Section 5.2. in Meila (2002). 
-    weights <- rep(weights, length.out = n_of_objects(x))
+    weights <- rep_len(weights, n_of_objects(x))
     weights <- weights / sum(weights)
     M_x <- cl_membership(x)
     ## Weighted marginal distribution of x:
@@ -246,7 +246,7 @@ function(x, y, p = 1, alpha = NULL, beta = NULL)
     ##   if(is.null(alpha))
     ##       alpha <- rep.int(1 / n_x, n_x)
     ##   else {
-    ##       alpha <- rep(alpha, length.out = n_x)
+    ##       alpha <- rep_len(alpha, n_x)
     ##       alpha <- alpha / sum(alpha)
     ##   }
     ##
@@ -260,8 +260,8 @@ function(x, y, p = 1, alpha = NULL, beta = NULL)
     if(is.null(alpha)) alpha <- rep.int(1, k)
     if(is.null(beta)) beta <- rep.int(1, k)
     lpSolve::lp.transport(C, "min",
-                          rep("==", k), alpha,
-                          rep("==", k), beta,
+                          rep.int("==", k), alpha,
+                          rep.int("==", k), beta,
                           integers = NULL)$objval ^ (1 / p)
 }
 
@@ -303,8 +303,8 @@ function(x, y, L = NULL, alpha = NULL, beta = NULL, ...)
     if(is.null(beta)) beta <- rep.int(1, k_y)
     sum(C) - 2 * lpSolve::lp.transport(C / outer(alpha, beta, "+"),
                                        "max",
-                                       rep("==", k_x), alpha,
-                                       rep("==", k_y), beta,
+                                       rep.int("==", k_x), alpha,
+                                       rep.int("==", k_y), beta,
                                        integers = NULL)$objval
 }
 

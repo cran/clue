@@ -20,7 +20,7 @@ function(x, w = NULL, solver = weighted.mean, merger = c)
     n <- length(x)
     if(is.null(w)) {
         w <- if(is.list(x))
-            lapply(sapply(x, length), function(u) rep.int(1, u))
+            lapply(lengths(x), function(u) rep.int(1, u))
         else
             rep.int(1, n)
     } else if(is.list(x)) 
@@ -75,7 +75,7 @@ function(x, w = NULL, solver = weighted.mean, merger = c)
             }
         else break
     }
-    rep.int(vals, sapply(inds, length))
+    rep.int(vals, lengths(inds))
 }
 
 

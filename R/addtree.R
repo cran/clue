@@ -21,7 +21,7 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
             stop("Argument 'weights' must be compatible with 'x'.")
     }
     else
-        weights <- rep(weights, length.out = length(x))
+        weights <- rep_len(weights, length(x))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))

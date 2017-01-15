@@ -233,7 +233,7 @@ function(x, k, family, m = 1, weights = 1, control = list())
             !identical(formals(args(.subset)), c("x", "i")))
         stop("Invalid function to subset prototypes.")
 
-    weights <- rep(weights, length.out = B)
+    weights <- rep_len(weights, B)
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))

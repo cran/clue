@@ -25,8 +25,7 @@ function(x, method = NULL, normalize = TRUE)
             stop(gettextf("Value '%s' is not a valid abbreviation for a fuzziness method.",
                           method),
                  domain = NA)
-        method <- paste(".cl_fuzziness_partition", builtin_methods[ind],
-                        sep = "_")
+        method <- paste0(".cl_fuzziness_partition_", builtin_methods[ind])
         method_name <- builtin_method_names[ind]
         if(normalize)
             method_name <- paste("normalized", method_name)

@@ -19,7 +19,7 @@ function(x, method = NULL, weights = 1, control = list())
     if(!length(clusterings))
         stop("Cannot compute consensus of empty ensemble.")
 
-    weights <- rep(weights, length.out = length(clusterings))
+    weights <- rep_len(weights, length(clusterings))
     if(any(weights < 0))
         stop("Argument 'weights' has negative elements.")
     if(!any(weights > 0))
@@ -644,8 +644,8 @@ function(clusterings, weights, control, type = c("GV1"))
             ## Argh.  Call solve.QP() for each such i.  Alternatively,
             ## could set up on very large QP, but is this any better?
             Dmat <- diag(alpha, nc_M)
-            Amat <- t(rbind(rep(-1, nc_M), diag(1, nc_M)))
-            bvec <- c(-1, rep(0, nc_M))
+            Amat <- t(rbind(rep.int(-1, nc_M), diag(1, nc_M)))
+            bvec <- c(-1, rep.int(0, nc_M))
             for(i in which(ind))
                 M[i, ] <- quadprog::solve.QP(Dmat, alpha * M[i, ],
                                              Amat, bvec)$solution

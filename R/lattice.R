@@ -32,10 +32,10 @@ function(x)
     ## Cross-classify the objects.
     z <- split(ids, lapply(x, cl_class_ids))
     ## Subscript on the non-empty cells to get adjacent class ids.
-    lens <- sapply(z, length)
+    lens <- lengths(z)
     pos <- which(lens > 0)
     ids[unlist(z, use.names = FALSE)] <-
-        rep(seq_along(z[pos]), lens[pos])
+        rep.int(seq_along(z[pos]), lens[pos])
     cl_partition_by_class_ids(ids)
 }
 

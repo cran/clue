@@ -43,7 +43,7 @@ function(x)
                          use.names = FALSE))
     ## Preserve labels if possible, and re-order according to
     ## cardinality.
-    out <- out[order(sapply(out, length))]
+    out <- out[order(lengths(out))]
     class(out) <- c("cl_classes_of_hierarchy_of_objects",
                     "cl_classes_of_objects")
     attr(out, "n_of_objects") <- n

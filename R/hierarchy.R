@@ -310,7 +310,7 @@ function(x)
         ind <- split(ind, grp)
         len <- length(ind)
         for(a in seq_len(len)) {
-            for(b in seq(from = 1, length.out = a - 1)) {
+            for(b in seq_len(a - 1L)) {
                 ## Need both as we currently cannot assume that the
                 ## indices are sorted.  Alternatively, work with the
                 ## sequence from one to the number of objects, and
@@ -319,7 +319,7 @@ function(x)
                 m[ind[[b]], ind[[a]]] <<- s
             }
         }
-        ind <- ind[sapply(ind, length) > 1]
+        ind <- ind[lengths(ind) > 1L]
         pos <- which(step == s)
         step <- split(step[-pos], grp[-1][-pos])
         if(is.null(step)) return()

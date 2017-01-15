@@ -72,7 +72,7 @@ function(x, w = NULL)
     w <- if(is.null(w)) {
         rep.int(1, length(x))
     } else {
-        rep(w, length.out = length(x))
+        rep_len(w, length(x))
     }
     ## (Need the latter because we want w / sum(w) ...)
     dissimilarities <- lapply(x, cl_object_dissimilarities)
@@ -158,7 +158,7 @@ function(x, cls, ...)
 weighted_median <-
 function(x, w = 1, na.rm = FALSE)
 {
-    w <- rep(w, length.out = length(x))
+    w <- rep_len(w, length(x))
     if(na.rm && any(ind <- is.na(x))) {
         x <- x[!ind]
         w <- w[!ind]

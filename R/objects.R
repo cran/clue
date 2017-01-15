@@ -173,7 +173,7 @@ cl_object_names.cl_ensemble <-
 function(x)
 {
     nms <- lapply(x, cl_object_names)
-    ind <- which(sapply(nms, length) > 0)
+    ind <- which(lengths(nms) > 0L)
     if(any(ind)) nms[[ind[1L]]] else NULL
 }
 
