@@ -71,7 +71,11 @@ cl_validity(x, ...)
   Constructing ultrametric and additive trees based on the \eqn{L_1}
   norm.
   \emph{Journal of Classification}, \bold{18}/2, 185--207.
-  \doi{10.1007/s00357-001-0015-0}.
+  \url{https://link.springer.com/article/10.1007/s00357-001-0015-0}.
+  %% The above web page has
+  %%   \doi{10.1007/s00357-001-0015-0}.
+  %% which does not work.  Reported to the responsible DOI Registration
+  %% Agency on 2017-08-03, let's use the URL instead of the DOI for now.
 }  
 \seealso{
   \code{\link[fpc]{cluster.stats}} in package \pkg{fpc} for a variety of

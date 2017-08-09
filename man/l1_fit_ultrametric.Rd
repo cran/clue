@@ -104,7 +104,11 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   Constructing ultrametric and additive trees based on the \eqn{L_1}
   norm.
   \emph{Journal of Classification}, \bold{18}, 185--207.
-  \doi{10.1007/s00357-001-0015-0}.
+  \url{https://link.springer.com/article/10.1007/s00357-001-0015-0}.
+  %% The above web page has
+  %%   \doi{10.1007/s00357-001-0015-0}.
+  %% which does not work.  Reported to the responsible DOI Registration
+  %% Agency on 2017-08-03, let's use the URL instead of the DOI for now.
 }  
 \keyword{cluster}
 \keyword{optimize}

@@ -926,7 +926,7 @@ function(clusterings, weights, control)
     ## Could also create a relation ensemble from the comemberships and
     ## call relation_consensus().
 
-    M <- relations:::.make_fit_relation_symdiff_M(comemberships,
+    B <- relations:::.make_fit_relation_symdiff_B(comemberships,
                                                   weights)
     k <- control$k
     control <- control$control
@@ -936,11 +936,11 @@ function(clusterings, weights, control)
     I <- if(!is.null(k)) {
         ## <NOTE>
         ## We could actually get the memberships directly in this case.
-        relations:::fit_relation_symdiff_E_k(M, k, control)
+        relations:::fit_relation_LP_E_k(B, k, control)
         ## </NOTE>
     }
     else
-        relations:::fit_relation_symdiff(M, "E", control)
+        relations:::fit_relation_LP(B, "E", control)
 
     ids <- relations:::get_class_ids_from_incidence(I)
     names(ids) <- cl_object_names(clusterings)
