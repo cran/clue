@@ -1,4 +1,4 @@
-418e9a57f9ea9e5c703b39ed265ecfd5 *DESCRIPTION
+cbcb6ef2b8adb63fe22225daa8287580 *DESCRIPTION
 d9dfb1c0aac7ba6fae4e921fd35698a5 *NAMESPACE
 281c7577f564a5acbecf046c5d1b8e64 *R/AAA.R
 55529dfdb2e1c9b89acd049cc346f59c *R/addtree.R
@@ -20,7 +20,7 @@ a3dccf831a311ed068578f817f38161e *R/membership.R
 4b8e8ee574a015903622e264e7560aa8 *R/partition.R
 00c4dfcc2d401d810d70f246b7628f6b *R/pava.R
 6131a8ffa97003764405701373a3bd48 *R/pclust.R
-6959d2c0af3d783dcbdd0028cdd6f5d3 *R/predict.R
+480eb9d4a5ec63da63f059511b5e4dd4 *R/predict.R
 44b2e289ec1ed4ea042eccd8816080c5 *R/prototypes.R
 5eabc5a234802b0f5a9f4c244ebe9aa9 *R/proximity.R
 f1a133ffc362372bc24ff24581964b1e *R/registration.R
@@ -29,7 +29,7 @@ f1a133ffc362372bc24ff24581964b1e *R/registration.R
 dda39a06e1768617744e35d3a4551f55 *R/ultrametric.R
 b43e58c5919eab710f6d598830027845 *R/utilities.R
 9c6964efc6762066184463e4c363a2d3 *R/validity.R
-ca0b7a23f169208aca9ade8737e88765 *build/partial.rdb
+a3130b0b9681299393f732b6540c966e *build/partial.rdb
 11fb351393abda3927bf2fc92e9a2d0b *build/vignette.rds
 395d92d3ba3ad105c0d3c5aae46a6f8f *data/CKME.rda
 8117296f00d9a48d5abac574e1228890 *data/Cassini.rda
@@ -41,7 +41,7 @@ a8cdf10a1d867557634cdd048ece9103 *data/Kinship82_Consensus.rda
 adf865dd114dae54c3db24060e42d4a5 *inst/CITATION
 2fc643dc007499bced4eb7fde83f5625 *inst/doc/clue.R
 ec5243c6beee816b6e93e5cbda9f722a *inst/doc/clue.Rnw
-64ded8202ca77cb0cfa6554f0daf90f3 *inst/doc/clue.pdf
+6311e924a7c354e4395e64da9a2f08dc *inst/doc/clue.pdf
 fc5c32ebcb85203fa533853fb18d18d3 *inst/po/en@quot/LC_MESSAGES/R-clue.mo
 6b382525256a1a059e58ce576eff7106 *man/CKME.Rd
 0d61696816866774419c7fda98f05d5f *man/Cassini.Rd
