@@ -11,7 +11,7 @@ solve_LSAP(x, maximum = FALSE)
 \arguments{
   \item{x}{a matrix with nonnegative entries and at least as many
     columns as rows.}
-  \item{maximum}{a logical indicating whether to minimize of maximize
+  \item{maximum}{a logical indicating whether to minimize or maximize
     the sum of assigned costs.}
 }
 \details{
