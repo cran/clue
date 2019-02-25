@@ -37,8 +37,10 @@ function(x)
     ## case of non-binary trees).
     groups <- cutree(x, h = unique(c(0, x$height)))
     ## Give a list with the (unique) sets of numbers of the objects.
-    out <- unique(unlist(sapply(split(groups, col(groups)),
-                                function(k) split(labels, k)),
+    ## Note that objects may already be merged at height zero.
+    out <- unique(unlist(c(as.list(labels),
+                           lapply(split(groups, col(groups)),
+                                  function(k) split(labels, k))),
                          recursive = FALSE,
                          use.names = FALSE))
     ## Preserve labels if possible, and re-order according to

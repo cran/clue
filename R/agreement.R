@@ -11,7 +11,7 @@ function(x, y = NULL, method = "euclidean", ...)
     x <- as.cl_ensemble(x)
     is_partition_ensemble <-
         (inherits(x, "cl_partition_ensemble")
-         || all(sapply(x, .has_object_memberships)))
+         || all(vapply(x, .has_object_memberships, NA)))
 
     ## Be nice.
     if(is.character(y) || is.function(y)) {
@@ -37,7 +37,7 @@ function(x, y = NULL, method = "euclidean", ...)
         y <- as.cl_ensemble(y)
         is_partition_ensemble_y <-
             (inherits(y, "cl_partition_ensemble")
-             || all(sapply(x, .has_object_memberships)))
+             || all(vapply(x, .has_object_memberships, NA)))
         if(!identical(is_partition_ensemble, is_partition_ensemble_y))
             stop("Cannot mix partitions and hierarchies.")
         if(n_of_objects(x) != n_of_objects(y))

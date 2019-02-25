@@ -7,7 +7,7 @@ function(x, method = NULL, normalize = TRUE)
     ## The docs say that we should only have partitions ...
     attr(out, "description") <- "Fuzziness"
     class(out) <- "cl_fuzziness"
-    parties <- sapply(x, is.cl_partition)
+    parties <- vapply(x, is.cl_partition, NA)
     if(!(length(x) || any(parties))) {
         ## Currently, no fuzzy hierarchies ...
         return(out)

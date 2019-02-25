@@ -108,7 +108,7 @@ function(x, method = c("SUMT", "IP", "IR"), weights = 1,
         if(length(x) == 0L)
             stop("Given ensemble contains no dissimilarities.")
         ## Let's be nice as usual ...
-        ind <- !sapply(x, .has_object_dissimilarities)
+        ind <- !vapply(x, .has_object_dissimilarities, NA)
         if(any(ind))
             x[ind] <- lapply(x[ind], as.dist)
         x <- .weighted_mean_of_object_dissimilarities(x,
@@ -300,8 +300,9 @@ function(x, weights = 1, control = list())
     if(!is.null(order)) {
         if(!is.list(order))
             order <- as.list(order)
-        if(!all(sapply(order,
-                       function(o) all(sort(o) == seq_len(n)))))
+        if(!all(vapply(order,
+                       function(o) all(sort(o) == seq_len(n)),
+                       NA)))
             stop("All given orders must be valid permutations.")
     }
     else {
@@ -376,8 +377,9 @@ function(x, weights = 1, control = list())
     if(!is.null(order)) {
         if(!is.list(order))
             order <- as.list(order)
-        if(!all(sapply(order,
-                       function(o) all(sort(o) == seq_len(n)))))
+        if(!all(vapply(order,
+                       function(o) all(sort(o) == seq_len(n)),
+                       NA)))
             stop("All given orders must be valid permutations.")
     }
     else {

@@ -24,12 +24,12 @@ function(..., list = NULL)
     ## ensembles of partitions or hierarchies we add additional class
     ## information.
 
-    if(all(sapply(clusterings, is.cl_partition)))
+    if(all(vapply(clusterings, is.cl_partition, NA)))
         class(clusterings) <- c("cl_partition_ensemble", "cl_ensemble")
-    else if(all(sapply(clusterings, is.cl_dendrogram)))
+    else if(all(vapply(clusterings, is.cl_dendrogram, NA)))
         class(clusterings) <- c("cl_dendrogram_ensemble",
                                 "cl_hierarchy_ensemble", "cl_ensemble")
-    else if(all(sapply(clusterings, is.cl_hierarchy)))
+    else if(all(vapply(clusterings, is.cl_hierarchy, NA)))
         class(clusterings) <- c("cl_hierarchy_ensemble", "cl_ensemble")
     else
         class(clusterings) <- "cl_ensemble"
@@ -159,17 +159,18 @@ function(x, ..., main = NULL, layout = NULL)
 
     ## (Note that currently there is neither is.cl_ultrametric() nor
     ## is.cl_addtree().)
-    ok <- sapply(x,
+    ok <- vapply(x,
                  function(e)
                  (is.cl_dendrogram(e) ||
-                  inherits(e, c("cl_addtree", "cl_ultrametric"))))
+                  inherits(e, c("cl_addtree", "cl_ultrametric"))),
+                 NA)
     if(!all(ok))
         stop(gettextf("Plotting not available for elements %s of the ensemble.",
                       paste(which(!ok), collapse = " ")),
              domain = NA)
 
     ## Prefer dendrogram plot methods to those for hclust objects.
-    ind <- sapply(x, is.cl_dendrogram)
+    ind <- vapply(x, is.cl_dendrogram, NA)
     if(any(ind))
         x[ind] <- lapply(x, as.cl_dendrogram)
 
