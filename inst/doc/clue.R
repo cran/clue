@@ -1,5 +1,4 @@
 ### R code from vignette source 'clue.Rnw'
-### Encoding: UTF-8
 
 ###################################################
 ### code chunk number 1: clue.Rnw:40-42

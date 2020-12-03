@@ -173,7 +173,7 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   Cluster ensembles --- A knowledge reuse framework for combining
   multiple partitions.
   \emph{Journal of Machine Learning Research}, \bold{3}, 583--617. \cr
-  \url{http://www.jmlr.org/papers/volume3/strehl02a/strehl02a.pdf}.
+  \url{https://www.jmlr.org/papers/volume3/strehl02a/strehl02a.pdf}.
 
   R. Tibshirani and G. Walter (2005).
   Cluster validation by Prediction Strength.
