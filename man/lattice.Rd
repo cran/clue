@@ -110,7 +110,7 @@ cl_join(A, B)
 ## (least) partition does not make a difference: 
 C_lumper <- as.cl_partition(rep(1, n_of_objects(A)))
 cl_meet(cl_ensemble(A, B, C_lumper))
-C_splitter <- as.cl_partition(seq(length = n_of_objects(A)))
+C_splitter <- as.cl_partition(seq_len(n_of_objects(A)))
 cl_join(cl_ensemble(A, B, C_splitter))
 ## Another way of computing the join:
 range(A, B, C_splitter)$max

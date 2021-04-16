@@ -54,7 +54,7 @@ cl_fuzziness(x, method = NULL, normalize = TRUE)
   values).
 }
 \examples{
-if(require("e1071", quiet = TRUE)) {
+if(require("e1071", quietly = TRUE)) {
     ## Use an on-line version of fuzzy c-means from package e1071 if
     ## available.
     data("Cassini")

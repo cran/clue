@@ -1,5 +1,5 @@
 Package: clue
-Version: 0.3-58
+Version: 0.3-59
 Encoding: UTF-8
 Title: Cluster Ensembles
 Description: CLUster Ensembles.
@@ -14,9 +14,9 @@ Suggests: e1071, lpSolve (>= 5.5.7), quadprog (>= 1.4-8), relations
 Enhances: RWeka, ape, cba, cclust, flexclust, flexmix, kernlab, mclust,
         movMF, modeltools
 NeedsCompilation: yes
-Packaged: 2020-12-02 13:44:38 UTC; hornik
+Packaged: 2021-04-16 13:53:17 UTC; hornik
 Author: Kurt Hornik [aut, cre] (<https://orcid.org/0000-0003-4198-9911>),
   Walter Böhm [ctb]
 Maintainer: Kurt Hornik <Kurt.Hornik@R-project.org>
 Repository: CRAN
-Date/Publication: 2020-12-03 18:47:03 UTC
+Date/Publication: 2021-04-16 18:05:49 UTC
