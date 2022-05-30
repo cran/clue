@@ -3,6 +3,8 @@
 
 #include <R.h>
 
+typedef int Sint;
+
 void solve_LSAP(double *c, Sint *n, Sint *p);
 
 double **clue_vector_to_square_matrix(double *x, Sint n);

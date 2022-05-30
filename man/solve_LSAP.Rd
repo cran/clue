@@ -38,7 +38,7 @@ solve_LSAP(x, maximum = FALSE)
   Englewood Cliffs: Prentice Hall.
 }
 \author{
-  Walter Böhm \email{Walter.Boehm@wu-wien.ac.at} kindly provided C code
+  Walter Böhm \email{Walter.Boehm@wu.ac.at} kindly provided C code
   implementing the Hungarian method.
 }
 \examples{

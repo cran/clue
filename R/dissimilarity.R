@@ -149,7 +149,7 @@ function(x, y)
     k_y <- n_of_classes(y)
     M_x <- cl_membership(x, k_x)
     M_y <- cl_membership(y, k_y)
-    C <- outer(colSums(M_x ^ 2), colSums(M_y ^ 2), "+") -
+    C <- outer(colSums(M_x ^ 2), colSums(M_y ^ 2), `+`) -
         2 * crossprod(M_x, M_y)
     if(k_x < k_y)
         C <- rbind(C, matrix(0, nrow = k_y - k_x, ncol = k_y))
@@ -301,7 +301,7 @@ function(x, y, L = NULL, alpha = NULL, beta = NULL, ...)
     C <- crossprod(M_x, M_y) * L
     if(is.null(alpha)) alpha <- rep.int(1, k_x)
     if(is.null(beta)) beta <- rep.int(1, k_y)
-    sum(C) - 2 * lpSolve::lp.transport(C / outer(alpha, beta, "+"),
+    sum(C) - 2 * lpSolve::lp.transport(C / outer(alpha, beta, `+`),
                                        "max",
                                        rep.int("==", k_x), alpha,
                                        rep.int("==", k_y), beta,

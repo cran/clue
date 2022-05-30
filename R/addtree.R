@@ -331,7 +331,7 @@ function(x)
 .make_centroid_matrix <-
 function(g)
 {
-    y <- outer(g, g, "+")
+    y <- outer(g, g, `+`)
     diag(y) <- 0
     y
 }

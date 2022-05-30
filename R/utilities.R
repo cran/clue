@@ -76,7 +76,7 @@ function(x, w = NULL)
     }
     ## (Need the latter because we want w / sum(w) ...)
     dissimilarities <- lapply(x, cl_object_dissimilarities)
-    m <- rowSums(mapply("*", dissimilarities, w / sum(w)))
+    m <- rowSums(mapply(`*`, dissimilarities, w / sum(w)))
     labels <- attr(dissimilarities[[1L]], "Labels")
     .dist_from_vector(m, labels = labels)
 }
@@ -92,7 +92,7 @@ function(x, w = NULL, nr = NULL)
     ## reasonably efficient way of doing this is the following.
     if(is.null(w)) w <- rep.int(1, length(x))
     if(is.null(nr)) nr <- NROW(x[[1L]])
-    matrix(rowSums(mapply("*", x, w)), nr)
+    matrix(rowSums(mapply(`*`, x, w)), nr)
 }
 
 ### ** .weighted_sum_of_vectors
@@ -102,7 +102,7 @@ function(x, w = NULL)
 {
     ## See above.
     if(is.null(w)) w <- rep.int(1, length(x))
-    rowSums(mapply("*", x, w))
+    rowSums(mapply(`*`, x, w))
 }
 
 ### * Containers

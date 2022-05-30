@@ -484,7 +484,7 @@ function(clusterings, weights, control, type = c("GV1"))
 
         ## See also .cl_dissimilarity_partition_GV1().
         
-        C <- outer(colSums(M ^ 2), colSums(u ^ 2), "+") -
+        C <- outer(colSums(M ^ 2), colSums(u ^ 2), `+`) -
             2 * crossprod(M, u)
         nc_M <- .n_of_nonzero_columns(M)
         nc_u <- ncol(u)
@@ -918,7 +918,7 @@ function(clusterings, weights, control)
                    ## Here, we always turn possibly soft partitions to
                    ## their closest hard partitions.
                    ids <- cl_class_ids(x)
-                   outer(ids, ids, "==")
+                   outer(ids, ids, `==`)
                    ## (Simpler than using tcrossprod() on
                    ## cl_membership().)
                })

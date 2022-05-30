@@ -88,7 +88,7 @@ function(m, d)
         rowSums(sapply(seq_len(ncol(m)),
                        function(k) {
                            z <- m[, k]
-                           w <- outer(z, z, "*")
+                           w <- outer(z, z)
                            c(sum(w * d), sum(w))
                        }))
     average_within_d <- within_sums[1L] / within_sums[2L]
