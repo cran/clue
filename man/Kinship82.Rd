@@ -16,7 +16,7 @@
   \dQuote{sorting} experiments.  These \dQuote{original} Rosenberg-Kim
   kinship terms data were published in Arabie, Carroll and de Sarbo
   (1987), and are also contained in file \file{indclus.data} in the
-  shell archive \url{http://www.netlib.org/mds/indclus.shar}.
+  shell archive \url{https://netlib.org/mds/indclus.shar}.
 
   For one of the experiments, partitions of the terms were printed in
   Rosenberg (1982).  Comparison with the original data indicates that

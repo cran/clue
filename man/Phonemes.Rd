@@ -21,7 +21,7 @@
 }
 \source{
   The data set is also contained in file \file{mapclus.data} in the
-  shell archive \url{http://www.netlib.org/mds/mapclus.shar}.
+  shell archive \url{https://netlib.org/mds/mapclus.shar}.
 }
 \references{
   G. A. Miller and P. E. Nicely (1955).
