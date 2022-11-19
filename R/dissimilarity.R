@@ -603,11 +603,12 @@ function(A, B, method = c("euclidean", "manhattan", "minkowski"), ...)
                   })
                       
     out <- matrix(0, NROW(A), NROW(B))
-    ## Be nice: wish of Wael Salem ZRAFI <zrafi.w.s@gmail.com>.
+    ## Be nice: thanks to Wael Salem ZRAFI <zrafi.w.s@gmail.com> for
+    ## suggesting this improvement.
     if(!is.null(cnA <- colnames(A)) &&
        !is.null(cnB <- colnames(B)) &&
        !identical(cnA, cnB))
-        B <- B[, cnA, drop = FALSE]
+        A <- A[, cnB, drop = FALSE]
     for(k in seq_len(NROW(B)))
         out[, k] <- FOO(A, B[k, ])
     out
