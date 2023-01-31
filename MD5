@@ -1,4 +1,4 @@
-eb09d6b354936330530f6bc8c6c037cb *DESCRIPTION
+7e4514c7bb5ab6070b598b37552ca5f4 *DESCRIPTION
 d9dfb1c0aac7ba6fae4e921fd35698a5 *NAMESPACE
 281c7577f564a5acbecf046c5d1b8e64 *R/AAA.R
 3cd212ef14c9566294542d691268fd5a *R/addtree.R
@@ -38,10 +38,10 @@ b765f02dcc015e7019ca0a35e2b0abf3 *data/GVME_Consensus.rda
 b1c3565c51e76894269c8436023137d6 *data/Kinship82.rda
 d83345916fff99aa156b0e504080543e *data/Kinship82_Consensus.rda
 f6e01b6e51aeebe631a3e608acee6003 *data/Phonemes.rda
-54c74a4dbf71af0f78762417f4985b5f *inst/CITATION
+2a6241c5a81a77397582d55686ebd255 *inst/CITATION
 4ce2ff29ebfc819444d6c7eb2f09ff6b *inst/doc/clue.R
 ec5243c6beee816b6e93e5cbda9f722a *inst/doc/clue.Rnw
-89a256b45397079cb819f14110c1fbd8 *inst/doc/clue.pdf
+c905fe14abfa55b00f46de090e9b86e9 *inst/doc/clue.pdf
 fc5c32ebcb85203fa533853fb18d18d3 *inst/po/en@quot/LC_MESSAGES/R-clue.mo
 6b382525256a1a059e58ce576eff7106 *man/CKME.Rd
 0d61696816866774419c7fda98f05d5f *man/Cassini.Rd
