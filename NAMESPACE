@@ -2,7 +2,7 @@ useDynLib("clue", .registration = TRUE, .fixes = "C_")
 
 import("stats")
 importFrom("graphics", "par", "plot")
-importFrom("cluster", "silhouette")
+importFrom("cluster", "clara", "pam", "silhouette")
 
 export("cl_agreement",
        "cl_bag",

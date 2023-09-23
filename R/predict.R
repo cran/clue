@@ -64,7 +64,7 @@ function(object, newdata = NULL,
     method <- object$call$metric
     if(is.null(method)) {
         ## Not given in the call, hence use default value.
-        method <- eval(formals(cluster::clara)$metric)[1L]
+        method <- eval(formals(clara)$metric)[1L]
         ## (Or hard-wire the default value: "euclidean".)
     }
     d <- .rxdist(newdata, object$medoids, method)
@@ -88,7 +88,7 @@ function(object, newdata = NULL,
     method <- object$call$metric
     if(is.null(method)) {
         ## Not given in the call, hence use default value.
-        method <- eval(formals(cluster::pam)$metric)[1L]
+        method <- eval(formals(pam)$metric)[1L]
         ## (Or hard-wire the default value: "euclidean".)
     }
     d <- .rxdist(newdata, object$medoids, method)

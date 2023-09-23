@@ -72,7 +72,7 @@ function(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
     ## For pam(), we need the dissimilarities for all objects.
     if(solver == "pam") {
         dissimilarities <- dissimilarities[positions, positions]
-        party <- cluster::pam(as.dist(dissimilarities), k)
+        party <- pam(as.dist(dissimilarities), k)
         class_ids <- cl_class_ids(party)
         medoid_ids <- cl_medoid_ids(party)
         medoids <- clusterings[medoid_ids]

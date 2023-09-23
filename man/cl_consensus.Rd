@@ -150,7 +150,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
       This method can also be referred to as \code{"soft/manhattan"}.
     }
 
-    \item{\code{"SM"}}{a fixed-point algorithm for obtaining \emph{hard}
+    \item{\code{"HM"}}{a fixed-point algorithm for obtaining \emph{hard}
       median Manhattan consensus partitions (i.e., for minimizing
       \eqn{L} with Manhattan dissimilarity \eqn{d} and \eqn{p =	1} over 
       all hard partitions with a given maximal number of classes).
