@@ -43,9 +43,7 @@ cl_fuzziness(x, method = NULL, normalize = TRUE)
   values.
 }
 \references{
-  J. C. Bezdek (1981).
-  \emph{Pattern Recognition with Fuzzy Objective Function Algorithms}.
-  New York: Plenum.
+  \bibshow{Bezdek:1981}
 }
 \seealso{
   Function \code{\link[e1071]{fclustIndex}} in package \pkg{e1071},

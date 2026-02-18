@@ -43,7 +43,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   consensus solution is called a \emph{medoid} (see
   \code{\link{cl_medoid}}).  For \eqn{p = 2}, we obtain \emph{least
     squares} consensus partitions and hierarchies (generalized means).
-  See also Gordon (1999) for more information.
+  See also \bibcitet{R:Gordon:1999} for more information.
 
   If all elements of the ensemble are partitions, the built-in consensus
   methods compute consensus partitions by minimizing a criterion of the
@@ -93,8 +93,8 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     }
 
     \item{\code{"GV1"}}{the fixed-point algorithm for the \dQuote{first
-	model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
-      \eqn{d} being GV1 dissimilarity and \eqn{p = 2} over all soft
+	model} in \bibcitet{Gordon+Vichi:2001} for minimizing \eqn{L}
+      with \eqn{d} being GV1 dissimilarity and \eqn{p = 2} over all soft
       partitions with a given maximal number of classes.
 
       This is similar to \code{"SE"}, but uses GV1 rather than Euclidean
@@ -104,7 +104,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     }
     
     \item{\code{"DWH"}}{an extension of the greedy algorithm in
-      Dimitriadou, Weingessel and Hornik (2002) for (approximately)
+      \bibcitet{Dimitriadou+Weingessel+Hornik:2002} for (approximately)
       obtaining soft least squares Euclidean consensus partitions.
       The reference provides some structure theory relating finding
       the consensus partition to an instance of the multiple assignment
@@ -161,7 +161,7 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     }
 
     \item{\code{"GV3"}}{a \acronym{SUMT} algorithm for the \dQuote{third
-      model} in Gordon and Vichi (2001) for minimizing \eqn{L} with
+      model} in \bibcitet{Gordon+Vichi:2001} for minimizing \eqn{L} with
       \eqn{d} being co-membership dissimilarity and \eqn{p = 2}.  (See
       \code{\link{sumt}} for more information on the \acronym{SUMT}
       approach.)  This optimization problem is equivalent to finding the
@@ -239,8 +239,8 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
     }
     
     \item{\code{"majority"}}{a hierarchy obtained from an extension of
-      the majority consensus tree of Margush and McMorris (1981), which
-      minimizes \eqn{L(x) = \sum w_b d(x_b, x)} over all dendrograms,
+      the majority consensus tree of \bibcitet{Margush+McMorris:1981},
+      which minimizes \eqn{L(x) = \sum w_b d(x_b, x)} over all dendrograms,
       where \eqn{d} is the symmetric difference dissimilarity.  The
       unweighted \eqn{p}-majority tree is the \eqn{n}-tree (hierarchy in
       the strict sense) consisting of all subsets of objects contained
@@ -274,25 +274,10 @@ cl_consensus(x, method = NULL, weights = 1, control = list())
   \dQuote{sufficiently many} replications of the methods.
 }
 \references{
-  E. Dimitriadou, A. Weingessel and K. Hornik (2002).
-  A combination scheme for fuzzy clustering.
-  \emph{International Journal of Pattern Recognition and Artificial
-    Intelligence}, \bold{16}, 901--912. \cr
-  \doi{10.1142/S0218001402002052}.
-
-  A. D. Gordon and M. Vichi (2001).
-  Fuzzy partition models for fitting a set of partitions.
-  \emph{Psychometrika}, \bold{66}, 229--248.
-  \doi{10.1007/BF02294837}.
-
-  A. D. Gordon (1999).
-  \emph{Classification} (2nd edition).
-  Boca Raton, FL: Chapman & Hall/CRC.
-
-  T. Margush and F. R. McMorris (1981).
-  Consensus \eqn{n}-trees.
-  \emph{Bulletin of Mathematical Biology}, \bold{43}, 239--244.
-  \doi{10.1007/BF02459446}.
+  \bibshow{Dimitriadou+Weingessel+Hornik:2002,
+    Gordon+Vichi:2001,
+    R:Gordon:1999,
+    Margush+McMorris:1981}
 }
 \seealso{
   \code{\link{cl_medoid}},

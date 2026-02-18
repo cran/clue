@@ -40,7 +40,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
     \item{\code{"euclidean"}}{the Euclidean dissimilarity of the
       memberships, i.e., the square root of the minimal sum of the
       squared differences of \eqn{u} and all column permutations of
-      \eqn{v}.  See Dimitriadou, Weingessel and Hornik (2002).}
+      \eqn{v}.  See \bibcitet{Dimitriadou+Weingessel+Hornik:2002}.}
     \item{\code{"manhattan"}}{the Manhattan dissimilarity of the
       memberships, i.e., the minimal sum of the absolute differences of
       \eqn{u} and all column permutations of \eqn{v}.}
@@ -63,19 +63,20 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       (currently) the Rand distance of the corresponding nearest hard
       partitions is used.}
     \item{\code{"GV1"}}{the square root of the dissimilarity
-      \eqn{\Delta_1}{Delta_1} used for the first model in Gordon and
-      Vichi (2001), i.e., the square root of the minimal sum of the
+      \eqn{\Delta_1}{Delta_1} used for the first model in
+      \bibcitet{Gordon+Vichi:2001},
+      i.e., the square root of the minimal sum of the
       squared differences of the \emph{matched} non-zero columns of
       \eqn{u} and \eqn{v}.}
     \item{\code{"BA/\var{d}"}}{distance measures for hard partitions
-      discussed in Boorman and Arabie (1972), with \var{d} one of
+      discussed in \bibcitet{Boorman+Arabie:1972}, with \var{d} one of
       \samp{A}, \samp{C}, \samp{D}, or \samp{E}.  For soft partitions,
       the distances of the corresponding nearest hard partitions are
       used.
 
       \code{"BA/A"} is the minimum number of single element moves (move
       from one class to another or a new one) needed to transform one
-      partition into the other.  Introduced in Rubin (1967).
+      partition into the other.  Introduced in \bibcitet{Rubin:1967}.
 
       \code{"BA/C"} is the minimum number of lattice moves for
       transforming one partition into the other, where partitions are
@@ -99,18 +100,21 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       \code{"BA/E"} is the normalized information distance, defined as
       \eqn{1 - I / H}, where \eqn{I} is the average mutual information
       between the partitions, and \eqn{H} is the average entropy of the
-      meet \eqn{z} of the partitions.  Introduced in Rajski (1961).
+      meet \eqn{z} of the partitions.
+      Introduced in \bibcitet{Rajski:1961}.
 
       (Boorman and Arabie also discuss a distance measure (\eqn{B})
       based on the minimum number of set moves needed to transform one
       partition into the other, which, differently from the \eqn{A} and
-      \eqn{C} distance measures is hard to compute (Day, 1981) and
-      (currently) not provided.)}
-    \item{\code{"VI"}}{Variation of Information, see Meila (2003).  If
+      \eqn{C} distance measures is hard to compute \bibcitep{Day:1981}
+      and (currently) not provided.)}
+    \item{\code{"VI"}}{Variation of Information, see
+      \bibcitet{Meila:2003}.  If
       \code{\dots} has an argument named \code{weights}, it is taken to
       specify case weights.}
-    \item{\code{"Mallows"}}{the Mallows-type distance by Zhou, Li and
-      Zha (2005), which is related to the Monge-Kantorovich mass
+    \item{\code{"Mallows"}}{the Mallows-type distance by
+      \bibcitet{Zhou+Li+Zha:2005},
+      which is related to the Monge-Kantorovich mass
       transfer problem, and given as the \eqn{p}-th root of the minimal
       value of the transportation problem \eqn{\sum w_{jk} \sum_i
       |u_{ij} - v_{ik}| ^ p} with constraints \eqn{w_{jk} \ge 0},
@@ -121,7 +125,8 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       dissimilarity), and can be specified via additional arguments
       named \code{p}, \code{alpha}, and \code{beta}, respectively.}
     \item{\code{"CSSD"}}{the Cluster Similarity Sensitive Distance of
-      Zhou, Li and Zha (2005), which is given as the minimal value of
+      \bibcitet{Zhou+Li+Zha:2005},
+      which is given as the minimal value of
       \eqn{\sum_{k,l} (1 - 2 w_{kl} / (\alpha_k + \beta_l)) L_{kl}},
       where \eqn{L_{kl} = \sum_i u_{ik} v_{il} d(p_{x;k}, p_{y;l})} with
       \eqn{p_{x;k}} and \eqn{p_{y;l}} the prototype of the \eqn{k}-th
@@ -137,14 +142,17 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   }
 
   For hard partitions, both Manhattan and squared Euclidean
-  dissimilarity give twice the \emph{transfer distance} (Charon et al.,
-  2005), which is the minimum number of objects that must be removed so
+  dissimilarity give twice the \emph{transfer distance}
+  \bibcitep{Charon+Denoeud+Guénoche:2006},
+  which is the minimum number of objects that must be removed so
   that the implied partitions (restrictions to the remaining objects)
-  are identical.  This is also known as the \emph{\eqn{R}-metric} in Day
-  (1981), i.e., the number of augmentations and removals of single
+  are identical.  This is also known as the \emph{\eqn{R}-metric} in
+  \bibcitet{Day:1981},
+  i.e., the number of augmentations and removals of single
   objects needed to transform one partition into the other, and the
-  \emph{partition-distance} in Gusfield (2002), and equals twice the
-  number of single element moves distance of Boorman and Arabie.
+  \emph{partition-distance} in \bibcitet{Gusfield:2002}, and equals
+  twice the number of single element moves distance of Boorman and
+  Arabie. 
 
   For hard partitions, the pair-bonds (Boorman-Arabie \eqn{D}) distance
   is identical to the Rand distance, and can also be written as the
@@ -179,12 +187,14 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
     \item{\code{"Lyapunov"}}{the logarithm of the product of the
       maximal and minimal ratios of the ultrametrics.  This is also
       known as the \dQuote{Hilbert projective metric} on the cone
-      represented by the ultrametrics (e.g., Jardine & Sibson (1971),
-      page 107), and only defined for \emph{strict} ultrametrics (which
+      represented by the ultrametrics
+      \bibcitep{e.g.|Jardine+Sibson:1971|page 107},
+      and only defined for \emph{strict} ultrametrics (which
       are strictly positive for distinct objects).}
     \item{\code{"BO"}}{the \eqn{m_\delta} family of tree metrics by
-      Boorman and Olivier (1973), which are of the form \eqn{m_\delta =
-	\int_0^\infty \delta(p(h), q(h)) dh}, where \eqn{p(h)} and
+      \bibcitet{Boorman+Olivier:1973}, which are of the form
+      \eqn{m_\delta = \int_0^\infty \delta(p(h), q(h)) dh}, where
+      \eqn{p(h)} and
       \eqn{q(h)} are the hard partitions obtaining by cutting the trees
       (dendrograms) at height \eqn{h}, and \eqn{\delta} is a suitably
       dissimilarity measure for partitions.  In particular, when taking
@@ -194,8 +204,8 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       If \code{\dots} has an argument named \code{delta} it is taken to
       specify the partition dissimilarity \eqn{\delta} to be employed.}
     \item{\code{"spectral"}}{the spectral norm (2-norm) of the
-      differences of the ultrametrics, suggested in Mérigot, Durbec, and
-      Gaertner (2010).}
+      differences of the ultrametrics, suggested in
+      \bibcitet{Mérigot+Durbec+Gaertner:2010}.}
   }
 
   The measures based on ultrametrics also allow computing dissimilarity
@@ -221,78 +231,19 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
   see the examples.
 }
 \references{
-  S. A. Boorman and P. Arabie (1972).
-  Structural measures and the method of sorting.
-  In R. N. Shepard, A. K. Romney, & S. B. Nerlove (eds.),
-  \emph{Multidimensional Scaling: Theory and Applications in the
-    Behavioral Sciences, 1: Theory} (pages 225--249).
-  New York: Seminar Press.
-
-  S. A. Boorman and D. C. Olivier (1973).
-  Metrics on spaces of finite trees.
-  \emph{Journal of Mathematical Psychology}, \bold{10}, 26--59.
-  \doi{10.1016/0022-2496(73)90003-5}.
-  
-  I. Charon, L. Denoeud, A. Guénoche and O. Hudry (2006).
-  \emph{Maximum Transfer Distance Between Partitions}.
-  \emph{Journal of Classification}, \bold{23}, 103--121.
-  \doi{10.1007/s00357-006-0006-2}.
-  
-  W. E. H. Day (1981).
-  The complexity of computing metric distances between partitions.
-  \emph{Mathematical Social Sciences}, \bold{1}, 269--287.
-  \doi{10.1016/0165-4896(81)90042-1}.
-  
-  E. Dimitriadou, A. Weingessel and K. Hornik (2002).
-  A combination scheme for fuzzy clustering.
-  \emph{International Journal of Pattern Recognition and Artificial
-    Intelligence}, \bold{16}, 901--912. \cr
-  \doi{10.1142/S0218001402002052}.
-
-  A. D. Gordon and M. Vichi (2001).
-  Fuzzy partition models for fitting a set of partitions.
-  \emph{Psychometrika}, \bold{66}, 229--248.
-  \doi{10.1007/BF02294837}.
-
-  D. Gusfield (2002).
-  Partition-distance: A problem and class of perfect graphs arising in
-  clustering.
-  \emph{Information Processing Letters}, \bold{82}, 159--164.
-  \doi{10.1016/S0020-0190(01)00263-0}.
-
-  N. Jardine and E. Sibson (1971).
-  \emph{Mathematical Taxonomy}.
-  London: Wiley.
-
-  M. Meila (2003).
-  Comparing clusterings by the variation of information.
-  In B. Schölkopf and M. K. Warmuth (eds.), \emph{Learning Theory and
-    Kernel Machines}, pages 173--187.
-  Springer-Verlag: Lecture Notes in Computer Science 2777.
-
-  B. Mérigot, J.-P. Durbec and J.-C. Gaertner (2010).
-  On goodness-of-fit measure for dendrogram-based analyses.
-  \emph{Ecology}, \bold{91}, 1850—-1859.
-  \doi{10.1890/09-1387.1}.
-
-  C. Rajski (1961).
-  A metric space of discrete probability distributions,
-  \emph{Information and Control}, \bold{4}, 371--377.
-  \doi{10.1016/S0019-9958(61)80055-7}.
-
-  J. Rubin (1967).
-  Optimal classification into groups: An approach for solving the
-  taxonomy problem.
-  \emph{Journal of Theoretical Biology}, \bold{15}, 103--144.
-  \doi{10.1016/0022-5193(67)90046-X}.
-
-  D. Zhou, J. Li and H. Zha (2005).
-  A new Mallows distance based metric for comparing clusterings.
-  In \emph{Proceedings of the 22nd international Conference on Machine
-    Learning} (Bonn, Germany, August 07--11, 2005), pages 1028--1035.
-  ICML '05, volume 119.
-  ACM Press, New York, NY.
-  \doi{10.1145/1102351.1102481}.
+  \bibshow{Boorman+Arabie:1972,
+    Boorman+Olivier:1973,
+    Charon+Denoeud+Guénoche:2006,
+    Day:1981,
+    Dimitriadou+Weingessel+Hornik:2002,
+    Gordon+Vichi:2001,
+    Gusfield:2002,
+    Jardine+Sibson:1971,
+    Meila:2003,
+    Mérigot+Durbec+Gaertner:2010,
+    Rajski:1961,
+    Rubin:1967,
+    Zhou+Li+Zha:2005}
 }  
 \seealso{
   \code{\link{cl_agreement}}

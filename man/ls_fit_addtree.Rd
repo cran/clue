@@ -41,14 +41,15 @@ ls_fit_centroid(x)
 
   We provide three heuristics for solving this problem.
 
-  Method \code{"SUMT"} implements the \acronym{SUMT} (Sequential
-  Unconstrained Minimization Technique, Fiacco and McCormick, 1968)
-  approach of de Soete (1983).  Incomplete dissimilarities are currently
-  not supported.
+  Method \code{"SUMT"} implements the \acronym{SUMT}
+  \bibcitep{Sequential Unconstrained Minimization Technique|Fiacco+McCormick:1968|}
+  approach of \bibcitet{De_Soete:1983}.
+  Incomplete dissimilarities are currently not supported.
 
   Methods \code{"IP"} and \code{"IR"} implement the Iterative
-  Projection and Iterative Reduction approaches of Hubert and Arabie
-  (1995) and Roux (1988), respectively.  Non-identical weights and
+  Projection and Iterative Reduction approaches of
+  \bibcitet{Hubert+Arabie:1995} and \bibcitet{Roux:1988}, respectively.
+  Non-identical weights and
   incomplete dissimilarities are currently not supported.
 
   See \code{\link{ls_fit_ultrametric}} for details on these methods and
@@ -64,30 +65,10 @@ ls_fit_centroid(x)
   optimization problem has a closed-form solution.
 }
 \references{
-  A. V. Fiacco and G. P. McCormick (1968).
-  \emph{Nonlinear programming: Sequential unconstrained minimization
-    techniques}.
-  New York: John Wiley & Sons.
-
-  L. Hubert and P. Arabie (1995).
-  Iterative projection strategies for the least squares fitting of tree
-  structures to proximity data.
-  \emph{British Journal of Mathematical and Statistical Psychology},
-  \bold{48}, 281--317.
-  \doi{10.1111/j.2044-8317.1995.tb01065.x}.
-
-  M. Roux (1988).
-  Techniques of approximation for building two tree structures.
-  In C. Hayashi and E. Diday and M. Jambu and N. Ohsumi (Eds.),
-  \emph{Recent Developments in Clustering and Data Analysis}, pages
-  151--170.
-  New York: Academic Press.
-  
-  G. de Soete (1983).
-  A least squares algorithm for fitting additive trees to proximity
-  data.
-  \emph{Psychometrika}, \bold{48}, 621--626.
-  \doi{10.1007/BF02293884}.
+  \bibshow{Fiacco+McCormick:1968,
+    Hubert+Arabie:1995,
+    Roux:1988,
+    De_Soete:1983}
 }
 \keyword{cluster}
 \keyword{optimize}

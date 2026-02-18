@@ -72,9 +72,6 @@ sumt(x0, L, P, grad_L = NULL, grad_P = NULL, method = NULL,
 }
 
 \references{
-  A. V. Fiacco and G. P. McCormick (1968).
-  \emph{Nonlinear programming: Sequential unconstrained minimization
-    techniques}.
-  New York: John Wiley & Sons.
+  \bibshow{Fiacco+McCormick:1968}
 }
 \keyword{optimize}

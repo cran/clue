@@ -17,15 +17,13 @@
   product (GDP) in USD (converted to 1987 prices); the percentage of GDP
   provided by agriculture; the percentage of employees who worked in
   agriculture; and gross domestic investment, expressed as a percentage
-  of the GDP.  See Gordon and Vichi (2001), page 230, for more details.
+  of the GDP.
+  See \bibcitet{|Gordon+Vichi:2001|page 230}, for more details.
 }
 \source{
-  Table 1 in Gordon and Vichi (2001).
+  Table 1 in \bibcitet{Gordon+Vichi:2001}.
 }
 \references{
-  A. D. Gordon and M. Vichi (2001).  
-  Fuzzy partition models for fitting a set of partitions.
-  \emph{Psychometrika}, \bold{66}, 229--248.
-  \doi{10.1007/BF02294837}.
+  \bibshow{Gordon+Vichi:2001}
 }
 \keyword{datasets}

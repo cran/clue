@@ -31,7 +31,8 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   \deqn{L(u) = \sum_{i,j} w_{ij} |x_{ij} - u_{ij}|}
   over all \eqn{u} satisfying the ultrametric constraints (i.e., for all
   \eqn{i, j, k}, \eqn{u_{ij} \le \max(u_{ik}, u_{jk})}).  This problem
-  is known to be NP hard (Krivanek and Moravek, 1986).
+  is known to be NP hard
+  \bibcitep{Křivánek+Morávek:1986}.
 
   We provide two heuristics for solving this problem.
 
@@ -52,7 +53,8 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   }
 
   Method \code{"IRIP"} implements a variant of the Iteratively
-  Reweighted Iterative Projection approach of Smith (2001), which
+  Reweighted Iterative Projection approach of \bibcitet{Smith:2001},
+  which
   attempts to solve the \eqn{L_1} problem via a sequence of weighted
   \eqn{L_2} problems, determining \eqn{u(t+1)} by minimizing the
   criterion function
@@ -95,20 +97,7 @@ l1_fit_ultrametric(x, method = c("SUMT", "IRIP"), weights = 1,
   \code{\link{ls_fit_ultrametric}}.
 }
 \references{
-  M. Krivanek and J. Moravek (1986).
-  NP-hard problems in hierarchical tree clustering.
-  \emph{Acta Informatica}, \bold{23}, 311--323.
-  \doi{10.1007/BF00289116}.
-
-  T. J. Smith (2001).
-  Constructing ultrametric and additive trees based on the \eqn{L_1}
-  norm.
-  \emph{Journal of Classification}, \bold{18}, 185--207.
-  \url{https://link.springer.com/article/10.1007/s00357-001-0015-0}.
-  %% The above web page has
-  %%   \doi{10.1007/s00357-001-0015-0}.
-  %% which does not work.  Reported to the responsible DOI Registration
-  %% Agency on 2017-08-03, let's use the URL instead of the DOI for now.
+  \bibshow{Křivánek+Morávek:1986, Smith:2001}
 }  
 \keyword{cluster}
 \keyword{optimize}

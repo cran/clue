@@ -22,7 +22,8 @@ cl_bag(x, B, k = NULL, algorithm = "kmeans", parameters = NULL,
     the base algorithm.}
   \item{method}{a character string indicating the bagging method to
     use.  Currently, only method \code{"DFBC1"} is available, which
-    implements algorithm \emph{BagClust1} in Dudoit & Fridlyand (2003).}
+    implements algorithm \emph{BagClust1} in
+    \bibcitet{Dudoit+Fridlyand:2003}.}
   \item{control}{a list of control parameters for the aggregation.
     Currently, not used.}
 }
@@ -48,21 +49,12 @@ cl_bag(x, B, k = NULL, algorithm = "kmeans", parameters = NULL,
 
   If the base clustering algorithm yields prototypes, aggregation can be
   based on clustering these.  This is the idea underlying the
-  \dQuote{Bagged Clustering} algorithm introduced in Leisch (1999) and
-  implemented by function \code{\link[e1071]{bclust}} in package
-  \pkg{e1071}.
+  \dQuote{Bagged Clustering} algorithm introduced in
+  \bibcitet{Leisch:1999} and implemented by function
+  \code{\link[e1071]{bclust}} in package \pkg{e1071}.
 }
 \references{
-  S. Dudoit and J. Fridlyand (2003).
-  Bagging to improve the accuracy of a clustering procedure.
-  \emph{Bioinformatics}, \bold{19}/9, 1090--1099.
-  \doi{10.1093/bioinformatics/btg038}.
-  
-  F. Leisch (1999).
-  \emph{Bagged Clustering}.
-  Working Paper 51, SFB \dQuote{Adaptive Information Systems and
-    Modeling in Economics and Management Science}.
-  \doi{10.57938/9b129f95-b53b-44ce-a129-5b7a1168d832}.
+  \bibshow{Dudoit+Fridlyand:2003, Leisch:1999}
 }
 \examples{
 set.seed(1234)

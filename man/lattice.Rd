@@ -78,7 +78,8 @@ cl_join(x, y)
 
   In each case, a modular semilattice is obtained, which allows for a
   natural metrization via least element (semi)lattice move distances,
-  see Barthélémy, Leclerc and Monjardet (1981).  These latticial metrics
+  see \bibcitet{Barthélemy+Leclerc+Monjardet:1986}.
+  These latticial metrics
   are given by the BA/C (partitions), Manhattan (dendrograms), and
   symdiff (hierarchies) dissimilarities, respectively (see
   \code{\link{cl_dissimilarity}}).
@@ -90,11 +91,7 @@ cl_join(x, y)
   partitions or dendrograms, respectively.
 }
 \references{
-  J.-P. Barthélémy, B. Leclerc and B. Monjardet (1981).
-  On the use of ordered sets in problems of comparison and consensus of
-  classification.
-  \emph{Journal of Classification}, \bold{3}, 187--224.
-  \doi{10.1007/BF01894188}.
+  \bibshow{Barthélemy+Leclerc+Monjardet:1986}
 }
 \examples{
 ## Two simple partitions of 7 objects.

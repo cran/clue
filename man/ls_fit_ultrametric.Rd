@@ -33,7 +33,7 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   \deqn{L(u) = \sum_{i,j} w_{ij} (x_{ij} - u_{ij})^2}
   over all \eqn{u} satisfying the ultrametric constraints (i.e., for all
   \eqn{i, j, k}, \eqn{u_{ij} \le \max(u_{ik}, u_{jk})}).  This problem
-  is known to be NP hard (Krivanek and Moravek, 1986).
+  is known to be NP hard \bibcitep{Křivánek+Morávek:1986}.
 
   For an ensemble of dissimilarity objects, the criterion function is
   \deqn{L(u) = \sum_b w_b \sum_{i,j} w_{ij} (x_{ij}(b) - u_{ij})^2,}
@@ -44,17 +44,17 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
 
   We provide three heuristics for solving the basic problem.
 
-  Method \code{"SUMT"} implements the \acronym{SUMT} (Sequential
-  Unconstrained Minimization Technique, Fiacco and McCormick, 1968)
-  approach of de Soete (1986) which in turn simplifies the suggestions
-  in Carroll and Pruzansky (1980).  (See \code{\link{sumt}} for more
+  Method \code{"SUMT"} implements the \acronym{SUMT}
+  \bibcitep{Sequential Unconstrained Minimization Technique|Fiacco+McCormick:1968|}
+  approach of \bibcitet{De_Soete:1984a} which in turn simplifies the suggestions
+  in \bibcitet{Carroll+Pruzansky:1980}.  (See \code{\link{sumt}} for more
   information on the \acronym{SUMT} approach.)  We then use a final
   single linkage hierarchical clustering step to ensure that the
   returned object exactly satisfies the ultrametric constraints.  The
   starting value \eqn{u_0} is obtained by \dQuote{random shaking} of the
   given dissimilarity object (if not given).  If there are missing
   values in \code{x}, i.e., the given dissimilarities are
-  \emph{incomplete}, we follow a suggestion of de Soete (1984), imputing
+  \emph{incomplete}, we follow a suggestion of \bibcitet{De_Soete:1984a}, imputing
   the missing values by the weighted mean of the non-missing ones, and
   setting the corresponding weights to zero.
 
@@ -85,7 +85,7 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   \acronym{SUMT} runs, the (first) best solution found is returned.
 
   Method \code{"IP"} implements the Iterative Projection approach of
-  Hubert and Arabie (1995).  This iteratively projects the current
+  \bibcitet{Hubert+Arabie:1995}.  This iteratively projects the current
   dissimilarities to the closed convex set given by the ultrametric
   constraints (3-point conditions) for a single index triple \eqn{(i, j,
     k)}, in fact replacing the two largest values among \eqn{d_{ij},
@@ -119,7 +119,8 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   supported.
 
   Method \code{"IR"} implements the Iterative Reduction approach
-  suggested by Roux (1988), see also Barthélémy and Guénoche (1991).
+  suggested by \bibcitet{Roux:1988}, see also
+  \bibcitet{Barthélemy+Guénoche:1991}.
   This is similar to the Iterative Projection method, but modifies the
   dissimilarities between objects proportionally to the aggregated
   change incurred from the ultrametric projections.  Available control
@@ -134,45 +135,16 @@ ls_fit_ultrametric(x, method = c("SUMT", "IP", "IR"), weights = 1,
   replications of the base algorithm.
 }
 \references{
-  J.-P. Barthélémy and A. Guénoche (1991).
-  \emph{Trees and proximity representations}.
-  Chichester: John Wiley & Sons.
-  ISBN 0-471-92263-3.
-  
-  J. D. Carroll and S. Pruzansky (1980).
-  Discrete and hybrid scaling models.
-  In E. D. Lantermann and H. Feger (eds.), \emph{Similarity and Choice}.
-  Bern (Switzerland): Huber.
-
-  L. Hubert and P. Arabie (1995).
-  Iterative projection strategies for the least squares fitting of tree
-  structures to proximity data.
-  \emph{British Journal of Mathematical and Statistical Psychology},
-  \bold{48}, 281--317.
-  \doi{10.1111/j.2044-8317.1995.tb01065.x}.
-  
-  M. Krivanek and J. Moravek (1986).
-  NP-hard problems in hierarchical tree clustering.
-  \emph{Acta Informatica}, \bold{23}, 311--323.
-  \doi{10.1007/BF00289116}.
-  
-  M. Roux (1988).
-  Techniques of approximation for building two tree structures.
-  In C. Hayashi and E. Diday and M. Jambu and N. Ohsumi (Eds.),
-  \emph{Recent Developments in Clustering and Data Analysis}, pages
-  151--170.
-  New York: Academic Press.
-
-  G. de Soete (1984).
-  Ultrametric tree representations of incomplete dissimilarity data.
-  \emph{Journal of Classification}, \bold{1}, 235--242.
-  \doi{10.1007/BF01890124}.
-
-  G. de Soete (1986).
-  A least squares algorithm for fitting an ultrametric tree to a
-  dissimilarity matrix.
-  \emph{Pattern Recognition Letters}, \bold{2}, 133--137.
-  \doi{10.1016/0167-8655(84)90036-9}.
+  \bibinfo{De_Soete:1984a}{year}{1984a}
+  \bibinfo{De_Soete:1984b}{year}{1984b}  
+  \bibshow{Barthélemy+Guénoche:1991,
+    Carroll+Pruzansky:1980,
+    Fiacco+McCormick:1968,
+    Hubert+Arabie:1995,
+    Křivánek+Morávek:1986,
+    Roux:1988,
+    De_Soete:1984a,
+    De_Soete:1984b}
 }
 \seealso{
   \code{\link{cl_consensus}} for computing least squares (Euclidean)
@@ -192,7 +164,7 @@ u <- ls_fit_ultrametric(d, control = list(verbose = TRUE))
 cor(d, u)
 ## Plot:
 plot(u)
-## ("Basically" the same as Figure 1 in de Soete (1986).)
+## ("Basically" the same as Figure 1 in de Soete (1984b).)
 }
 \keyword{cluster}
 \keyword{optimize}

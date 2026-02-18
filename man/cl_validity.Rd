@@ -36,8 +36,10 @@ cl_validity(x, ...)
   classes.
 
   For hierarchies, the validity measures computed by default are
-  \dQuote{variance accounted for} (VAF, e.g., Hubert, Arabie & Meulman,
-  2006) and \dQuote{deviance accounted for} (DEV, e.g., Smith, 2001).
+  \dQuote{variance accounted for}
+  (VAF, e.g., \bibcitet{Hubert+Arabie+Meulman:2006})
+  and \dQuote{deviance accounted for}
+  (DEV, e.g., \bibcitet{Smith:2001}).
   If \code{u} is the ultrametric corresponding to the hierarchy \code{x}
   and \code{d} the dissimilarity \code{x} was obtained from, these
   validity measures are given by
@@ -62,20 +64,7 @@ cl_validity(x, ...)
   coefficients are provided in addition to the default ones.
 }
 \references{
-  L. Hubert, P. Arabie and J. Meulman (2006).
-  \emph{The structural representation of proximity matrices with
-    MATLAB}.
-  Philadelphia, PA: SIAM.
-
-  T. J. Smith (2001).
-  Constructing ultrametric and additive trees based on the \eqn{L_1}
-  norm.
-  \emph{Journal of Classification}, \bold{18}/2, 185--207.
-  \url{https://link.springer.com/article/10.1007/s00357-001-0015-0}.
-  %% The above web page has
-  %%   \doi{10.1007/s00357-001-0015-0}.
-  %% which does not work.  Reported to the responsible DOI Registration
-  %% Agency on 2017-08-03, let's use the URL instead of the DOI for now.
+  \bibshow{Hubert+Arabie+Meulman:2006, Smith:2001}
 }  
 \seealso{
   \code{\link[fpc]{cluster.stats}} in package \pkg{fpc} for a variety of

@@ -20,8 +20,8 @@ cl_medoid(x, method = "euclidean")
 }
 \details{
   Medoid clusterings are special cases of \dQuote{consensus} clusterings
-  characterized as the solutions of an optimization problem.  See Gordon
-  (2001) for more information.
+  characterized as the solutions of an optimization problem.
+  See \bibcitet{R:Gordon:1999} for more information.
   
   The dissimilarities \code{d} for determining the medoid are obtained
   by calling \code{cl_dissimilarity} with arguments \code{x} and
@@ -32,9 +32,7 @@ cl_medoid(x, method = "euclidean")
   \pkg{cluster}.
 }
 \references{
-  A. D. Gordon (1999).
-  \emph{Classification} (2nd edition).
-  Boca Raton, FL: Chapman & Hall/CRC.
+  \bibshow{R:Gordon:1999}
 }  
 \seealso{
   \code{\link{cl_consensus}}

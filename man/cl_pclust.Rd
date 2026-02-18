@@ -55,8 +55,9 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1,
   Euclidean consensus clusterings, i.e., use Euclidean dissimilarity
   \eqn{d} and \eqn{e = 2}.
 
-  For \eqn{m = 1}, the partitioning procedure was introduced by Gaul and
-  Schader (1988) for \dQuote{Clusterwise Aggregation of Relations} (with
+  For \eqn{m = 1}, the partitioning procedure was introduced by
+  \bibcitet{Gaul+Schader:1988}
+  for \dQuote{Clusterwise Aggregation of Relations} (with
   the same domains), containing equivalence relations, i.e., hard
   partitions, as a special case.
 
@@ -69,14 +70,7 @@ cl_pclust(x, k, method = NULL, m = 1, weights = 1,
   replications of the base algorithm.
 }
 \references{
-  J. C. Bezdek (1981).
-  \emph{Pattern recognition with fuzzy objective function algorithms}.
-  New York: Plenum.
-
-  W. Gaul and M. Schader (1988).
-  Clusterwise aggregation of relations.
-  \emph{Applied Stochastic Models and Data Analysis}, \bold{4}:273--282.
-  \doi{10.1002/asm.3150040406}.
+  \bibshow{Bezdek:1981, Gaul+Schader:1988}
 }
 \examples{
 ## Use a precomputed ensemble of 50 k-means partitions of the

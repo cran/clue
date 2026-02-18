@@ -27,8 +27,8 @@ as.cl_addtree(x)
   in the four-point conditions are strengthened to equalities (such that
   all three sums are equal), and can be represented as \eqn{d_{ij} = g_i
     + g_j}, i.e., as sums of distances from a \dQuote{centroid}.
-  See, e.g., Barthélémy and Guénoche (1991) for more details on additive
-  tree distances.
+  See, e.g., \bibcitet{Barthélemy+Guénoche:1991} for more details on
+  additive tree distances.
 
   \code{as.cl_addtree} is a generic function.  Its default method can
   handle objects representing ultrametric distances and raw additive
@@ -44,9 +44,6 @@ as.cl_addtree(x)
   There is a \code{\link{plot}} method for additive tree distances.
 }
 \references{
-  J.-P. Barthélémy and A. Guénoche (1991).
-  \emph{Trees and proximity representations}.
-  Chichester: John Wiley & Sons.
-  ISBN 0-471-92263-3.
+  \bibshow{Barthélemy+Guénoche:1991}
 }
 \keyword{cluster}

@@ -16,7 +16,8 @@ cl_pam(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
     \code{method} of function \code{\link{cl_dissimilarity}}.}
   \item{solver}{a character string indicating the \eqn{k}-medoids solver
     to be employed.  May be abbreviated.  If \code{"pam"} (default), the
-    Partitioning Around Medoids (Kaufman & Rousseeuw (1990), Chapter 2)
+    Partitioning Around Medoids
+    \bibcitep{|Kaufman+Rousseeuw:1990|Chapter 2}
     heuristic \code{\link[cluster]{pam}} of package \pkg{cluster} is
     used.  Otherwise, the exact algorithm of \code{\link{kmedoids}} is
     employed.}
@@ -42,20 +43,14 @@ cl_pam(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
   \eqn{L = \sum_{l=1}^k \min_{j \in C_l} \sum_{i \in C_l} d(x_i, x_j)} 
   is minimized.
 
-  Such secondary partitions (e.g., Gordon & Vichi, 1998) are obtained by
+  Such secondary partitions \bibcitep{e.g.|Gordon+Vichi:1998|}
+  are obtained by
   computing the dissimilarities \eqn{d} of the objects in the ensemble
   for the given dissimilarity method, and applying a dissimilarity-based
   \eqn{k}-medoids solver to \eqn{d}.
 }
 \references{
-  L. Kaufman and P. J. Rousseeuw (1990).
-  \emph{Finding Groups in Data: An Introduction to Cluster Analysis}.
-  Wiley, New York.
-  
-  A. D. Gordon and M. Vichi (1998).
-  Partitions of partitions.
-  \emph{Journal of Classification}, \bold{15}, 265--285.
-  \doi{10.1007/s003579900034}.
+  \bibshow{Kaufman+Rousseeuw:1990, Gordon+Vichi:1998}
 }
 \seealso{
   \code{\link{cl_pclust}} for more general prototype-based partitions of

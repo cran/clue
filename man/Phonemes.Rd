@@ -11,7 +11,8 @@
   English consonant phonemes.
 }
 \details{
-  Miller and Nicely (1955) obtained the confusions by exposing female
+  \bibcitet{Miller+Nicely:1955}
+  obtained the confusions by exposing female
   subjects to a series of syllables consisting of one of the 16
   consonants followed by the vowel \samp{a} under 17 different
   experimental conditions.  The data provided are obtained from
@@ -24,10 +25,6 @@
   shell archive \url{https://netlib.org/mds/mapclus.shar}.
 }
 \references{
-  G. A. Miller and P. E. Nicely (1955).
-  An analysis of perceptual confusions among some English consonants.
-  \emph{Journal of the Acoustical Society of America}, \bold{27},
-  338--352.
-  \doi{10.1121/1.1907526}.
+  \bibshow{Miller+Nicely:1955}
 }
 \keyword{datasets}

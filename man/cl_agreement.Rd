@@ -41,8 +41,8 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
       Euclidean dissimilarity of the memberships, i.e., the square root
       of the minimal sum of the squared differences of \eqn{u} and all
       column permutations of \eqn{v}, and \eqn{m} is an upper bound for
-      the maximal Euclidean dissimilarity.  See Dimitriadou, Weingessel
-      and Hornik (2002).}
+      the maximal Euclidean dissimilarity.
+      See \bibcitet{Dimitriadou+Weingessel+Hornik:2002}.}
     \item{\code{"manhattan"}}{\eqn{1 - d / m}, where \eqn{d} is the
       Manhattan dissimilarity of the memberships, i.e., the minimal
       sum of the absolute differences of \eqn{u} and all column
@@ -50,19 +50,22 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
       maximal Manhattan dissimilarity.}
     \item{\code{"Rand"}}{the Rand index (the rate of distinct pairs of
       objects both in the same class or both in different classes in
-      both partitions), see Rand (1971) or Gordon (1999), page 198.
+      both partitions), see \bibcitet{Rand:1971} or
+      \bibcitet{|R:Gordon:1999|page 198}.
       For soft partitions, (currently) the Rand index of the
       corresponding nearest hard partitions is used.}
     \item{\code{"cRand"}}{the Rand index corrected for agreement by
-      chance, see Hubert and Arabie (1985) or Gordon (1999), page 198.
+      chance, see \bibcitet{Hubert+Arabie:1985} or
+      \bibcitet{|R:Gordon:1999|page 198}.
       Can only be used for hard partitions.}
-    \item{\code{"NMI"}}{Normalized Mutual Information, see Strehl and
-      Ghosh (2002).  For soft partitions, (currently) the NMI of the
+    \item{\code{"NMI"}}{Normalized Mutual Information, see
+      \bibcitet{Strehl+Ghosh:2002}.
+      For soft partitions, (currently) the NMI of the
       corresponding nearest hard partitions is used.} 
     \item{\code{"KP"}}{the Katz-Powell index, i.e., the product-moment
       correlation coefficient between the elements of the co-membership
-      matrices \eqn{C(u) = u u'} and \eqn{C(v)}, respectively, see Katz
-      and Powell (1953).  For soft partitions, (currently) the
+      matrices \eqn{C(u) = u u'} and \eqn{C(v)}, respectively,
+      see \bibcitet{Katz+Powell:1953}.  For soft partitions, (currently) the
       Katz-Powell index of the corresponding nearest hard partitions is
       used.  (Note that for hard partitions, the \eqn{(i,j)} entry of
       \eqn{C(u)} is one iff objects \eqn{i} and \eqn{j} are in the same
@@ -72,7 +75,7 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
     \item{\code{"diag"}}{the maximal co-classification rate, i.e., the
       maximal rate of objects with the same class ids in both
       partitions after arbitrarily permuting the ids.}
-    \item{\code{"FM"}}{the index of Fowlkes and Mallows (1983), i.e.,
+    \item{\code{"FM"}}{the index of \bibcitet{Fowlkes+Mallows:1983}, i.e.,
       the ratio \eqn{N_{xy} / \sqrt{N_x N_y}}{N_xy / sqrt(N_x N_y)} of
       the number \eqn{N_{xy}}{N_xy} of distinct pairs of objects in the
       same class in both partitions and the geometric mean of the
@@ -92,10 +95,10 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
       where \eqn{n_{ij}} is the joint frequency of objects in class
       \eqn{i} for \code{x} and in class \eqn{j} for \code{y}, and
       \eqn{n} is the total number of objects.}
-    \item{\code{"PS"}}{Prediction Strength, see Tibshirani and Walter
-      (2005): the minimum, over all classes \eqn{j} of \code{y}, of the
-      maximal rate of objects in the same class for \code{x} and in
-      class \eqn{j} for \code{y}.}
+    \item{\code{"PS"}}{Prediction Strength, see
+      \bibcitet{Tibshirani+Walther:2005}: the minimum, over all classes
+      \eqn{j} of \code{y}, of the maximal rate of objects in the same
+      class for \code{x} and in class \eqn{j} for \code{y}.}
   }
 
   If all components are hierarchies, available built-in methods for
@@ -136,50 +139,14 @@ cl_agreement(x, y = NULL, method = "euclidean", \dots)
   (non-symmetric agreement) object of class \code{"cl_cross_agreement"}.
 }
 \references{
-  E. Dimitriadou, A. Weingessel and K. Hornik (2002).
-  A combination scheme for fuzzy clustering.
-  \emph{International Journal of Pattern Recognition and Artificial
-    Intelligence}, \bold{16}, 901--912. \cr
-  \doi{10.1142/S0218001402002052}.
-
-  E. B. Fowlkes and C. L. Mallows (1983).
-  A method for comparing two hierarchical clusterings.
-  \emph{Journal of the American Statistical Association}, \bold{78},
-  553--569. \cr
-  \doi{10.1080/01621459.1983.10478008}.
-  
-  A. D. Gordon (1999).
-  \emph{Classification} (2nd edition).
-  Boca Raton, FL: Chapman & Hall/CRC.
-  
-  L. Hubert and P. Arabie (1985).
-  Comparing partitions.
-  \emph{Journal of Classification}, \bold{2}, 193--218.
-  \doi{10.1007/bf01908075}.
-
-  W. M. Rand (1971).
-  Objective criteria for the evaluation of clustering methods.
-  \emph{Journal of the American Statistical Association}, \bold{66},
-  846--850.
-  \doi{10.2307/2284239}.
-
-  L. Katz and J. H. Powell (1953).
-  A proposed index of the conformity of one sociometric measurement to
-  another.
-  \emph{Psychometrika}, \bold{18}, 249--256.
-  \doi{10.1007/BF02289063}.
-
-  A. Strehl and J. Ghosh (2002).
-  Cluster ensembles --- A knowledge reuse framework for combining
-  multiple partitions.
-  \emph{Journal of Machine Learning Research}, \bold{3}, 583--617. \cr
-  \url{https://www.jmlr.org/papers/volume3/strehl02a/strehl02a.pdf}.
-
-  R. Tibshirani and G. Walter (2005).
-  Cluster validation by Prediction Strength.
-  \emph{Journal of Computational and Graphical Statistics}, \bold{14}/3,
-  511--528.
-  \doi{10.1198/106186005X59243}.
+  \bibshow{Dimitriadou+Weingessel+Hornik:2002,
+    Fowlkes+Mallows:1983,
+    R:Gordon:1999,
+    Hubert+Arabie:1985,
+    Katz+Powell:1953,
+    Rand:1971,
+    Strehl+Ghosh:2002,
+    Tibshirani+Walther:2005}
 }
 \seealso{
   \code{\link{cl_dissimilarity}};

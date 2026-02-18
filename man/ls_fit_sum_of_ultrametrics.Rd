@@ -31,7 +31,7 @@ ls_fit_sum_of_ultrametrics(x, nterms = 1, weights = 1,
   constraints.
 
   We provide an implementation of the iterative heuristic suggested in
-  Carroll & Pruzansky (1980) which in each step \eqn{t} sequentially
+  \bibcitet{Carroll+Pruzansky:1980} which in each step \eqn{t} sequentially
   refits the \eqn{u(k)} as the least squares ultrametric fit to the
   \dQuote{residuals} \eqn{x - \sum_{l \ne k} u(l)} using
   \code{\link{ls_fit_ultrametric}}.
@@ -65,10 +65,7 @@ ls_fit_sum_of_ultrametrics(x, nterms = 1, weights = 1,
   the fitted ultrametric distances.
 }
 \references{
-  J. D. Carroll and S. Pruzansky (1980).
-  Discrete and hybrid scaling models.
-  In E. D. Lantermann and H. Feger (eds.), \emph{Similarity and Choice}.
-  Bern (Switzerland): Huber.
+  \bibshow{Carroll+Pruzansky:1980}
 }
 \keyword{cluster}
 \keyword{optimize}

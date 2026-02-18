@@ -1178,7 +1178,7 @@ detail in the course of this paper).
  \item Add heuristics for finding least squares fits based on iterative
   projection on convex sets of constraints, see e.g.\
   \cite{cluster:Hubert+Arabie+Meulman:2006} and the accompanying MATLAB
-  code available at \url{http://cda.psych.uiuc.edu/srpm_mfiles} for
+  code available at \url{http://cda.psych.uiuc.edu/srpm_mfiles/} for
   using these methods (instead of SUMT approaches) to fit ultrametrics
   and additive trees to proximity data.
  \item Add an ``$L_1$ View''.  Emphasis in \pkg{clue}, in particular for

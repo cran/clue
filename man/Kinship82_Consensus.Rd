@@ -3,7 +3,7 @@
 \title{Gordon-Vichi Kinship82 Consensus Partition Data}
 \description{
   The soft (\dQuote{fuzzy}) consensus partitions for the Rosenberg-Kim
-  kinship terms partition data given in Gordon and Vichi (2001).
+  kinship terms partition data given in \bibcitet{Gordon+Vichi:2001}.
 }
 \usage{data("Kinship82_Consensus")}
 \format{
@@ -13,25 +13,15 @@
 \details{
   The elements of the ensemble are named \code{"MF1"}, \code{"MF2"}, and
   \code{"JMF"}, and correspond to the consensus partitions obtained by
-  applying models 1, 2, and 3 in Gordon and Vichi (2001) to the kinship
-  terms partition data in Rosenberg (1982), which are available as data
-  set \code{\link{Kinship82}}.
+  applying models 1, 2, and 3 in \bibcitet{Gordon+Vichi:2001} to the
+  kinship   terms partition data in \bibcitet{Rosenberg:1982}, which are
+  available as data set \code{\link{Kinship82}}.
 }
 \source{
-  Table 6 in Gordon and Vichi (2001).
+  Table 6 in \bibcitet{Gordon+Vichi:2001}.
 }
 \references{
-  A. D. Gordon and M. Vichi (2001).  
-  Fuzzy partition models for fitting a set of partitions.
-  \emph{Psychometrika}, \bold{66}, 229--248.
-  \doi{10.1007/BF02294837}.
-
-  S. Rosenberg (1982).
-  The method of sorting in multivariate research with applications
-  selected from cognitive psychology and person perception.
-  In N. Hirschberg and L. G. Humphreys (eds.),
-  \emph{Multivariate Applications in the Social Sciences}, 117--142.
-  Hillsdale, NJ: Erlbaum.
+  \bibshow{Gordon+Vichi:2001, Rosenberg:1982}
 }
 \examples{
 ## Load the consensus partitions.
