@@ -87,7 +87,7 @@ pclust_object(prototypes, membership, cluster, family, m = 1,
   the classes (using \code{C}).
 
   For \eqn{m > 1}, a generalization of the fuzzy \eqn{c}-means recipe
-  (e.g., \bibcitet{Bezdek:1981}) is used, which alternates between computing
+  \bibcitep{e.g.,|Bezdek:1981|} is used, which alternates between computing
   optimal memberships for fixed prototypes, and computing new prototypes
   as the suitably weighted consensus clusterings for the classes.
 

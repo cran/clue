@@ -188,7 +188,7 @@ cl_dissimilarity(x, y = NULL, method = "euclidean", \dots)
       maximal and minimal ratios of the ultrametrics.  This is also
       known as the \dQuote{Hilbert projective metric} on the cone
       represented by the ultrametrics
-      \bibcitep{e.g.|Jardine+Sibson:1971|page 107},
+      \bibcitep{e.g.,|Jardine+Sibson:1971|page 107},
       and only defined for \emph{strict} ultrametrics (which
       are strictly positive for distinct objects).}
     \item{\code{"BO"}}{the \eqn{m_\delta} family of tree metrics by

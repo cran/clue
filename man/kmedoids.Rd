@@ -32,14 +32,14 @@ kmedoids(x, k)
   is minimized.
 
   This is an NP-hard optimization problem.  PAM (Partitioning Around
-  Medoids, see \bibcitet{|Kaufman+Rousseeuw:1990|Chapter 2})
+  Medoids, see \bibcitet{|Kaufman+Rousseeuw:1990|chapter 2})
   is a very popular
   heuristic for obtaining optimal \eqn{k}-medoids partitions, and
   provided by \code{\link[cluster]{pam}} in package \pkg{cluster}.
 
   \code{kmedoids} is an exact algorithm based on a binary linear
   programming formulation of the optimization problem
-  \bibcitep{e.g.|Gordon+Vichi:1998|[P4']},
+  \bibcitep{e.g.,|Gordon+Vichi:1998|[P4']},
   using \code{\link[lpSolve]{lp}} from package
   \pkg{lpSolve} as solver.  Depending on available hardware resources
   (the number of constraints of the program is of the order \eqn{n^2}),

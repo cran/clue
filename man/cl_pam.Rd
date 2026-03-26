@@ -17,7 +17,7 @@ cl_pam(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
   \item{solver}{a character string indicating the \eqn{k}-medoids solver
     to be employed.  May be abbreviated.  If \code{"pam"} (default), the
     Partitioning Around Medoids
-    \bibcitep{|Kaufman+Rousseeuw:1990|Chapter 2}
+    \bibcitep{|Kaufman+Rousseeuw:1990|chapter 2}
     heuristic \code{\link[cluster]{pam}} of package \pkg{cluster} is
     used.  Otherwise, the exact algorithm of \code{\link{kmedoids}} is
     employed.}
@@ -43,7 +43,7 @@ cl_pam(x, k, method = "euclidean", solver = c("pam", "kmedoids"))
   \eqn{L = \sum_{l=1}^k \min_{j \in C_l} \sum_{i \in C_l} d(x_i, x_j)} 
   is minimized.
 
-  Such secondary partitions \bibcitep{e.g.|Gordon+Vichi:1998|}
+  Such secondary partitions \bibcitep{e.g.,|Gordon+Vichi:1998|}
   are obtained by
   computing the dissimilarities \eqn{d} of the objects in the ensemble
   for the given dissimilarity method, and applying a dissimilarity-based

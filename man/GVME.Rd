@@ -18,7 +18,7 @@
   provided by agriculture; the percentage of employees who worked in
   agriculture; and gross domestic investment, expressed as a percentage
   of the GDP.
-  See \bibcitet{|Gordon+Vichi:2001|page 230}, for more details.
+  See \bibcitet{|Gordon+Vichi:2001|page 230} for more details.
 }
 \source{
   Table 1 in \bibcitet{Gordon+Vichi:2001}.
